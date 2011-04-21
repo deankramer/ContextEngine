@@ -1,15 +1,14 @@
+/**
+ * @project ContextEngine
+ * @date 21 Apr 2011
+ * @author Dean Kramer & Anna Kocurova
+ */
+
 package uk.ac.tvu.mdse.contextengine;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-
-/**
- * @project ContextEngine
- * @date 21 Apr 2011
- * @author Anna Kocurova
- */
 
 public class OpenDbHelper extends SQLiteOpenHelper {
 	

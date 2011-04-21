@@ -1,10 +1,10 @@
-package uk.ac.tvu.mdse.contextengine;
-
 /**
  * @project ContextEngine
  * @date 21 Apr 2011
- * @author Anna Kocurova
+ * @author Dean Kramer & Anna Kocurova
  */
+
+package uk.ac.tvu.mdse.contextengine;
 
 public interface ContextDB {
 

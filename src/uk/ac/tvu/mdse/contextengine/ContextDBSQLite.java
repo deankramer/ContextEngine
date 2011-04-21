@@ -1,3 +1,9 @@
+/**
+ * @project ContextEngine
+ * @date 21 Apr 2011
+ * @author Dean Kramer & Anna Kocurova
+ */
+
 package uk.ac.tvu.mdse.contextengine;
 
 import java.text.SimpleDateFormat;
@@ -8,12 +14,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
-
-/**
- * @project ContextEngine
- * @date 21 Apr 2011
- * @author Anna Kocurova
- */
 
 public class ContextDBSQLite implements ContextDB{
 	
