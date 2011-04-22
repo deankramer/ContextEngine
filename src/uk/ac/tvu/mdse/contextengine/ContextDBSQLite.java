@@ -23,7 +23,7 @@ public class ContextDBSQLite implements ContextDB{
 		dbHelper = new OpenDbHelper(context);
 	}
 
-	@Override
+	
 	public boolean addContext(ContextEntity c) {
 		try{
 			SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
@@ -31,7 +31,7 @@ public class ContextDBSQLite implements ContextDB{
 			ContentValues initialValues = new ContentValues();
 			
 			initialValues.put("name", c.name);
-			//initialValues.put("lastDateTime", c.lastDateTime);
+			initialValues.put("lastDateTime", c.getDateTimeString());
 			initialValues.put("count", c.count);
 			
 			sqlite.insert("contexts", null, initialValues);
@@ -44,7 +44,7 @@ public class ContextDBSQLite implements ContextDB{
 		return true;
 	}
 
-	@Override
+	
 	public ContextEntity getContext(int id) {
 		ContextEntity context = new ContextEntity();
 		try{
@@ -71,7 +71,7 @@ public class ContextDBSQLite implements ContextDB{
 		
 	}
 
-	@Override
+	
 	public boolean removeContext(int id) {
 		try{
 			SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
@@ -84,10 +84,25 @@ public class ContextDBSQLite implements ContextDB{
 		}
 	}
 
-	@Override
+
 	public boolean updateContext(ContextEntity c) {
-		// TODO Auto-generated method stub
-		return false;
+		try{
+			SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
+			ContentValues initialValues = new ContentValues();
+			
+			initialValues.put("name", c.name);
+			initialValues.put("lastDateTime", c.getDateTimeString());
+			initialValues.put("count", c.count);
+			
+			sqlite.update("contexts", initialValues, "_id=?", new String[]{Integer.toString(c.id)});
+			sqlite.close();
+			return true;
+			
+		}catch(Exception sqlerror){
+			Log.v("Table update error", sqlerror.getMessage());
+			return false;
+		}
 	}
+	
 
 }
