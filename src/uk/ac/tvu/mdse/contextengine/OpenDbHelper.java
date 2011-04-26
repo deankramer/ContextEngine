@@ -21,6 +21,7 @@ public class OpenDbHelper extends SQLiteOpenHelper {
 		+ "name text not null"
 		+ "lastDateTime text not null"
 		+ "count integer not null"
+		+ "value text not null"
 		+ ");";
 
 	public OpenDbHelper(Context context){

@@ -33,6 +33,7 @@ public class ContextDBSQLite implements ContextDB{
 			initialValues.put("name", c.name);
 			initialValues.put("lastDateTime", c.getDateTimeString());
 			initialValues.put("count", c.count);
+			initialValues.put("value", c.value);
 			
 			sqlite.insert("contexts", null, initialValues);
 			sqlite.close();
@@ -60,6 +61,7 @@ public class ContextDBSQLite implements ContextDB{
 				cdate.setTime(dateFormat.parse(crsr.getString(2)));
 				context.lastDateTime = cdate;
 				context.count = crsr.getInt(3);
+				context.value = crsr.getString(4);
 				crsr.moveToNext();
 			}
 			crsr.close();
@@ -93,6 +95,7 @@ public class ContextDBSQLite implements ContextDB{
 			initialValues.put("name", c.name);
 			initialValues.put("lastDateTime", c.getDateTimeString());
 			initialValues.put("count", c.count);
+			initialValues.put("value", c.value);
 			
 			sqlite.update("contexts", initialValues, "_id=?", new String[]{Integer.toString(c.id)});
 			sqlite.close();

@@ -16,6 +16,7 @@ public class ContextEntity implements Serializable{
 	public String name;
 	public Calendar lastDateTime;
 	public int count;
+	public String value;
 	
 	//constructors
 	public ContextEntity(){
@@ -23,13 +24,15 @@ public class ContextEntity implements Serializable{
 		name="unknown";
 		lastDateTime = Calendar.getInstance();
 		count=0;
+		value="unknown";
 	}
 	
-	public ContextEntity(int anId, String aName, Calendar aDateTime, int aCount){
+	public ContextEntity(int anId, String aName, Calendar aDateTime, int aCount, String aValue){
 		id=anId;
 		name=aName;
 		lastDateTime=aDateTime;
 		count=aCount;
+		value=aValue;
 	}
 	
 	//methods
