@@ -9,17 +9,24 @@ package uk.ac.tvu.mdse.contextengine;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+
 public class ContextEntity implements Serializable{
+
 
 	//attributes
 	public int id;
 	public String name;
 	public Calendar lastDateTime;
 	public int count;
-	public String value;
+	public String value;	
 	
 	//constructors
-	public ContextEntity(){
+	public ContextEntity(){	
 		id=0;
 		name="unknown";
 		lastDateTime = Calendar.getInstance();
@@ -78,5 +85,5 @@ public class ContextEntity implements Serializable{
 		date.append(lastDateTime.get(Calendar.SECOND));
 		return date.toString();
 	}
-
+	
 }

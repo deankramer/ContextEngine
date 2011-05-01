@@ -8,26 +8,55 @@ package uk.ac.tvu.mdse.contextengine;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 
-public class Component extends ContextEntity implements Serializable{
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
 
-	//attributes
-	public ArrayList<ContextEntity> contexts;	
+public class Component implements Serializable{
 	
-	//constructors
-	public Component(){
-		super();
+	//Monitoring
+	private static final String LOG_TAG = "CONTEXT_ENTITY";
+	private static final boolean D = true;
+	
+	// Key names for context change
+    public static final String CONTEXT_NAME = "context_name";
+    public static final String CONTEXT_DATE = "context_date";
+    public static final String CONTEXT_VALUE = "context_value";
+    
+    //BroadcastReceiver
+    private BroadcastReceiver contextMonitor = null;    
+    
+	//Attributes
+	public ContextEntity contextEntity;
+	public ArrayList<Component> contexts;
+	private String broadcastAction = "";
+	public Context context; //android context to broadcast intent...INITIALISE!
+	
+	//Constructors
+	public Component(){		
+		this.contextEntity = new ContextEntity(); //use parameters
 		if (contexts==null)
-			this.contexts = new ArrayList<ContextEntity>();
+			this.contexts = new ArrayList<Component>();
+		this.broadcastAction = "uk.ac.tvu.mdse.contextengine."+this.contextEntity.name+".action.CONTEXT_CHANGED";
+		setupContextMonitor();
 	}
 	
-	public Component(ArrayList contexts){
-		super();
+	public Component(ContextEntity contextEntity){		
+		this.contextEntity = contextEntity;
+		if (contexts==null)
+			this.contexts = new ArrayList<Component>();
+	}
+	
+	public Component(ArrayList contexts){		
 		if (contexts==null)
 			this.contexts = contexts;
 	}
 	
-	public boolean registerContextEntity(ContextEntity c){
+	public boolean registerComponent(Component c){
 		int pos = contexts.indexOf(c);
 		if (pos == -1) 
 			return false;
@@ -37,7 +66,11 @@ public class Component extends ContextEntity implements Serializable{
 			}
 	}
 	
-	public ArrayList getContextEntities(){
+	public ContextEntity getContextEntity(){
+		return contextEntity;
+	}
+	
+	public ArrayList getContexts(){
 		return contexts;
 	}
 	
@@ -47,4 +80,42 @@ public class Component extends ContextEntity implements Serializable{
 		else
 			return false;
 	}
+	
+	public void sendNotification(){
+		if(D) Log.d(LOG_TAG, "sendNotification");
+		Intent intent = new Intent();
+		//check the possibility to create custom actions!!!
+	    intent.setAction(this.broadcastAction); //might be better to use the name of the context
+	    intent.putExtra(CONTEXT_NAME, this.contextEntity.name);
+	    intent.putExtra(CONTEXT_DATE, this.contextEntity.getDateTimeString());
+	    intent.putExtra(CONTEXT_VALUE, this.contextEntity.value);
+	    context.sendBroadcast(intent);
+	}	
+
+	 private void setupContextMonitor() {
+			contextMonitor = new BroadcastReceiver() {
+	        	@Override 
+	        	public void onReceive(Context context,Intent intent) {
+	        		for(Component c: contexts){
+	        			if ((!c.broadcastAction.equals(null))&&(intent.getAction().equals(c.broadcastAction))) {
+		        			Log.d( LOG_TAG, "contextMonitor");
+		        			Bundle bundle = intent.getExtras();
+		        			String changeName = intent.getExtras().getString(Component.CONTEXT_NAME);
+		        			String changeDateTime = intent.getExtras().getString(Component.CONTEXT_DATE);//(Calendar) intent.getExtras().get(ContextEntity.CONTEXT_DATE);
+		        			String changeValue = intent.getExtras().getString(Component.CONTEXT_VALUE);
+		        			//check rules what happens if child context changed & get corresponding state for this context
+		        			//e.g. if received a notification about wifi (is off) --> data connectivity (this component) is off too 
+		        			//persist new state in the dbs 
+		        			sendNotification(); //to all components dependent on this component
+		        		}
+	        		}        		  	
+	        	}
+	        };
+
+	    }
+	 
+	 public void setupTimer(){
+		 
+	 }
+
 }
