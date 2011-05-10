@@ -1,5 +1,6 @@
 package uk.ac.tvu.mdse.contextengine;
 
+import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
 import android.R.color;
 import android.app.Activity;
 import android.app.ListActivity;
@@ -17,7 +18,7 @@ public class TestActivity extends ListActivity{
 	
 	
 	private BroadcastReceiver contextMonitor;
-	private uk.ac.tvu.mdse.contextengine.LocationContext locationContext;
+	private uk.ac.tvu.mdse.contextengine.contexts.LocationContext locationContext;
 	private LightContext lightcontext;
 	private IntentFilter filter;
 

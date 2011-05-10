@@ -1,8 +1,9 @@
-package uk.ac.tvu.mdse.contextengine;
+package uk.ac.tvu.mdse.contextengine.contexts;
 
 import java.util.Calendar;
 
-import android.app.Activity;
+import uk.ac.tvu.mdse.contextengine.Component;
+
 import android.content.Context;
 import android.location.Criteria;
 import android.location.LocationListener;
@@ -17,7 +18,7 @@ public class LocationContext extends Component implements LocationListener{
 	Criteria criteria;
 	private static final long UPDATETIME = 3000;
 	
-	LocationContext(LocationManager loc, Context c){
+	public LocationContext(LocationManager loc, Context c){
 		super();
 		Log.v("Status", "done super()");
 		this.context = c;

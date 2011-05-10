@@ -1,6 +1,8 @@
-package uk.ac.tvu.mdse.contextengine;
+package uk.ac.tvu.mdse.contextengine.contexts;
 
 import java.util.Calendar;
+
+import uk.ac.tvu.mdse.contextengine.Component;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -12,16 +14,16 @@ import android.util.Log;
 public class LightContext extends Component implements SensorEventListener{
 	
 	public SensorManager sensorm;
-	public Sensor myLightSensor;
-	LightContext(SensorManager sm, Context c){
+	public Sensor lightSensor;
+	public LightContext(SensorManager sm, Context c){
 		super();
 		Log.v("Status", "done super()");
 		this.context = c;
 		sensorm = sm;
-		myLightSensor = sensorm.getDefaultSensor(Sensor.TYPE_LIGHT);
+		lightSensor = sensorm.getDefaultSensor(Sensor.TYPE_LIGHT);
 		sensorm.registerListener(this,
-		          myLightSensor,
-		          SensorManager.SENSOR_DELAY_FASTEST);
+		          lightSensor,
+		          SensorManager.SENSOR_DELAY_UI);
 		this.contextEntity.name = "light";
 		
 	}
