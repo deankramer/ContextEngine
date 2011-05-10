@@ -17,10 +17,10 @@ public class LocationContext extends Component implements LocationListener{
 	Criteria criteria;
 	private static final long UPDATETIME = 3000;
 	
-	LocationContext(LocationManager loc){
+	LocationContext(LocationManager loc, Context c){
 		super();
 		Log.v("Status", "done super()");
-		
+		this.context = c;
 		locationManager = loc;
 		criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
@@ -30,43 +30,44 @@ public class LocationContext extends Component implements LocationListener{
 		criteria.setPowerRequirement(Criteria.POWER_LOW);
 		Log.v("Status", "done criteria");
 		String provider = locationManager.getBestProvider(criteria, true);
-		//this.contextEntity.value = locationManager.getLastKnownLocation(provider).toString();
+		this.contextEntity.value = locationManager.getLastKnownLocation(provider).toString();
+		Log.v("Location", this.contextEntity.value);
 		Log.v("Status", "done getLastKnownLocation");
-		this.contextEntity.name = "moo";
+		this.contextEntity.name = "location";
 		this.contextEntity.lastDateTime = Calendar.getInstance();
-		this.contextEntity.value = "added value";
+		//this.contextEntity.value = "added value";
 		sendNotification();
 		//locationManager.requestLocationUpdates(provider, UPDATETIME, 1, this);
 	}
 
-	@Override
+	
 	public void getContextValue() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void onLocationChanged(android.location.Location location) {
 		// TODO Auto-generated method stub
 		
 		this.contextEntity.value = location.toString();
+		this.contextEntity.lastDateTime = Calendar.getInstance();
 		sendNotification();
 		
 	}
 
-	@Override
+	
 	public void onProviderDisabled(String provider) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	
 	public void onProviderEnabled(String provider) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		// TODO Auto-generated method stub
 		

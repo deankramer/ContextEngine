@@ -34,7 +34,9 @@ public abstract class Component implements Serializable{
 	//Attributes
 	public ContextEntity contextEntity;
 	//public ArrayList<Component> contexts;
-	private String broadcastAction = "";
+	public String broadcastAction = "";
+	public static final String CUSTOM_INTENT = "uk.ac.tvu.mdse.contextengine.light.action.CONTEXT_CHANGED";
+
 	public Context context; //android context to broadcast intent...INITIALISE!
 	
 	//Constructors
@@ -86,7 +88,7 @@ public abstract class Component implements Serializable{
 		if(D) Log.d(LOG_TAG, "sendNotification");
 		Intent intent = new Intent();
 		//check the possibility to create custom actions!!!
-	    intent.setAction(this.broadcastAction); //might be better to use the name of the context
+	    intent.setAction(CUSTOM_INTENT); //might be better to use the name of the context
 	    intent.putExtra(CONTEXT_NAME, this.contextEntity.name);
 	    intent.putExtra(CONTEXT_DATE, this.contextEntity.getDateTimeString());
 	    intent.putExtra(CONTEXT_VALUE, this.contextEntity.value);
