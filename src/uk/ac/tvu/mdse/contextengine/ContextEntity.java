@@ -9,12 +9,6 @@ package uk.ac.tvu.mdse.contextengine;
 import java.io.Serializable;
 import java.util.Calendar;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-
 public class ContextEntity implements Serializable{
 
 
