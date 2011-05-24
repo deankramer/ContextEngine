@@ -44,7 +44,6 @@ public class CompositeComponent extends Component implements Serializable{
 			// TODO Auto-generated method stub
 			String context = in.getExtras().getString(CONTEXT_NAME);
 			boolean value = in.getExtras().getBoolean(CONTEXT_VALUE);
-			Log.v(contextName, context + " is " + value);
 			if(contexts.containsKey(context)){
 					contexts.put(context, value);
 					checkContext();	
@@ -79,7 +78,6 @@ public class CompositeComponent extends Component implements Serializable{
 	}
 	
 	public void checkContext(){
-		Log.v(contextName, "Checking Context");
 		if ( ! contexts.containsValue(false) && contextValue==false){
 			sendNotification(true);
 			contextValue=true;

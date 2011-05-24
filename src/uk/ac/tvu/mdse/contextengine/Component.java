@@ -17,11 +17,8 @@ import android.util.Log;
 
 public abstract class Component implements Serializable{
 	
-	/**
-	 * 
-	 */
+	//Attributes
 	private static final long serialVersionUID = -4339043280287205031L;
-	//Monitoring
 	public static final String LOG_TAG = "CONTEXT";
 	public static final boolean D = true;
 	
@@ -29,12 +26,11 @@ public abstract class Component implements Serializable{
     public static final String CONTEXT_NAME = "context_name";
     public static final String CONTEXT_DATE = "context_date";
     public static final String CONTEXT_VALUE = "context_value";
-    //public static final long UPDATE= 3000;
     
     //BroadcastReceiver
     public BroadcastReceiver contextMonitor = null;    
     
-	//Attributes
+	
 	public static final String CONTEXT_INTENT = "uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED";
 	public IntentFilter filter = new IntentFilter(CONTEXT_INTENT);
 	public Context context;

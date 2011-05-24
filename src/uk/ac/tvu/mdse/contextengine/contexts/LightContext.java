@@ -13,15 +13,12 @@ import android.util.Log;
 
 public class LightContext extends Component implements SensorEventListener{
 	
-	
-	/**
-	 * 
-	 */
+	//Attributes
 	private static final long serialVersionUID = -8230486605325209599L;
-	public SensorManager sensorm;
-	public Sensor lightSensor;
-	public static final double HIGH_LUM_VALUE = 180;
-	public static final double MEDIUM_LUM_VALUE = 100;
+	private SensorManager sensorm;
+	private Sensor lightSensor;
+	private static final double HIGH_LUM_VALUE = 180;
+	private static final double MEDIUM_LUM_VALUE = 100;
 	private int delaytype= SensorManager.SENSOR_DELAY_UI;
 	
 	public LightContext(SensorManager sm, Context c){
@@ -33,7 +30,7 @@ public class LightContext extends Component implements SensorEventListener{
 		          delaytype);
 	}
 
-	public void setDelaytype(int delaytype) {
+	public void setDelaytype(int delaytype){
 		this.delaytype = delaytype;
 		sensorm.unregisterListener(this, lightSensor);
 		sensorm.registerListener(this,
@@ -41,17 +38,15 @@ public class LightContext extends Component implements SensorEventListener{
 		          delaytype);
 	}
 
-	public int getDelaytype() {
+	public int getDelaytype(){
 		return delaytype;
 	}
 
-	public void onAccuracyChanged(Sensor arg0, int arg1) {
-		// TODO Auto-generated method stub
+	public void onAccuracyChanged(Sensor arg0, int arg1){
 		
 	}
 
-	public void onSensorChanged(SensorEvent arg0) {
-		// TODO Auto-generated method stub
+	public void onSensorChanged(SensorEvent arg0){
 		if(arg0.sensor.getType()==Sensor.TYPE_LIGHT){
 		      double value= arg0.values[0];
 		      if(value >= HIGH_LUM_VALUE){
@@ -69,6 +64,7 @@ public class LightContext extends Component implements SensorEventListener{
 		      }
 		   };
 	}
+	
 	
 	public void sendNotification(String name, boolean value){
 		Intent intent = new Intent();

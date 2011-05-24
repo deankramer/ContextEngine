@@ -55,9 +55,7 @@ public class TestActivity extends ListActivity{
        	contextMonitor = new BroadcastReceiver() {
             	@Override 
              	public void onReceive(Context context,Intent intent) {
-            		Log.v("value", "getting action");
              			if (intent.getAction().equals("uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED")) {
-             				Log.v("value", "got action");
              				Bundle bundle = intent.getExtras();
              				String changeName = bundle.getString(Component.CONTEXT_NAME);
      	        			boolean currentcontext = bundle.getBoolean(Component.CONTEXT_VALUE);
