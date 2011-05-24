@@ -8,13 +8,19 @@ package uk.ac.tvu.mdse.contextengine;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.util.Log;
 
-public abstract class Component extends BroadcastReceiver implements Serializable{
+public abstract class Component implements Serializable{
 	
 	//Monitoring
 	public static final String LOG_TAG = "CONTEXT";
@@ -24,83 +30,49 @@ public abstract class Component extends BroadcastReceiver implements Serializabl
     public static final String CONTEXT_NAME = "context_name";
     public static final String CONTEXT_DATE = "context_date";
     public static final String CONTEXT_VALUE = "context_value";
-    public static final long UPDATE= 3000;
+    //public static final long UPDATE= 3000;
     
     //BroadcastReceiver
     public BroadcastReceiver contextMonitor = null;    
     
 	//Attributes
-	public ContextEntity contextEntity;
-	public ArrayList<Component> contexts;
-	public String broadcastAction = "";
+	//public ContextEntity contextEntity;
+	//public ArrayList<Component> contexts;
+	//public String broadcastAction = "";
 	
-
-	public Context context; //android context to broadcast intent...INITIALISE!
+	public static final String CONTEXT_INTENT = "uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED";
+	public IntentFilter filter = new IntentFilter(CONTEXT_INTENT);
+	public Context context;
+	public String contextName;
+	public boolean contextValue;
 	
 	//Constructors
-	public Component(Context c){		
+	public Component(Context c, String name){		
 		this.context = c;
-		this.contextEntity = new ContextEntity(); //use parameters
-		if (contexts==null)
-			this.contexts = new ArrayList<Component>();
-		this.broadcastAction = "uk.ac.tvu.mdse.contextengine."+this.contextEntity.name+".action.CONTEXT_CHANGED";
+		this.contextName = name;
+		this.contextValue = false;
+		//this.contextEntity = new ContextEntity(); //use parameters
+		//if (contexts==null)
+		//	this.contexts = new ArrayList<Component>();
+		
+		//this.broadcastAction = "uk.ac.tvu.mdse.contextengine."+this.contextEntity.name+".action.CONTEXT_CHANGED";
 	//	setupContextMonitor();
 	}
 	
-	public Component(ContextEntity contextEntity){		
-		this.contextEntity = contextEntity;
-		if (contexts==null)
-			this.contexts = new ArrayList<Component>();
-	}
-	
-	public Component(ArrayList contexts){		
-	//	if (contexts==null)
-	//		this.contexts = contexts;
-	}
-	
-	public boolean registerComponent(Component c){
-		int pos = contexts.indexOf(c);
-		if (pos == -1) 
-			return false;
-		else{
-			contexts.add(c);
-			return true;
-			}
-	}
-	
-	public ContextEntity getContextEntity(){
-		return contextEntity;
-	}
-	
-	//public ArrayList getContexts(){
-	//	return contexts;
-	//}
-	
-	//public boolean isComposite(){
-//		if (contexts.size()>1) 
-	//		return true;
-	//	else
-	//		return false;
-	//}
-	
-	public void sendNotification(String action){
-		if(D) Log.d(contextEntity.name + LOG_TAG, contextEntity.name+" sendNotification");
+	public void sendNotification(boolean value){
+	//	if(D) Log.d(contextEntity.name + LOG_TAG, contextEntity.name+" sendNotification");
 		Intent intent = new Intent();
 		//check the possibility to create custom actions!!!
-	    intent.setAction(action); //might be better to use the name of the context
-	    intent.putExtra(CONTEXT_NAME, this.contextEntity.name);
-	    intent.putExtra(CONTEXT_DATE, this.contextEntity.getDateTimeString());
-	    intent.putExtra(CONTEXT_VALUE, this.contextEntity.value);
+	    intent.setAction(CONTEXT_INTENT); //might be better to use the name of the context
+	    intent.putExtra(CONTEXT_NAME, this.contextName);
+	    intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+	    intent.putExtra(CONTEXT_VALUE, value);
 	    try{
 	    context.sendBroadcast(intent);
-	    Log.v(contextEntity.name + LOG_TAG, "sent Notification");
+	    Log.v(this.contextName, "sent Notification");
 	    }
 	    catch(Exception e){
-	    	Log.v(contextEntity.name + LOG_TAG,"not working");
+	//    	Log.v(contextEntity.name + LOG_TAG,"not working");
 	    }
 	}	
-
-	 //public abstract void setupContextMonitor();
-	 
-
 }

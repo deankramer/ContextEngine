@@ -13,19 +13,18 @@ import android.util.Log;
 
 public class LightContext extends Component implements SensorEventListener{
 	
-	public static final String CUSTOM_INTENT = "uk.ac.tvu.mdse.contextengine.light.action.CONTEXT_CHANGED";
 	
 	public SensorManager sensorm;
 	public Sensor lightSensor;
+	
 	public LightContext(SensorManager sm, Context c){
-		super(c);
+		super(c, "LIGHT");
 		Log.v("Status", "done super()");
 		sensorm = sm;
 		lightSensor = sensorm.getDefaultSensor(Sensor.TYPE_LIGHT);
 		sensorm.registerListener(this,
 		          lightSensor,
 		          SensorManager.SENSOR_DELAY_UI);
-		this.contextEntity.name = "light";
 		
 	}
 
@@ -38,17 +37,49 @@ public class LightContext extends Component implements SensorEventListener{
 		// TODO Auto-generated method stub
 		if(arg0.sensor.getType()==Sensor.TYPE_LIGHT){
 			  Log.v("light", "Changed");
-		      this.contextEntity.value=String.valueOf(arg0.values[0]);
-		      this.contextEntity.lastDateTime=Calendar.getInstance();
-		      sendNotification(CUSTOM_INTENT);
+			  String contextName;
+		      double value= arg0.values[0];
+		      if(value < 100){
+  				contextName="lightlevelLOW";
+  				sendNotification("lightlevelLOW", true);
+  				sendNotification("lightlevelMEDIUM", false);
+  				sendNotification("lightlevelHIGH", false);
+		      }else if (value < 180){
+  				contextName="lightlevelMEDIUM";
+		      	sendNotification("lightlevelLOW", false);
+				sendNotification("lightlevelMEDIUM", true);
+				sendNotification("lightlevelHIGH", false);
+		      }else{
+  				contextName="lightlevelHIGH";
+  				sendNotification("lightlevelLOW", false);
+				sendNotification("lightlevelMEDIUM", false);
+				sendNotification("lightlevelHIGH", true);
+		      }
+		      //this.contextEntity.lastDateTime=Calendar.getInstance();
 		   };
 		
 	}
-
-	@Override
-	public void onReceive(Context context, Intent intent) {
-		// TODO Auto-generated method stub
-		
+	
+	public void sendNotification(String name, boolean value){
+		//	if(D) Log.d(contextEntity.name + LOG_TAG, contextEntity.name+" sendNotification");
+			Intent intent = new Intent();
+			//check the possibility to create custom actions!!!
+		    intent.setAction(CONTEXT_INTENT); //might be better to use the name of the context
+		    intent.putExtra(CONTEXT_NAME, name);
+		    intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+		    intent.putExtra(CONTEXT_VALUE, value);
+		    try{
+		    context.sendBroadcast(intent);
+		 //   Log.v(contextEntity.name + LOG_TAG, "sent Notification");
+		    }
+		    catch(Exception e){
+		//    	Log.v(contextEntity.name + LOG_TAG,"not working");
+		    }
+		} 
+	
+	public void stop(){
+		sensorm.unregisterListener(this, lightSensor);
+		Log.v("LightContext", "Stopping");
 	}
 
 }
