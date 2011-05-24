@@ -1,6 +1,10 @@
-package uk.ac.tvu.mdse.contextengine;
+package uk.ac.tvu.mdse.contextengine.test;
 
 import java.util.ArrayList;
+
+import uk.ac.tvu.mdse.contextengine.R;
+import uk.ac.tvu.mdse.contextengine.R.id;
+import uk.ac.tvu.mdse.contextengine.R.layout;
 
 import android.content.ContentResolver;
 import android.content.Context;

@@ -1,6 +1,7 @@
 package uk.ac.tvu.mdse.contextengine;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 import android.content.BroadcastReceiver;
@@ -10,14 +11,27 @@ import android.util.Log;
 
 public class CompositeComponent extends Component implements Serializable{
 	
-	public boolean value;
-	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -493221379660180723L;
+	//Attributes
 	public Hashtable<String, Boolean> contexts;
 	
-	public CompositeComponent(Context c, String contextName){
-		super(c, contextName);
+	public CompositeComponent(String name, Context c){
+		super(name, c);
 		contexts = new Hashtable<String, Boolean>();
 		setupMonitor();
+		
+	}
+	
+	public CompositeComponent(String name, Context c, ArrayList<String> contextList){
+		super(name, c);
+		contexts = new Hashtable<String, Boolean>();
+		setupMonitor();
+		for(String cn : contextList){
+			registerComponent(cn);
+		}
 		
 	}
 
@@ -41,13 +55,20 @@ public class CompositeComponent extends Component implements Serializable{
 	}
 	
 	public boolean registerComponent(String c){
-		//int pos = contexts.containsKey(c);
-	//	if (pos == -1) 
-	//		return false;
-	//	else{
+		if ( ! contexts.containsKey(c)){	
 			contexts.put(c, false);
+			return true;		
+		}else
+			return false;
+	}
+	
+	public boolean unregisterComponent(String c){
+		
+		if (contexts.containsKey(c)){
+			contexts.remove(c);
 			return true;
-	//		}
+		}else
+			return false;	
 	}
 	
 	public boolean isComposite(){
@@ -59,13 +80,13 @@ public class CompositeComponent extends Component implements Serializable{
 	
 	public void checkContext(){
 		Log.v(contextName, "Checking Context");
-		if ( ! contexts.containsValue(false) && value==false){
+		if ( ! contexts.containsValue(false) && contextValue==false){
 			sendNotification(true);
-			value=true;
+			contextValue=true;
 		}
-		else if (contexts.containsValue(false) && value==true){
+		else if (contexts.containsValue(false) && contextValue==true){
 			sendNotification(false);
-			value=false;
+			contextValue=false;
 		}
 	}
 	
@@ -74,9 +95,5 @@ public class CompositeComponent extends Component implements Serializable{
 		Log.v(contextName, "Stopping");
 	}
 	
-	//public 
-
 }
 
-
-//hello

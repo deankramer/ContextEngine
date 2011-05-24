@@ -7,21 +7,20 @@
 package uk.ac.tvu.mdse.contextengine;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.util.Log;
 
 public abstract class Component implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4339043280287205031L;
 	//Monitoring
 	public static final String LOG_TAG = "CONTEXT";
 	public static final boolean D = true;
@@ -36,10 +35,6 @@ public abstract class Component implements Serializable{
     public BroadcastReceiver contextMonitor = null;    
     
 	//Attributes
-	//public ContextEntity contextEntity;
-	//public ArrayList<Component> contexts;
-	//public String broadcastAction = "";
-	
 	public static final String CONTEXT_INTENT = "uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED";
 	public IntentFilter filter = new IntentFilter(CONTEXT_INTENT);
 	public Context context;
@@ -47,32 +42,24 @@ public abstract class Component implements Serializable{
 	public boolean contextValue;
 	
 	//Constructors
-	public Component(Context c, String name){		
-		this.context = c;
-		this.contextName = name;
-		this.contextValue = false;
-		//this.contextEntity = new ContextEntity(); //use parameters
-		//if (contexts==null)
-		//	this.contexts = new ArrayList<Component>();
-		
-		//this.broadcastAction = "uk.ac.tvu.mdse.contextengine."+this.contextEntity.name+".action.CONTEXT_CHANGED";
-	//	setupContextMonitor();
+	public Component(String name, Context c){		
+		context = c;
+		contextName = name;
+		contextValue = false;
 	}
 	
 	public void sendNotification(boolean value){
 	//	if(D) Log.d(contextEntity.name + LOG_TAG, contextEntity.name+" sendNotification");
 		Intent intent = new Intent();
-		//check the possibility to create custom actions!!!
-	    intent.setAction(CONTEXT_INTENT); //might be better to use the name of the context
-	    intent.putExtra(CONTEXT_NAME, this.contextName);
+		
+	    intent.setAction(CONTEXT_INTENT);
+	    intent.putExtra(CONTEXT_NAME, contextName);
 	    intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
 	    intent.putExtra(CONTEXT_VALUE, value);
 	    try{
-	    context.sendBroadcast(intent);
-	    Log.v(this.contextName, "sent Notification");
-	    }
-	    catch(Exception e){
-	//    	Log.v(contextEntity.name + LOG_TAG,"not working");
+	    	context.sendBroadcast(intent);
+	    }catch(Exception e){
+	    	Log.v(contextName,"not working");
 	    }
 	}	
 }

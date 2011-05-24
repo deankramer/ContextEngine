@@ -1,5 +1,9 @@
-package uk.ac.tvu.mdse.contextengine;
+package uk.ac.tvu.mdse.contextengine.test;
 
+import uk.ac.tvu.mdse.contextengine.Component;
+import uk.ac.tvu.mdse.contextengine.CompositeComponent;
+import uk.ac.tvu.mdse.contextengine.R;
+import uk.ac.tvu.mdse.contextengine.R.layout;
 import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
 import android.R.color;
 import android.app.ListActivity;
@@ -8,8 +12,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.SensorManager;
-import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -37,7 +39,7 @@ public class TestActivity extends ListActivity{
         setupContextMonitor();
              
         lightcontext = new LightContext(sm, getApplicationContext());
-        sync= new CompositeComponent(getApplicationContext(), "datasync_ON");
+        sync= new CompositeComponent("datasync_ON", getApplicationContext());
         sync.registerComponent("lightlevelHIGH");
         
         
@@ -58,21 +60,16 @@ public class TestActivity extends ListActivity{
              				Log.v("value", "got action");
              				Bundle bundle = intent.getExtras();
              				String changeName = bundle.getString(Component.CONTEXT_NAME);
-     	        			String changeDateTime = bundle.getString(Component.CONTEXT_DATE);//(Calendar) intent.getExtras().get(ContextEntity.CONTEXT_DATE);
      	        			boolean currentcontext = bundle.getBoolean(Component.CONTEXT_VALUE);
      	        			if(changeName.equalsIgnoreCase("datasync_ON") &&( currentcontext ) )
      	        				getListView().setBackgroundResource(color.black);
      	        			else if (changeName.equalsIgnoreCase("datasync_ON") &&( !currentcontext ) )
      	        				getListView().setBackgroundResource(color.white);
-     	     
-     	     				
-     	        			Log.v("value", changeName + " = " + currentcontext);
      	      		}
              		}        		  	
              	
              };
-             registerReceiver(contextMonitor, filter);
-             Log.v("value", "register receiver");     	
+             registerReceiver(contextMonitor, filter);  	
          }
          
          @Override

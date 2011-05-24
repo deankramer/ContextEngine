@@ -1,4 +1,4 @@
-package uk.ac.tvu.mdse.contextengine;
+package uk.ac.tvu.mdse.contextengine.test;
 
 public class TestCon {
 	
