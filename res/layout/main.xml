@@ -1,12 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-      android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-<ListView android:id="@id/android:list"
-               android:layout_width="match_parent"
-               android:layout_height="match_parent"
-               android:layout_weight="1" />
-          
-</LinearLayout>
+    
+<TextView android:layout_width="wrap_content"
+ 	android:layout_height="wrap_content"
+ 	android:id="@+id/TextView01"
+   	android:textSize="15px" 
+   	android:textStyle="bold" 
+   	android:layout_centerHorizontal="true"
+    android:paddingTop="5px"
+    android:text="CONTEXT ENGINE"
+    android:layout_centerInParent="false"></TextView>
+<Button android:layout_width="wrap_content"
+ 	android:layout_height="wrap_content"
+  	android:clickable="true"
+   	android:width="200dip"
+    android:layout_marginLeft="65dip"
+    android:layout_marginTop="100dip"
+    android:id="@+id/btnStartService"
+    android:text="Start Service"></Button>
+<Button android:layout_width="wrap_content"
+ 	android:layout_height="wrap_content"
+ 	android:clickable="true"
+   	android:width="200dip"
+    android:layout_marginLeft="65dip"
+    android:id="@+id/btnStopService"
+    android:text="Stop Service"
+    android:layout_alignRight="@+id/btnStartProcess"
+    android:layout_below="@+id/btnStartProcess"></Button>
+ <TextView android:id="@+id/servicestatus"
+	android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/servicestatus"
+    android:layout_below="@+id/btnStopService"
+    android:layout_marginTop="10px" 
+    android:layout_centerHorizontal="true"/>
+</RelativeLayout>

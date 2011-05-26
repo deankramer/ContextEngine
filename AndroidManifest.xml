@@ -17,6 +17,11 @@
         </receiver>
          
         </activity>
+        <service android:name="ContextEngine">
+            <intent-filter>
+                <action android:name="uk.ac.tvu.mdse.contextengine.IContextsDefinition"></action>
+            </intent-filter>
+        </service>
 
     </application>
 

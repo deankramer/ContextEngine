@@ -2,4 +2,9 @@
 <resources>
     <string name="hello">Hello World, test!</string>
     <string name="app_name">ContextEngine</string>
+    
+    <!--  ContextEngine Service -->
+    <string name="local_service_started">Local Service Started</string>
+	<string name="local_service_stopped">Local Service Stopped</string>
+	<string name="servicestatus">Service status: N/A</string>
 </resources>
