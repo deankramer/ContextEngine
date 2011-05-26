@@ -10,12 +10,20 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
+
+import android.R.color;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.SensorManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -23,11 +31,13 @@ import android.widget.Toast;
 
 public class ContextEngine extends Service{
 	
-	private static final String LOG_TAG = "CAWEFA_SERVER";
+	private static final String LOG_TAG = "ContextEngine";
 	private boolean D = true;
 	
 	private NotificationManager mNM;
-	
+	private BroadcastReceiver contextMonitor;
+	private IntentFilter filter;
+	private LightContext lightcontext;
 	private CompositeComponent sync;
 	
 	
@@ -48,11 +58,12 @@ public class ContextEngine extends Service{
 	
 	
     @Override
-    public void onCreate() {
-    
+    public void onCreate() {    
     	if (D) Log.d( LOG_TAG, "onCreate" );
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-	
+        SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        filter = new IntentFilter("uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED");
+        setupContextMonitor();	
     }
 	
     @Override
@@ -81,21 +92,46 @@ public class ContextEngine extends Service{
 		public void newComposite(String compositeName)
 				throws RemoteException {
 			 sync = new CompositeComponent(compositeName, getApplicationContext());
-		     sync.registerComponent("lightlevelHIGH");
+			 if (D) Log.d( LOG_TAG, "newComposite" );	
 			
 		}
 
 		@Override
 		public void registerComponent(String componentName, String compositeName)
 				throws RemoteException {
-			// TODO Auto-generated method stub
-			
+			//lightcontext = new LightContext(sm, getApplicationContext());
+			sync.registerComponent(componentName);
+			if (D) Log.d( LOG_TAG, "registerComponent" );	
 		}
        
     };
     
+    private void setupContextMonitor() {
+   	 Log.v("value", "add contextMonitor");
+  	contextMonitor = new BroadcastReceiver() {
+       	@Override 
+        	public void onReceive(Context context,Intent intent) {
+        			if (intent.getAction().equals("uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED")) {
+        				if (D) Log.d( LOG_TAG, "onReceive" );
+        				Bundle bundle = intent.getExtras();
+        				String changeName = bundle.getString(Component.CONTEXT_NAME);
+	        			boolean currentcontext = bundle.getBoolean(Component.CONTEXT_VALUE);
+//	        			if(changeName.equalsIgnoreCase("datasync_ON") &&( currentcontext ) )
+//	        				getListView().setBackgroundResource(color.black);
+//	        			else if (changeName.equalsIgnoreCase("datasync_ON") &&( !currentcontext ) )
+//	        				getListView().setBackgroundResource(color.white);
+	        			showNotification("light changed");
+	      		}
+        		}        		  	
+        	
+        };
+        registerReceiver(contextMonitor, filter);  	
+    }
+    
+    
     private void showNotification(String contextChange) {
 		// In this sample, we'll use the same text for the ticker and the expanded notification
+    	if (D) Log.d( LOG_TAG, "showNotification");
 		CharSequence text = getText(R.string.local_service_started);
 		
 		CharSequence contentTitle = "ContextEngine";
@@ -119,15 +155,14 @@ public class ContextEngine extends Service{
 	    public void onDestroy() {
 	    	Log.d( LOG_TAG, "onDestroy" );
 	        // Cancel the persistent notification.
-	        mNM.cancel(R.string.local_service_started);	     
+	        mNM.cancel(R.string.local_service_started);	
+	        lightcontext.stop();
+       	 	sync.stop();
+       	 	unregisterReceiver(contextMonitor);
 	        // Tell the user we stopped.
 	        Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT).show();
 	    }
-
-	public void newComposite(String string) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 }
 
 

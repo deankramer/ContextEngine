@@ -27,8 +27,8 @@
     android:layout_marginLeft="65dip"
     android:id="@+id/btnStopService"
     android:text="Stop Service"
-    android:layout_alignRight="@+id/btnStartProcess"
-    android:layout_below="@+id/btnStartProcess"></Button>
+    android:layout_alignRight="@+id/btnStartService"
+    android:layout_below="@+id/btnStartService"></Button>
  <TextView android:id="@+id/servicestatus"
 	android:layout_width="wrap_content"
     android:layout_height="wrap_content"
