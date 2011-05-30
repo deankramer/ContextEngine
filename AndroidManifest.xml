@@ -12,11 +12,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <receiver android:name="test.TestActivity" android:enabled="true">
+            <receiver android:enabled="true" android:name="test.TestActivity">
 
         </receiver>
          
         </activity>
+        <service android:name="ContextEngine">
+            <intent-filter>
+                <action android:name="uk.ac.tvu.mdse.contextengine.IContextsDefinition"></action>
+                <action android:name="uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED"></action>
+            </intent-filter>
+        </service>
 
     </application>
 
