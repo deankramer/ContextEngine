@@ -108,8 +108,7 @@ public class ContextEngine extends Service{
 			sync.registerComponent(componentName);
 			//showNotification("light changed");
 			if (D) Log.d( LOG_TAG, "registerComponent" );	
-		}
-       
+		}       
     };
     
     private void setupContextMonitor() {
@@ -159,6 +158,7 @@ public class ContextEngine extends Service{
 		mNM.notify(R.string.local_service_started, notification);
 	}
 
+
 	 @Override
 	    public void onDestroy() {
 		    super.onDestroy();
@@ -166,8 +166,10 @@ public class ContextEngine extends Service{
 	        // Cancel the persistent notification.
 	        mNM.cancel(R.string.local_service_started);	
 	        lightcontext.stop();
-       	 	sync.stop();
-       	 	unregisterReceiver(contextMonitor);
+	    	sync.stop();
+	    	lightcontext= null;
+	    	sync=null;
+	    	unregisterReceiver(contextMonitor);	    
 	        // Tell the user we stopped.
 	        Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT).show();
 	        

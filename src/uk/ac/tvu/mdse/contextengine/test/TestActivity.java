@@ -18,6 +18,7 @@ import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -87,12 +88,12 @@ public class TestActivity extends Activity{
          	
             	try{
             		 Intent i = new Intent();
-            		 i.setClassName("uk.ac.tvu.mdse.contextengine", "uk.ac.tvu.mdse.contextengine.ContextEngine");
+            		 i.setClassName("uk.ac.tvu.mdse.contextengine", "uk.ac.tvu.mdse.contextengine.ContextEngine");            		 
             		 stopService( i );
             		 
             		 started = false;
             		 updateServiceStatus();
-                	
+            		 doUnbindService(); 
                 	}
             		catch (Exception e){
             			Toast.makeText(TestActivity.this, "Error is " + e, Toast.LENGTH_LONG).show();
@@ -160,7 +161,8 @@ public class TestActivity extends Activity{
                  // This is called when the connection with the service has been
                  // unexpectedly disconnected -- that is, its process crashed.
                  // Because it is running in our same process, we should never
-                 // see this happen.             	
+                 // see this happen. 
+            	Log.d("value", "onServiceDisconnected");            	
              	contextService = null;                 
              }
          };
@@ -173,6 +175,13 @@ public class TestActivity extends Activity{
         	 
              bindService(new Intent(IContextsDefinition.class.getName()), mConnection, Context.BIND_AUTO_CREATE);
              mIsBound = true;
+         }
+         
+         void doUnbindService() {     
+        	
+        	 unbindService(mConnection);
+             //bindService(new Intent(IContextsDefinition.class.getName()), mConnection, Context.BIND_AUTO_CREATE);
+             mIsBound = false;
          }
          
          

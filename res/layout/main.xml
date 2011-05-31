@@ -35,7 +35,7 @@
    	android:width="200dip"
     android:layout_marginLeft="65dip"
     android:id="@+id/btnBluetooth"
-    android:text="Bluetooth Chnage"
+    android:text="Bluetooth Change"
     android:layout_alignRight="@+id/btnStopService"
     android:layout_below="@+id/btnStopService"></Button>
  <TextView android:id="@+id/servicestatus"

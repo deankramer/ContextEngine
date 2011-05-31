@@ -5,6 +5,6 @@ package uk.ac.tvu.mdse.contextengine;
 
 interface IContextsDefinition {
   void newComposite(in String compositeName);
-  void registerComponent(in String componentName, in String compositeName);
+  void registerComponent(in String componentName, in String compositeName);  
 }
 
