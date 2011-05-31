@@ -6,29 +6,18 @@ package uk.ac.tvu.mdse.contextengine.test;
  * @author Dean Kramer & Anna Kocurova
  */
 
-import uk.ac.tvu.mdse.contextengine.Component;
-import uk.ac.tvu.mdse.contextengine.CompositeComponent;
-import uk.ac.tvu.mdse.contextengine.ContextEngine;
 import uk.ac.tvu.mdse.contextengine.IContextsDefinition;
 import uk.ac.tvu.mdse.contextengine.R;
-import uk.ac.tvu.mdse.contextengine.R.layout;
-import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
-import android.R.color;
 import android.app.Activity;
-import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Resources.NotFoundException;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -99,7 +88,8 @@ public class TestActivity extends Activity{
             	try{
             		 Intent i = new Intent();
             		 i.setClassName("uk.ac.tvu.mdse.contextengine", "uk.ac.tvu.mdse.contextengine.ContextEngine");
-            		 stopService( i );            		 
+            		 stopService( i );
+            		 
             		 started = false;
             		 updateServiceStatus();
                 	
@@ -155,12 +145,12 @@ public class TestActivity extends Activity{
 						contextService.newComposite("datasync_ON");
 						contextService.registerComponent("datasync_ON","lightlevelHIGH");
 					} catch (RemoteException e) {
-						// TODO Auto-generated catch block
+				
 						e.printStackTrace();
 					}
              		
        			} catch (NotFoundException e) {
-     				// TODO Auto-generated catch block
+     			
      				e.printStackTrace();
      			}      	
                  

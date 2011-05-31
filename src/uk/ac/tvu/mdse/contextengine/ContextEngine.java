@@ -37,6 +37,7 @@ public class ContextEngine extends Service{
 	private LightContext lightcontext;
 	private CompositeComponent sync;
 	private BluetoothContext bc;
+	private SensorManager sm;
 	
 	// This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
@@ -58,18 +59,18 @@ public class ContextEngine extends Service{
     public void onCreate() {    
     	if (D) Log.d( LOG_TAG, "onCreate" );
         mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         filter = new IntentFilter("uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED");
-        setupContextMonitor();	
+        setupContextMonitor();
     }
 	
-    @Override
+   @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("LocalService", "Received start id " + startId + ": " + intent);
         // We want this service to continue running until it is explicitly
         // stopped, so return sticky.        
         return START_STICKY;
-    }
+    } 
 	
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -83,20 +84,24 @@ public class ContextEngine extends Service{
 		 return mBinder;
 	}
 	
+	@Override
+	public boolean onUnbind(Intent intent){
+		this.stopSelf();	
+		return true;
+	}
+	
 	public final IContextsDefinition.Stub contextsBinder = new IContextsDefinition.Stub() {
 
-		@Override
 		public void newComposite(String compositeName)
 				throws RemoteException {
 			 sync = new CompositeComponent(compositeName, getApplicationContext());
-			 
 			 bc = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(), getApplicationContext());
+			 lightcontext = new LightContext(sm, getApplicationContext());
 			 //bc.registerIntent(getApplicationContext());
 			 if (D) Log.d( LOG_TAG, "newComposite" );	
 			
 		}
 
-		@Override
 		public void registerComponent(String componentName, String compositeName)
 				throws RemoteException {
 			//lightcontext = new LightContext(sm, getApplicationContext());
@@ -156,6 +161,7 @@ public class ContextEngine extends Service{
 
 	 @Override
 	    public void onDestroy() {
+		    super.onDestroy();
 	    	Log.d( LOG_TAG, "onDestroy" );
 	        // Cancel the persistent notification.
 	        mNM.cancel(R.string.local_service_started);	
@@ -164,6 +170,7 @@ public class ContextEngine extends Service{
        	 	unregisterReceiver(contextMonitor);
 	        // Tell the user we stopped.
 	        Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT).show();
+	        
 	    }
 	
 }

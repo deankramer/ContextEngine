@@ -45,7 +45,6 @@ public class UserPreferenceContext extends Component implements OnPreferenceChan
 		
 	}
 	
-	@Override
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
 		if (D) Log.v(LOG_TAG, "onPreferenceChange");
 		//if (preference.equals(this.preference))
