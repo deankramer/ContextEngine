@@ -29,11 +29,20 @@
     android:text="Stop Service"
     android:layout_alignRight="@+id/btnStartService"
     android:layout_below="@+id/btnStartService"></Button>
+    <Button android:layout_width="wrap_content"
+ 	android:layout_height="wrap_content"
+ 	android:clickable="true"
+   	android:width="200dip"
+    android:layout_marginLeft="65dip"
+    android:id="@+id/btnBluetooth"
+    android:text="Bluetooth Chnage"
+    android:layout_alignRight="@+id/btnStopService"
+    android:layout_below="@+id/btnStopService"></Button>
  <TextView android:id="@+id/servicestatus"
 	android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:text="@string/servicestatus"
-    android:layout_below="@+id/btnStopService"
+    android:layout_below="@+id/btnBluetooth"
     android:layout_marginTop="10px" 
     android:layout_centerHorizontal="true"/>
 </RelativeLayout>

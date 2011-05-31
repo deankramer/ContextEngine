@@ -6,17 +6,14 @@
 
 package uk.ac.tvu.mdse.contextengine;
 
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
+import uk.ac.tvu.mdse.contextengine.contexts.BluetoothContext;
 import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
-
-import android.R.color;
+import uk.ac.tvu.mdse.contextengine.test.TestActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -39,7 +36,7 @@ public class ContextEngine extends Service{
 	private IntentFilter filter;
 	private LightContext lightcontext;
 	private CompositeComponent sync;
-	
+	private BluetoothContext bc;
 	
 	// This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
@@ -92,6 +89,9 @@ public class ContextEngine extends Service{
 		public void newComposite(String compositeName)
 				throws RemoteException {
 			 sync = new CompositeComponent(compositeName, getApplicationContext());
+			 
+			 bc = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(), getApplicationContext());
+			 //bc.registerIntent(getApplicationContext());
 			 if (D) Log.d( LOG_TAG, "newComposite" );	
 			
 		}
@@ -101,6 +101,7 @@ public class ContextEngine extends Service{
 				throws RemoteException {
 			//lightcontext = new LightContext(sm, getApplicationContext());
 			sync.registerComponent(componentName);
+			//showNotification("light changed");
 			if (D) Log.d( LOG_TAG, "registerComponent" );	
 		}
        
@@ -120,7 +121,7 @@ public class ContextEngine extends Service{
 //	        				getListView().setBackgroundResource(color.black);
 //	        			else if (changeName.equalsIgnoreCase("datasync_ON") &&( !currentcontext ) )
 //	        				getListView().setBackgroundResource(color.white);
-	        			showNotification("light changed");
+	        			showNotification(changeName);
 	      		}
         		}        		  	
         	
@@ -133,17 +134,19 @@ public class ContextEngine extends Service{
 		// In this sample, we'll use the same text for the ticker and the expanded notification
     	if (D) Log.d( LOG_TAG, "showNotification");
 		CharSequence text = getText(R.string.local_service_started);
-		
+		text=contextChange;
 		CharSequence contentTitle = "ContextEngine";
 		CharSequence contentText = "Context Changed:" + contextChange;
 		long when = System.currentTimeMillis();
-
+		
+		//this intent needs to be adapted, serves only for testing purposes!!!
+		Intent i;		
+		i = new Intent(getBaseContext(),TestActivity.class);
+		//i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		
 		Notification notification = new Notification(R.drawable.stat_sample,text,when);
-		
-		notification.defaults |= Notification.DEFAULT_VIBRATE;
-		long[] vibrate = {0,100,200,300};
-		notification.vibrate = vibrate;
-		
+		PendingIntent contentIntent = PendingIntent.getActivity(ContextEngine.this, 0, i, Intent.FLAG_ACTIVITY_NEW_TASK);
+		notification.setLatestEventInfo(this, "ContextEngine", text, contentIntent);
 		notification.flags |= notification.FLAG_AUTO_CANCEL;
 		
 		// Send the notification.
@@ -164,6 +167,3 @@ public class ContextEngine extends Service{
 	    }
 	
 }
-
-
-

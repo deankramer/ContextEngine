@@ -40,6 +40,8 @@ public class TestActivity extends Activity{
 	private boolean started= false;
 	private boolean mIsBound= false;
 	
+	BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
+	
 //	private BroadcastReceiver contextMonitor;
 //	private IntentFilter filter;
 //	private LightContext lightcontext;
@@ -107,6 +109,28 @@ public class TestActivity extends Activity{
             		}	
             }
             }
+        });
+        
+        Button btnBluetoothChange = (Button) findViewById(R.id.btnBluetooth);
+        btnBluetoothChange.setOnClickListener(new View.OnClickListener() {	        	
+            public void onClick(View view) {
+            	 
+            	try{
+            		if (bt.isEnabled()){
+          				bt.disable();
+          				//bluetooth.setText(String.valueOf(bt.getState()));
+          			}
+          			else{
+          				bt.enable();
+          				//bluetooth.setText(String.valueOf(bt.getState()));
+          			}
+                	
+                	}
+            		catch (Exception e){
+            			Toast.makeText(TestActivity.this, "Error is " + e, Toast.LENGTH_LONG).show();
+            		}	
+            }
+            
         });
                
            //  LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
