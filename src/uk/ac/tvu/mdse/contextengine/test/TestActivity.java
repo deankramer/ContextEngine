@@ -14,11 +14,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -41,6 +45,8 @@ public class TestActivity extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         //String[] menu = new String[] {
     	///		"Testing Context"
     	//};
@@ -123,7 +129,18 @@ public class TestActivity extends Activity{
             }
             
         });
-               
+        
+//        StringBuilder builder = new StringBuilder();
+//        
+//        builder.append("\n"+ sp.getBoolean("Main_Option",false));
+//        builder.append("\n"+ sp.getString("listPref","-1"));
+//        builder.append("\n"+ sp.getBoolean("Advanced_Option",false));
+//        builder.append("\n"+ sp.getInt("customPref",-1));
+//        builder.append("\n"+ sp.getString("pref_dialog","NULL"));
+//        
+//        TextView view = (TextView)findViewById(R.id.viewbox);
+//        view.setText(builder.toString());
+//               
            //  LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
            //  locationContext = new LocationContext(locationManager, this.getApplicationContext());
              
@@ -219,5 +236,22 @@ public class TestActivity extends Activity{
          							startStatus;
          	  TextView t = (TextView)findViewById( R.id.servicestatus );
          	  t.setText( statusText );	  
-         	}
+        }
+         
+         @Override
+         public boolean onCreateOptionsMenu(Menu menu) {
+             //super.onCreateOptionsMenu(menu);
+             MenuItem i = menu.add(1,1,1,"Preferences");
+             i.setIcon(android.R.drawable.ic_menu_preferences);
+             //CreateMenu(menu);
+             return true;
+         }
+      
+         @Override
+         public boolean onOptionsItemSelected(MenuItem item)
+         {    
+        	Intent preferencesIntent = new Intent(TestActivity.this,TestPreferenceActivity.class);
+ 	    	startActivity(preferencesIntent);
+ 	    	return true;
+         }
 }

@@ -26,6 +26,7 @@
                 <action android:name="uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED"></action>
             </intent-filter>
         </service>
+        <activity android:name=".test.TestPreferenceActivity"></activity>
 
     </application>
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceCategory android:title="Password Preferences">
+<EditTextPreference android:summary="Please maintain your password" android:key="password" android:title="Password"></EditTextPreference>
+<CheckBoxPreference android:title="Remember password" android:key="remember_pwd" android:summary="Please indicate if password is remembered" android:defaultValue="false"></CheckBoxPreference>
+</PreferenceCategory>
+
+
+<PreferenceCategory android:title="Social Networks">
+
+
+
+<CheckBoxPreference android:summary="Tweet new and amended events" android:title="Twitter" android:key="useTwitter"></CheckBoxPreference>
+
+
+</PreferenceCategory>
+<PreferenceCategory android:title="Calendars"><CheckBoxPreference android:key="useCalendar" android:title="Calendar" android:summary="Add Events to your calendar"></CheckBoxPreference>
+</PreferenceCategory>
+</PreferenceScreen>

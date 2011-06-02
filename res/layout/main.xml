@@ -45,4 +45,11 @@
     android:layout_below="@+id/btnBluetooth"
     android:layout_marginTop="10px" 
     android:layout_centerHorizontal="true"/>
+<TextView android:id="@+id/viewbox"
+	android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="@string/viewbox"
+    android:layout_below="@+id/servicestatus"
+    android:layout_marginTop="10px" 
+    android:layout_centerHorizontal="true"/>
 </RelativeLayout>

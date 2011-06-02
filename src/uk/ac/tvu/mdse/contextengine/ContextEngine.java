@@ -94,9 +94,9 @@ public class ContextEngine extends Service{
 
 		public void newComposite(String compositeName)
 				throws RemoteException {
-			 sync = new CompositeComponent(compositeName, getApplicationContext());
+			 //sync = new CompositeComponent(compositeName, getApplicationContext());
 			 bc = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(), getApplicationContext());
-			 lightcontext = new LightContext(sm, getApplicationContext());
+			 //lightcontext = new LightContext(sm, getApplicationContext());
 			 //bc.registerIntent(getApplicationContext());
 			 if (D) Log.d( LOG_TAG, "newComposite" );	
 			
@@ -105,7 +105,7 @@ public class ContextEngine extends Service{
 		public void registerComponent(String componentName, String compositeName)
 				throws RemoteException {
 			//lightcontext = new LightContext(sm, getApplicationContext());
-			sync.registerComponent(componentName);
+			//sync.registerComponent(componentName);
 			//showNotification("light changed");
 			if (D) Log.d( LOG_TAG, "registerComponent" );	
 		}       
