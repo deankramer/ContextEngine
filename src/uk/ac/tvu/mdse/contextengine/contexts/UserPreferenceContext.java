@@ -19,7 +19,7 @@ import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.util.Log;
 
-public class UserPreferenceContext extends Component implements OnPreferenceChangeListener{
+public class UserPreferenceContext extends Component implements OnSharedPreferenceChangeListener{
 
 	private static final long serialVersionUID = 560933927152794610L;
 	//Monitoring
@@ -28,21 +28,24 @@ public class UserPreferenceContext extends Component implements OnPreferenceChan
 	
 	private PreferenceManager preferencem;
 	private SharedPreferences sharedPreferences;
-	private Preference preference;
+	private String preference;
 	
 	public static final String CONTEXT_NAME = "context_name";
     public static final String CONTEXT_DATE = "context_date";
     public static final String CONTEXT_VALUE = "context_value";
     
-    public UserPreferenceContext(PreferenceManager pm, Preference pref, Context c){
+    public UserPreferenceContext(SharedPreferences pm, String pref, Context c){
 		super("USERPREFERENCECONTEXT", c);
-		//might be option to work just with one preference a time, ot register a number of preferences
+		//might be option to work just with one preference a time, or register a number of preferences
 		preference = pref;
-		preferencem = pm;
-		sharedPreferences = pm.getSharedPreferences();
-		//preference = pm.findPreference(CONTEXT_NAME);
-		preference.setOnPreferenceChangeListener(this);
-		
+		sharedPreferences = pm;
+		sharedPreferences.registerOnSharedPreferenceChangeListener(this);		
+	}	
+    
+    public UserPreferenceContext(SharedPreferences pm, Context c){
+		super("USERPREFERENCECONTEXT", c);
+		sharedPreferences = pm;
+		sharedPreferences.registerOnSharedPreferenceChangeListener(this);		
 	}
 	
 	public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -66,14 +69,18 @@ public class UserPreferenceContext extends Component implements OnPreferenceChan
 		}
 	} 
 	
-	public void registerIntent(Context context){
-		IntentFilter intentFilter = new IntentFilter();
-    	intentFilter.addAction("uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED");
-    	if (D) Log.v(LOG_TAG, "registerIntent");
-	}
-	
 	public void stop(){
-		this.stop(); //?
+		sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);		
 		if (D) Log.v(LOG_TAG, "Stopping");
+	}
+
+
+	@Override
+	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
+		if (D) Log.v(LOG_TAG, "onPreferenceChange");
+		if (preference==null)
+			sendNotification(arg1,true);
+		else if (preference.equals(arg1))
+			sendNotification(arg1,true);
 	}
 }

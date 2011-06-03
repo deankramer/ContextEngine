@@ -8,6 +8,7 @@ package uk.ac.tvu.mdse.contextengine;
 
 import uk.ac.tvu.mdse.contextengine.contexts.BluetoothContext;
 import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
+import uk.ac.tvu.mdse.contextengine.contexts.UserPreferenceContext;
 import uk.ac.tvu.mdse.contextengine.test.TestActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -18,11 +19,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,7 +41,12 @@ public class ContextEngine extends Service{
 	private LightContext lightcontext;
 	private CompositeComponent sync;
 	private BluetoothContext bc;
+	private UserPreferenceContext uc;
 	private SensorManager sm;
+	
+	//for notifications
+	static int count = 0;
+	static String order = "*";
 	
 	// This is the object that receives interactions from clients.  See
     // RemoteService for a more complete example.
@@ -94,10 +103,16 @@ public class ContextEngine extends Service{
 
 		public void newComposite(String compositeName)
 				throws RemoteException {
-			 //sync = new CompositeComponent(compositeName, getApplicationContext());
+			 sync = new CompositeComponent(compositeName, getApplicationContext());
 			 bc = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(), getApplicationContext());
-			 //lightcontext = new LightContext(sm, getApplicationContext());
-			 //bc.registerIntent(getApplicationContext());
+			 
+			 //listen to this particular preference change
+			 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());	
+			 String pref = "remember_pwd";
+			 uc = new UserPreferenceContext(sp, pref, getApplicationContext());		
+			 //or listen to any preference change
+			 //uc = new UserPreferenceContext(sp, getApplicationContext());			
+			 lightcontext = new LightContext(sm, getApplicationContext());			
 			 if (D) Log.d( LOG_TAG, "newComposite" );	
 			
 		}
@@ -105,7 +120,7 @@ public class ContextEngine extends Service{
 		public void registerComponent(String componentName, String compositeName)
 				throws RemoteException {
 			//lightcontext = new LightContext(sm, getApplicationContext());
-			//sync.registerComponent(componentName);
+			sync.registerComponent(componentName);
 			//showNotification("light changed");
 			if (D) Log.d( LOG_TAG, "registerComponent" );	
 		}       
@@ -137,8 +152,6 @@ public class ContextEngine extends Service{
     private void showNotification(String contextChange) {
 		// In this sample, we'll use the same text for the ticker and the expanded notification
     	if (D) Log.d( LOG_TAG, "showNotification");
-		CharSequence text = getText(R.string.local_service_started);
-		text=contextChange;
 		CharSequence contentTitle = "ContextEngine";
 		CharSequence contentText = "Context Changed:" + contextChange;
 		long when = System.currentTimeMillis();
@@ -148,14 +161,15 @@ public class ContextEngine extends Service{
 		i = new Intent(getBaseContext(),TestActivity.class);
 		//i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		Notification notification = new Notification(R.drawable.stat_sample,text,when);
+		Notification notification = new Notification(R.drawable.stat_sample,contentText,when);
 		PendingIntent contentIntent = PendingIntent.getActivity(ContextEngine.this, 0, i, Intent.FLAG_ACTIVITY_NEW_TASK);
-		notification.setLatestEventInfo(this, "ContextEngine", text, contentIntent);
+		notification.setLatestEventInfo(this, contentTitle, contentText, contentIntent);
 		notification.flags |= notification.FLAG_AUTO_CANCEL;
 		
 		// Send the notification.
 		// We use a layout id because it is a unique number.  We use it later to cancel.
-		mNM.notify(R.string.local_service_started, notification);
+		++count;
+		mNM.notify(count, notification);
 	}
 
 
@@ -167,6 +181,8 @@ public class ContextEngine extends Service{
 	        mNM.cancel(R.string.local_service_started);	
 	        lightcontext.stop();
 	    	sync.stop();
+	    	uc.stop();
+	    	uc=null;
 	    	lightcontext= null;
 	    	sync=null;
 	    	unregisterReceiver(contextMonitor);	    

@@ -19,6 +19,7 @@ import android.content.res.Resources.NotFoundException;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
@@ -160,6 +161,7 @@ public class TestActivity extends Activity{
              		//contextService = ((ContextEngine.LocalBinder)service).getService();   
              		contextService = IContextsDefinition.Stub.asInterface(service);
              		try {
+       
 						contextService.newComposite("datasync_ON");
 						contextService.registerComponent("datasync_ON","lightlevelHIGH");
 					} catch (RemoteException e) {
