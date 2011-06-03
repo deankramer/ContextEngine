@@ -19,7 +19,7 @@
     android:layout_marginLeft="65dip"
     android:layout_marginTop="100dip"
     android:id="@+id/btnStartService"
-    android:text="Start Service"></Button>
+    android:text="Start Service" android:onClick="startService"></Button>
 <Button android:layout_width="wrap_content"
  	android:layout_height="wrap_content"
  	android:clickable="true"
@@ -28,7 +28,7 @@
     android:id="@+id/btnStopService"
     android:text="Stop Service"
     android:layout_alignRight="@+id/btnStartService"
-    android:layout_below="@+id/btnStartService"></Button>
+    android:layout_below="@+id/btnStartService" android:onClick="stopService"></Button>
     <Button android:layout_width="wrap_content"
  	android:layout_height="wrap_content"
  	android:clickable="true"
@@ -37,7 +37,7 @@
     android:id="@+id/btnBluetooth"
     android:text="Bluetooth Change"
     android:layout_alignRight="@+id/btnStopService"
-    android:layout_below="@+id/btnStopService"></Button>
+    android:layout_below="@+id/btnStopService" android:onClick="bluetoothChange"></Button>
  <TextView android:id="@+id/servicestatus"
 	android:layout_width="wrap_content"
     android:layout_height="wrap_content"

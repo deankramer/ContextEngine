@@ -75,7 +75,6 @@ public class UserPreferenceContext extends Component implements OnSharedPreferen
 	}
 
 
-	@Override
 	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
 		if (D) Log.v(LOG_TAG, "onPreferenceChange");
 		if (preference==null)

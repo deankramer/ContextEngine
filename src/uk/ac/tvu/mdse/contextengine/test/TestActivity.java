@@ -32,7 +32,7 @@ import android.widget.Toast;
 public class TestActivity extends Activity{
 	
 	private IContextsDefinition contextService;
-	private boolean started= false;
+	private boolean started=false;
 	private boolean mIsBound= false;
 	
 	BluetoothAdapter bt = BluetoothAdapter.getDefaultAdapter();
@@ -46,7 +46,6 @@ public class TestActivity extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         //String[] menu = new String[] {
     	///		"Testing Context"
@@ -62,75 +61,7 @@ public class TestActivity extends Activity{
              
 //        lightcontext = new LightContext(sm, getApplicationContext());
 //        sync= new CompositeComponent("datasync_ON", getApplicationContext());
-//        sync.registerComponent("lightlevelHIGH");
-        
-        Button btnStartService = (Button) findViewById(R.id.btnStartService);
-        btnStartService.setOnClickListener(new View.OnClickListener() {	        	
-            public void onClick(View view) {            	
-          	  if( started ) {
-                  Toast.makeText(TestActivity.this, "Service already started", Toast.LENGTH_SHORT).show();
-          	  }
-          	  else{
-          		  try {
-          			Intent i = new Intent();
-               	    i.setClassName("uk.ac.tvu.mdse.contextengine", "uk.ac.tvu.mdse.contextengine.ContextEngine");
-               	    startService( i );               	    
-               		started = true;
-               		updateServiceStatus();   
-               		doBindService();               		
-          		  }
-          		catch (Exception e){
-        			Toast.makeText(TestActivity.this, "Error is " + e, Toast.LENGTH_LONG).show();
-        		}     	
-            }
-            }
-        });
-        
-        Button btnStopService = (Button) findViewById(R.id.btnStopService);
-        btnStopService.setOnClickListener(new View.OnClickListener() {	        	
-            public void onClick(View view) {
-            	 if( !started ) {
-            	        Toast.makeText(TestActivity.this, "Service not yet started", Toast.LENGTH_SHORT).show();
-            	} else {
-         	
-            	try{
-            		 Intent i = new Intent();
-            		 i.setClassName("uk.ac.tvu.mdse.contextengine", "uk.ac.tvu.mdse.contextengine.ContextEngine");            		 
-            		 stopService( i );
-            		 
-            		 started = false;
-            		 updateServiceStatus();
-            		 doUnbindService(); 
-                	}
-            		catch (Exception e){
-            			Toast.makeText(TestActivity.this, "Error is " + e, Toast.LENGTH_LONG).show();
-            		}	
-            }
-            }
-        });
-        
-        Button btnBluetoothChange = (Button) findViewById(R.id.btnBluetooth);
-        btnBluetoothChange.setOnClickListener(new View.OnClickListener() {	        	
-            public void onClick(View view) {
-            	 
-            	try{
-            		if (bt.isEnabled()){
-          				bt.disable();
-          				//bluetooth.setText(String.valueOf(bt.getState()));
-          			}
-          			else{
-          				bt.enable();
-          				//bluetooth.setText(String.valueOf(bt.getState()));
-          			}
-                	
-                	}
-            		catch (Exception e){
-            			Toast.makeText(TestActivity.this, "Error is " + e, Toast.LENGTH_LONG).show();
-            		}	
-            }
-            
-        });
-        
+//        sync.registerComponent("lightlevelHIGH");        
 //        StringBuilder builder = new StringBuilder();
 //        
 //        builder.append("\n"+ sp.getBoolean("Main_Option",false));
@@ -255,5 +186,61 @@ public class TestActivity extends Activity{
         	Intent preferencesIntent = new Intent(TestActivity.this,TestPreferenceActivity.class);
  	    	startActivity(preferencesIntent);
  	    	return true;
+         }
+         
+         public void startService(View v){
+        	 if( started ) {
+                 Toast.makeText(TestActivity.this, "Service already started", Toast.LENGTH_SHORT).show();
+         	  }
+         	  else{
+         		  try {
+         			Intent i = new Intent();
+              	    i.setClassName("uk.ac.tvu.mdse.contextengine", "uk.ac.tvu.mdse.contextengine.ContextEngine");
+              	    startService( i );               	    
+              		started = true;
+              		updateServiceStatus();   
+              		doBindService();               		
+         		  }
+         		catch (Exception e){
+       			Toast.makeText(TestActivity.this, "Error is " + e, Toast.LENGTH_LONG).show();
+       		}     	
+           }
+           }
+         
+         public void stopService(View v){
+        	 if( !started ) {
+     	        Toast.makeText(TestActivity.this, "Service not yet started", Toast.LENGTH_SHORT).show();
+     	} else {
+  	
+     	try{
+     		 Intent i = new Intent();
+     		 i.setClassName("uk.ac.tvu.mdse.contextengine", "uk.ac.tvu.mdse.contextengine.ContextEngine");            		 
+     		 stopService( i );
+     		 
+     		 started = false;
+     		 updateServiceStatus();
+     		 doUnbindService(); 
+         	}
+     		catch (Exception e){
+     			Toast.makeText(TestActivity.this, "Error is " + e, Toast.LENGTH_LONG).show();
+     		}	
+     }
+         }
+         
+         public void bluetoothChange(View v){
+        	 try{
+         		if (bt.isEnabled()){
+       				bt.disable();
+       				//bluetooth.setText(String.valueOf(bt.getState()));
+       			}
+       			else{
+       				bt.enable();
+       				//bluetooth.setText(String.valueOf(bt.getState()));
+       			}
+             	
+             	}
+         		catch (Exception e){
+         			Toast.makeText(TestActivity.this, "Error is " + e, Toast.LENGTH_LONG).show();
+         		}	
          }
 }
