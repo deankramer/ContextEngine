@@ -23,7 +23,10 @@ import android.content.SharedPreferences;
 import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
@@ -43,6 +46,17 @@ public class ContextEngine extends Service{
 	private BluetoothContext bc;
 	private UserPreferenceContext uc;
 	private SensorManager sm;
+	
+	/**
+     * This is a list of callbacks that have been registered with the
+     * service.  Note that this is package scoped (instead of private) so
+     * that it can be accessed more efficiently from inner classes.
+     */
+    final RemoteCallbackList<IRemoteServiceCallback> mCallbacks
+            = new RemoteCallbackList<IRemoteServiceCallback>();
+
+    int mValue = 0;
+
 	
 	//for notifications
 	static int count = 0;
@@ -71,6 +85,12 @@ public class ContextEngine extends Service{
         sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         filter = new IntentFilter("uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED");
         setupContextMonitor();
+        
+        // While this service is running, it will continually increment a
+        // number.  Send the first message that is used to perform the
+        // increment.
+        mHandler.sendEmptyMessage(REPORT_MSG);
+
     }
 	
    @Override
@@ -103,7 +123,7 @@ public class ContextEngine extends Service{
 
 		public void newComposite(String compositeName)
 				throws RemoteException {
-			 sync = new CompositeComponent(compositeName, getApplicationContext());
+			 //sync = new CompositeComponent(compositeName, getApplicationContext());
 			 bc = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(), getApplicationContext());
 			 
 			 //listen to this particular preference change
@@ -112,7 +132,7 @@ public class ContextEngine extends Service{
 			 uc = new UserPreferenceContext(sp, pref, getApplicationContext());		
 			 //or listen to any preference change
 			 //uc = new UserPreferenceContext(sp, getApplicationContext());			
-			 lightcontext = new LightContext(sm, getApplicationContext());			
+			 //lightcontext = new LightContext(sm, getApplicationContext());			
 			 if (D) Log.d( LOG_TAG, "newComposite" );	
 			
 		}
@@ -120,10 +140,18 @@ public class ContextEngine extends Service{
 		public void registerComponent(String componentName, String compositeName)
 				throws RemoteException {
 			//lightcontext = new LightContext(sm, getApplicationContext());
-			sync.registerComponent(componentName);
+			//sync.registerComponent(componentName);
 			//showNotification("light changed");
 			if (D) Log.d( LOG_TAG, "registerComponent" );	
-		}       
+		}     
+		
+		public void registerCallback(IRemoteServiceCallback cb) {
+            if (cb != null) mCallbacks.register(cb);
+        }
+        public void unregisterCallback(IRemoteServiceCallback cb) {
+            if (cb != null) mCallbacks.unregister(cb);
+        }
+
     };
     
     private void setupContextMonitor() {
@@ -171,6 +199,43 @@ public class ContextEngine extends Service{
 		++count;
 		mNM.notify(count, notification);
 	}
+    
+    private static final int REPORT_MSG = 1;
+
+    /**
+     * Our Handler used to execute operations on the main thread.  This is used
+     * to schedule increments of our value.
+     */
+    private final Handler mHandler = new Handler() {
+        @Override public void handleMessage(Message msg) {
+            switch (msg.what) {
+
+                // It is time to bump the value!
+                case REPORT_MSG: {
+                    // Up it goes.
+                    int value = ++mValue;
+
+                    // Broadcast to all clients the new value.
+                    final int N = mCallbacks.beginBroadcast();
+                    for (int i=0; i<N; i++) {
+                        try {
+                            mCallbacks.getBroadcastItem(i).valueChanged(value);
+                        } catch (RemoteException e) {
+                            // The RemoteCallbackList will take care of removing
+                            // the dead object for us.
+                        }
+                    }
+                    mCallbacks.finishBroadcast();
+
+                    // Repeat every 1 second.
+                    sendMessageDelayed(obtainMessage(REPORT_MSG), 1*1000);
+                } break;
+                default:
+                    super.handleMessage(msg);
+            }
+        }
+    };
+
 
 
 	 @Override
@@ -179,13 +244,22 @@ public class ContextEngine extends Service{
 	    	Log.d( LOG_TAG, "onDestroy" );
 	        // Cancel the persistent notification.
 	        mNM.cancel(R.string.local_service_started);	
-	        lightcontext.stop();
-	    	sync.stop();
+	        //lightcontext.stop();
+	    	//sync.stop();
 	    	uc.stop();
 	    	uc=null;
-	    	lightcontext= null;
-	    	sync=null;
-	    	unregisterReceiver(contextMonitor);	    
+	    	//lightcontext= null;
+	    	//sync=null;
+	    	unregisterReceiver(contextMonitor);	  
+	    	
+	    	// Unregister all callbacks.
+	        mCallbacks.kill();
+	        
+	        // Remove the next pending message to increment the counter, stopping
+	        // the increment loop.
+	        mHandler.removeMessages(REPORT_MSG);
+
+
 	        // Tell the user we stopped.
 	        Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT).show();
 	        

@@ -24,6 +24,7 @@
             <intent-filter>
                 <action android:name="uk.ac.tvu.mdse.contextengine.IContextsDefinition"></action>
                 <action android:name="uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED"></action>
+                <action android:name="uk.ac.tvu.mdse.contextengine.REMOTE_SERVICE"></action>
             </intent-filter>
         </service>
         <activity android:name=".test.TestPreferenceActivity"></activity>
