@@ -15,7 +15,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 
-public abstract class Component implements Serializable{
+public class Component implements Serializable{
 	
 	//Attributes
 	private static final long serialVersionUID = -4339043280287205031L;
@@ -71,5 +71,10 @@ public abstract class Component implements Serializable{
 		}catch(Exception e){
 		    Log.e(contextName,"not working");
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Component [contextName=" + contextName + "]";
 	} 
 }

@@ -102,9 +102,11 @@ public class CompositeComponent extends Component implements Serializable{
 		if (positivecontexts.containsKey(c)){
 			positivecontexts.remove(c);
 			return true;
-		}
-		else if (negativecontexts.containsKey(c)){
+		}else if (negativecontexts.containsKey(c)){
 			negativecontexts.remove(c);
+			return true;
+		}else if (eithercontexts.containsKey(c)){
+			eithercontexts.remove(c);
 			return true;
 		}else
 			return false;	
@@ -118,16 +120,42 @@ public class CompositeComponent extends Component implements Serializable{
 	}
 	
 	public void checkContext(){
-		if ( ( ! positivecontexts.containsValue(false)) && (! negativecontexts.containsValue(true)) 
+		if ( checkPositives()  && checkNegatives() && checkEithers() 
 				&& contextValue==false){
 			sendNotification(true);
 			contextValue=true;
 		}
-		else if (positivecontexts.containsValue(false) || negativecontexts.containsValue(false) 
+		else if ((! checkPositives()) || (! checkNegatives()) || (! checkEithers()) 
 				&& contextValue==true){
 			sendNotification(false);
 			contextValue=false;
 		}
+	}
+	
+	/*Because not all hashtables may contain a context, its important we don't
+	get null exceptions, so we check if they have anything. If they don't,
+	then just say its true so it gets ignored in the context checking,
+	though it does have a context, check it and return if it suits or not. 
+	*/
+	private Boolean checkPositives(){
+		if (positivecontexts.size()>0){
+			return ! positivecontexts.containsValue(false);
+		}else
+			return true;
+	}
+	
+	private Boolean checkNegatives(){
+		if (negativecontexts.size()>0){
+			return ! negativecontexts.containsValue(true);
+		}else
+			return true;
+	}
+	
+	private Boolean checkEithers(){
+		if (eithercontexts.size()>0){
+			return eithercontexts.containsValue(eithercontextvalue);
+		}else
+			return true;
 	}
 	
 	public void stop(){
