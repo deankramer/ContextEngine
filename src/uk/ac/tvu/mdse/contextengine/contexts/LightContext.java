@@ -19,7 +19,8 @@ public class LightContext extends Component implements SensorEventListener{
 	private Sensor lightSensor;
 	private static final double HIGH_LUM_VALUE = 180;
 	private static final double MEDIUM_LUM_VALUE = 100;
-	private int delaytype= SensorManager.SENSOR_DELAY_UI;
+	private int delaytype= SensorManager.SENSOR_DELAY_NORMAL;
+	private int value=0;
 	
 	public LightContext(SensorManager sm, Context c){
 		super("LIGHTCONTEXT", c);
@@ -49,15 +50,18 @@ public class LightContext extends Component implements SensorEventListener{
 	public void onSensorChanged(SensorEvent arg0){
 		if(arg0.sensor.getType()==Sensor.TYPE_LIGHT){
 		      double value= arg0.values[0];
-		      if(value >= HIGH_LUM_VALUE){
+		      if((value >= HIGH_LUM_VALUE) && ( value!=3 )){
+		    	  value=3;
 	  			  sendNotification("lightlevelLOW", false);
 			      sendNotification("lightlevelMEDIUM", false);
 				  sendNotification("lightlevelHIGH", true); 
-		      }else if (value >= MEDIUM_LUM_VALUE){
+		      }else if ((value >= MEDIUM_LUM_VALUE) && ( value !=2 )){
+		    	  value=2;
 		    	  sendNotification("lightlevelLOW", false);
 				  sendNotification("lightlevelMEDIUM", true);
 				  sendNotification("lightlevelHIGH", false); 
-		      }else{
+		      }else if((value < MEDIUM_LUM_VALUE) && ( value !=1 )){
+		    	  value=1;
 		    	  sendNotification("lightlevelLOW", true);
 	  			  sendNotification("lightlevelMEDIUM", false);
 	  			  sendNotification("lightlevelHIGH", false);

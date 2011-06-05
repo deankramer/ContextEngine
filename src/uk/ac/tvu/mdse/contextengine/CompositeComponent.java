@@ -120,15 +120,17 @@ public class CompositeComponent extends Component implements Serializable{
 	}
 	
 	public void checkContext(){
-		if ( checkPositives()  && checkNegatives() && checkEithers() 
-				&& contextValue==false){
-			sendNotification(true);
-			contextValue=true;
+		if ( checkPositives()  && checkNegatives() && checkEithers() ){
+			if (! contextValue){
+				sendNotification(true);
+				contextValue=true;
+			}
 		}
-		else if ((! checkPositives()) || (! checkNegatives()) || (! checkEithers()) 
-				&& contextValue==true){
-			sendNotification(false);
-			contextValue=false;
+		else if ((! checkPositives()) || (! checkNegatives()) || (! checkEithers())){
+			if (contextValue){
+				sendNotification(false);
+				contextValue=false;
+			}
 		}
 	}
 	
@@ -138,23 +140,23 @@ public class CompositeComponent extends Component implements Serializable{
 	though it does have a context, check it and return if it suits or not. 
 	*/
 	private Boolean checkPositives(){
-		if (positivecontexts.size()>0){
+		if (positivecontexts.size()>0)
 			return ! positivecontexts.containsValue(false);
-		}else
+		else
 			return true;
 	}
 	
 	private Boolean checkNegatives(){
-		if (negativecontexts.size()>0){
+		if (negativecontexts.size()>0)
 			return ! negativecontexts.containsValue(true);
-		}else
+		else
 			return true;
 	}
 	
 	private Boolean checkEithers(){
-		if (eithercontexts.size()>0){
+		if (eithercontexts.size()>0)
 			return eithercontexts.containsValue(eithercontextvalue);
-		}else
+		else
 			return true;
 	}
 	

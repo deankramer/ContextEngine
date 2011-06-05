@@ -6,6 +6,8 @@
 
 package uk.ac.tvu.mdse.contextengine;
 
+import java.util.ArrayList;
+
 import uk.ac.tvu.mdse.contextengine.contexts.BluetoothContext;
 import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
 import uk.ac.tvu.mdse.contextengine.contexts.UserPreferenceContext;
@@ -28,7 +30,6 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -129,7 +130,15 @@ public class ContextEngine extends Service{
 			 //listen to this particular preference change
 			 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());	
 			 String pref = "remember_pwd";
-			 uc = new UserPreferenceContext(sp, pref, getApplicationContext());		
+			 uc = new UserPreferenceContext(sp, pref, getApplicationContext());
+			 //lightcontext = new LightContext(sm, getApplicationContext());
+			 CompositeComponent cc = new CompositeComponent("testComposite", getApplicationContext());
+			 
+			 ArrayList<String> eithers = new ArrayList<String>();
+			 eithers.add("remember_pwd");
+			 eithers.add("bluetoothON");
+			 cc.registerComponent(eithers, true);
+			 //cc.registerComponent("bluetoothON", false);
 			 //or listen to any preference change
 			 //uc = new UserPreferenceContext(sp, getApplicationContext());			
 			 //lightcontext = new LightContext(sm, getApplicationContext());			
