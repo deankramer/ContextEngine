@@ -69,21 +69,6 @@ public class LightContext extends Component implements SensorEventListener{
 		   };
 	}
 	
-	
-	public void sendNotification(String name, boolean value){
-		Intent intent = new Intent();
-		
-		intent.setAction(CONTEXT_INTENT);
-		intent.putExtra(CONTEXT_NAME, name);
-		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_VALUE, value);
-		try{
-		    context.sendBroadcast(intent);
-		}catch(Exception e){
-		    Log.e(contextName,"not working");
-		}
-	} 
-	
 	public void stop(){
 		sensorm.unregisterListener(this, lightSensor);
 		Log.v(contextName, "Stopping");
