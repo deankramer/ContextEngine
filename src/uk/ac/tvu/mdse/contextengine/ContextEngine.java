@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import uk.ac.tvu.mdse.contextengine.contexts.BluetoothContext;
 import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
 import uk.ac.tvu.mdse.contextengine.contexts.UserPreferenceContext;
+import uk.ac.tvu.mdse.contextengine.contexts.WifiContext;
 import uk.ac.tvu.mdse.contextengine.test.TestActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -23,6 +24,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.hardware.SensorManager;
+import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Handler;
@@ -133,11 +135,12 @@ public class ContextEngine extends Service{
 			 uc = new UserPreferenceContext(sp, pref, getApplicationContext());
 			 //lightcontext = new LightContext(sm, getApplicationContext());
 			 CompositeComponent cc = new CompositeComponent("testComposite", getApplicationContext());
-			 
-			 ArrayList<String> eithers = new ArrayList<String>();
-			 eithers.add("remember_pwd");
-			 eithers.add("bluetoothON");
-			 cc.registerComponent(eithers, true);
+			 WifiContext wc = new WifiContext((WifiManager) getSystemService(Context.WIFI_SERVICE), getApplicationContext());
+			 //ArrayList<String> eithers = new ArrayList<String>();
+			 //eithers.add("remember_pwd");
+			 //eithers.add("bluetoothON");
+			 cc.registerComponent("bluetoothOn", true);
+			 cc.registerComponent("wifiOn", false);
 			 //cc.registerComponent("bluetoothON", false);
 			 //or listen to any preference change
 			 //uc = new UserPreferenceContext(sp, getApplicationContext());			

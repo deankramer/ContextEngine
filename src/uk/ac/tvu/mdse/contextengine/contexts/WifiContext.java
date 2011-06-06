@@ -17,6 +17,7 @@ public class WifiContext extends Component{
 		super("WIFI", c);
 		this.wm = wm;
 		setupMonitor();
+		checkContext();
 	}
 
 	private void setupMonitor() {
