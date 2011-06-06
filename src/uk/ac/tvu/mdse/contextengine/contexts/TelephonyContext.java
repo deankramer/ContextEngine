@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.telephony.TelephonyManager;
+import android.util.Log;
 import uk.ac.tvu.mdse.contextengine.Component;
 
 public class TelephonyContext extends Component{
@@ -17,7 +18,7 @@ public class TelephonyContext extends Component{
 	public TelephonyContext(String name, Context c) {
 		super("TELEPHONY", c);
 		setupMonitor();
-		checkTelephony();
+		checkContext();
 	}
 
 	private void setupMonitor() {
@@ -26,13 +27,13 @@ public class TelephonyContext extends Component{
 			
 			@Override
 			public void onReceive(Context c, Intent in) {	
-				checkTelephony();
+				checkContext();
 			}
 		};
 		context.registerReceiver(contextMonitor, new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE"));
 	}
 
-	protected void checkTelephony() {
+	protected void checkContext() {
 		// TODO Auto-generated method stub
 		checkRoaming();
 			
@@ -48,6 +49,11 @@ public class TelephonyContext extends Component{
 			sendNotification("roamingON", false);
 			roaming = false;
 		}
+	}
+	
+	public void stop(){
+		context.unregisterReceiver(contextMonitor);
+		Log.v(contextName, "Stopping");
 	}
 }
 

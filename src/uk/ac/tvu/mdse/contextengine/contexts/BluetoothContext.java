@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.NetworkInfo;
+import android.util.Log;
 import uk.ac.tvu.mdse.contextengine.Component;
 
 public class BluetoothContext extends Component {
@@ -39,6 +40,11 @@ public class BluetoothContext extends Component {
 			}};
 			context.registerReceiver(contextMonitor, new IntentFilter("android.bluetooth.adapter.action.STATE_CHANGED"));
 		
+	}
+	
+	public void stop(){
+		context.unregisterReceiver(contextMonitor);
+		Log.v(contextName, "Stopping");
 	}
 }
 

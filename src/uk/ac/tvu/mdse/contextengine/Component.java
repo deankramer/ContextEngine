@@ -33,9 +33,11 @@ public class Component implements Serializable{
 	
 	public static final String CONTEXT_INTENT = "uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED";
 	public IntentFilter filter = new IntentFilter(CONTEXT_INTENT);
+	public int contextId;
 	public Context context;
 	public String contextName;
 	public boolean contextValue;
+	public Calendar contextDate;
 	
 	//Constructors
 	public Component(String name, Context c){		
@@ -76,5 +78,45 @@ public class Component implements Serializable{
 	@Override
 	public String toString() {
 		return "Component [contextName=" + contextName + "]";
-	} 
+	}
+	
+	public String getDateToString(){
+		StringBuffer date = new StringBuffer();
+		date.append(contextDate.get(Calendar.DATE));
+		date.append("-");
+		date.append(contextDate.get(Calendar.MONTH)+1);
+		date.append("-");
+		date.append(contextDate.get(Calendar.YEAR));
+		return date.toString();
+	}
+	
+	public String getTimeToString(){
+		int mMinute = contextDate.get(Calendar.MINUTE);
+		int mHour = contextDate.get(Calendar.HOUR_OF_DAY);
+		
+		String min="";
+		if(mMinute==0)
+			min = Integer.toString(mMinute) + "0";
+		else if(mMinute<10)
+			min = "0" + Integer.toString(mMinute);
+		else
+			min = Integer.toString(mMinute);
+		return mHour + ":" + min;
+	}
+	
+	public String getDateTimeString(){
+		StringBuffer date = new StringBuffer();
+		date.append(contextDate.get(Calendar.DATE));
+		date.append("-");
+		date.append(contextDate.get(Calendar.MONTH)+1);
+		date.append("-");
+		date.append(contextDate.get(Calendar.YEAR));
+		date.append(" ");
+		date.append(contextDate.get(Calendar.HOUR_OF_DAY));
+		date.append(":");
+		date.append(contextDate.get(Calendar.MINUTE));
+		date.append(":");
+		date.append(contextDate.get(Calendar.SECOND));
+		return date.toString();
+	}
 }

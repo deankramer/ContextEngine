@@ -15,18 +15,15 @@ public class OpenDbHelper extends SQLiteOpenHelper {
 
 	private static final int DATABASE_VERSION = 1;
 	private static String DB_NAME = "contextDB";
-	private final Context myContext;
-	
 	private static final String CONTEXTTABLE_CREATE = "create table contexts (_id integer primary key autoincrement, "
 		+ "name text not null"
 		+ "lastDateTime text not null"
-		+ "count integer not null"
+		//+ "count integer not null"
 		+ "value text not null"
 		+ ");";
 
 	public OpenDbHelper(Context context){
 		super(context, DB_NAME, null, DATABASE_VERSION);
-		this.myContext = context;
 	}
 	@Override
 	public void onCreate(SQLiteDatabase db) {

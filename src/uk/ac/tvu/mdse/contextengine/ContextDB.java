@@ -8,9 +8,9 @@ package uk.ac.tvu.mdse.contextengine;
 
 public interface ContextDB {
 
-	boolean addContext(ContextEntity c);
+	boolean addContext(Component c);
 	boolean removeContext(int id);
-	boolean updateContext(ContextEntity c);
-	ContextEntity getContext(int id);
+	boolean updateContext(Component c);
+	Component getContext(int id);
 	
 }

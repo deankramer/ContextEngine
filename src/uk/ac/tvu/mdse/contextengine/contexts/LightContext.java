@@ -1,10 +1,7 @@
 package uk.ac.tvu.mdse.contextengine.contexts;
 
-import java.util.Calendar;
-
 import uk.ac.tvu.mdse.contextengine.Component;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -49,18 +46,18 @@ public class LightContext extends Component implements SensorEventListener{
 
 	public void onSensorChanged(SensorEvent arg0){
 		if(arg0.sensor.getType()==Sensor.TYPE_LIGHT){
-		      double value= arg0.values[0];
-		      if((value >= HIGH_LUM_VALUE) && ( value!=3 )){
+		      double v= arg0.values[0];
+		      if((v >= HIGH_LUM_VALUE) && ( value!=3 )){
 		    	  value=3;
 	  			  sendNotification("lightlevelLOW", false);
 			      sendNotification("lightlevelMEDIUM", false);
 				  sendNotification("lightlevelHIGH", true); 
-		      }else if ((value >= MEDIUM_LUM_VALUE) && ( value !=2 )){
+		      }else if ((v >= MEDIUM_LUM_VALUE) && ( value !=2 )){
 		    	  value=2;
 		    	  sendNotification("lightlevelLOW", false);
 				  sendNotification("lightlevelMEDIUM", true);
 				  sendNotification("lightlevelHIGH", false); 
-		      }else if((value < MEDIUM_LUM_VALUE) && ( value !=1 )){
+		      }else if((v < MEDIUM_LUM_VALUE) && ( value !=1 )){
 		    	  value=1;
 		    	  sendNotification("lightlevelLOW", true);
 	  			  sendNotification("lightlevelMEDIUM", false);
