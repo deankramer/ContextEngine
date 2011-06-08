@@ -11,20 +11,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class OpenDbHelper extends SQLiteOpenHelper {
-	
 
 	private static final int DATABASE_VERSION = 1;
 	private static String DB_NAME = "contextDB";
 	private static final String CONTEXTTABLE_CREATE = "create table contexts (_id integer primary key autoincrement, "
-		+ "name text not null"
-		+ "lastDateTime text not null"
-		//+ "count integer not null"
-		+ "value text not null"
-		+ ");";
+			+ "name text not null" + "lastDateTime text not null"
+			// + "count integer not null"
+			+ "value text not null" + ");";
 
-	public OpenDbHelper(Context context){
+	public OpenDbHelper(Context context) {
 		super(context, DB_NAME, null, DATABASE_VERSION);
 	}
+
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CONTEXTTABLE_CREATE);
@@ -33,7 +31,7 @@ public class OpenDbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 }

@@ -11,7 +11,6 @@ import uk.ac.tvu.mdse.contextengine.Component;
 
 public class BluetoothContext extends Component {
 
-	
 	private static final long serialVersionUID = -8852296839608708684L;
 	static BluetoothAdapter bluetoothAdapter;
 	static NetworkInfo netInfo;
@@ -19,32 +18,33 @@ public class BluetoothContext extends Component {
 	public BluetoothContext(BluetoothAdapter ba, Context c) {
 		super("BLUETOOTH", c);
 		bluetoothAdapter = ba;
-		setupMonitor();	
+		setupMonitor();
 	}
 
 	private void setupMonitor() {
-		
-		contextMonitor = new BroadcastReceiver(){
-			
+
+		contextMonitor = new BroadcastReceiver() {
+
 			@Override
 			public void onReceive(Context c, Intent in) {
 				bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 				int bluetoothValue = bluetoothAdapter.getState();
-				if(bluetoothValue==BluetoothAdapter.STATE_ON){
+				if (bluetoothValue == BluetoothAdapter.STATE_ON) {
 					sendNotification("bluetoothON", true);
 					sendNotification("bluetoothOFF", false);
-				}else{
+				} else {
 					sendNotification("bluetoothON", false);
 					sendNotification("bluetoothOFF", true);
 				}
-			}};
-			context.registerReceiver(contextMonitor, new IntentFilter("android.bluetooth.adapter.action.STATE_CHANGED"));
-		
+			}
+		};
+		context.registerReceiver(contextMonitor, new IntentFilter(
+				"android.bluetooth.adapter.action.STATE_CHANGED"));
+
 	}
-	
-	public void stop(){
+
+	public void stop() {
 		context.unregisterReceiver(contextMonitor);
 		Log.v(contextName, "Stopping");
 	}
 }
-

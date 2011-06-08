@@ -9,8 +9,11 @@ package uk.ac.tvu.mdse.contextengine;
 public interface ContextDB {
 
 	boolean addContext(Component c);
+
 	boolean removeContext(int id);
+
 	boolean updateContext(Component c);
+
 	Component getContext(int id);
-	
+
 }
