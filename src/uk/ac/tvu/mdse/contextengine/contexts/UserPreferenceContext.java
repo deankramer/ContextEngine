@@ -6,59 +6,23 @@
 
 package uk.ac.tvu.mdse.contextengine.contexts;
 
-import uk.ac.tvu.mdse.contextengine.Component;
+import uk.ac.tvu.mdse.contextengine.PreferenceChangeComponent;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.preference.Preference;
-import android.util.Log;
 
-public class UserPreferenceContext extends Component implements
-		OnSharedPreferenceChangeListener {
+public class UserPreferenceContext extends PreferenceChangeComponent{	
 
-	private static final long serialVersionUID = 560933927152794610L;
-	// Monitoring
-	private static final String LOG_TAG = "UserPreferenceContext";
-	private static final boolean D = true;
-
-	private SharedPreferences sharedPreferences;
+	private static final long serialVersionUID = 2997863934263820784L;
 	private String preference;
 
+	//for check box, ...boolean value
 	public UserPreferenceContext(SharedPreferences pm, String pref, Context c) {
-		super("USERPREFERENCECONTEXT", c);
-		// might be option to work just with one preference a time, or register
-		// a number of preferences
-		preference = pref;
-		sharedPreferences = pm;
-		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-	}
+		super(pm, pref, PreferenceChangeComponent.PreferenceType.BOOLEAN, c);	
+		this.preference = pref;
+	}	
 
-	public UserPreferenceContext(SharedPreferences pm, Context c) {
-		super("USERPREFERENCECONTEXT", c);
-		sharedPreferences = pm;
-		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-	}
-
-	public boolean onPreferenceChange(Preference preference, Object newValue) {
-		if (D)
-			Log.v(LOG_TAG, "onPreferenceChange");
-		// if (preference.equals(this.preference))
-		sendNotification(CONTEXT_NAME, true);
-		return true;
-	}
-
-	public void stop() {
-		sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-		if (D)
-			Log.v(LOG_TAG, "Stopping");
-	}
-
-	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
-		if (D)
-			Log.v(LOG_TAG, "onPreferenceChange");
-		if (preference == null)
-			sendNotification(arg1, true);
-		else if (preference.equals(arg1))
+	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {		
+		if (preference.equals(arg1))
 			sendNotification(arg1, true);
 	}
 }

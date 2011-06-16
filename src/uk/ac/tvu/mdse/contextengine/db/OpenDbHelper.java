@@ -4,7 +4,7 @@
  * @author Dean Kramer & Anna Kocurova
  */
 
-package uk.ac.tvu.mdse.contextengine;
+package uk.ac.tvu.mdse.contextengine.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

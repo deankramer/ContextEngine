@@ -13,6 +13,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.util.Log;
 
 public class Component implements Serializable {
@@ -44,21 +45,13 @@ public class Component implements Serializable {
 		contextName = name;
 		contextValue = false;
 	}
+	
+	public void sendNotification(){
+		sendNotification(contextName, contextValue);
+	}
 
 	public void sendNotification(boolean value) {
-		// if(D) Log.d(contextEntity.name + LOG_TAG,
-		// contextEntity.name+" sendNotification");
-		Intent intent = new Intent();
-
-		intent.setAction(CONTEXT_INTENT);
-		intent.putExtra(CONTEXT_NAME, contextName);
-		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_VALUE, value);
-		try {
-			context.sendBroadcast(intent);
-		} catch (Exception e) {
-			Log.v(contextName, "not working");
-		}
+		sendNotification(contextName, value);
 	}
 
 	public void sendNotification(String name, boolean value) {
@@ -75,6 +68,18 @@ public class Component implements Serializable {
 		}
 	}
 
+	public boolean getContextValue(){
+		return contextValue;
+	}
+	
+	//re-implement if context value depends on some values
+	protected void checkContext(Bundle data) {
+		//check data		
+		//evaluate by firing off the rules
+		//set contextValue	
+		sendNotification();
+	}
+	
 	@Override
 	public String toString() {
 		return "Component [contextName=" + contextName + "]";
@@ -120,8 +125,6 @@ public class Component implements Serializable {
 		return date.toString();
 	}
 	
-	public void stop() {
-		context.unregisterReceiver(contextMonitor);
-		Log.v(contextName, "Stopping");
+	public void stop() {		
 	}
 }

@@ -1,36 +1,18 @@
 package uk.ac.tvu.mdse.contextengine.contexts;
 
-import android.content.BroadcastReceiver;
+import uk.ac.tvu.mdse.contextengine.MonitorComponent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
-import android.util.Log;
-import uk.ac.tvu.mdse.contextengine.Component;
 
-public class WifiContext extends Component {
+public class WifiContext extends MonitorComponent {
 
 	private static final long serialVersionUID = -6833408704101539915L;
 	private WifiManager wm;
 
 	public WifiContext(WifiManager wm, Context c) {
-		super("WIFI", c);
-		this.wm = wm;
-		setupMonitor();
+		super("WIFI", c, "android.net.wifi.WIFI_STATE_CHANGED");
+		this.wm = wm;		
 		checkContext();
-	}
-
-	private void setupMonitor() {
-		// TODO Auto-generated method stub
-		contextMonitor = new BroadcastReceiver() {
-
-			@Override
-			public void onReceive(Context c, Intent in) {
-				checkContext();
-			}
-		};
-		context.registerReceiver(contextMonitor, new IntentFilter(
-				"android.net.wifi.WIFI_STATE_CHANGED"));
 	}
 
 	protected void checkContext() {
@@ -43,6 +25,14 @@ public class WifiContext extends Component {
 			contextValue = false;
 		}
 
+		//send context value - 2nd approach
+//		Boolean wifiEnabled = wm.isWifiEnabled();
+//		if (wifiEnabled & (!contextValue.equals("ON"))) {			
+//			contextValue = "ON";
+//		} else if ((!wifiEnabled) & (!contextValue.equals("OFF"))) {			
+//			contextValue = "OFF";
+//		}
+//		sendNotification();
 	}
 
 

@@ -11,7 +11,7 @@
 
 
 
-<CheckBoxPreference android:summary="Tweet new and amended events" android:title="Twitter" android:key="useTwitter"></CheckBoxPreference>
+<ListPreference android:summary="@string/communication_methodsListPreference" android:entryValues="@array/communication_methods" android:key="method" android:title="Communication Method" android:entries="@array/communication_methods"></ListPreference>
 
 
 </PreferenceCategory>

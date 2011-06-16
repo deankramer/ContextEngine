@@ -45,7 +45,8 @@ public class ContextEngine extends Service {
 	private LightContext lightcontext;
 	private CompositeComponent sync;
 	private BluetoothContext bc;
-	private UserPreferenceContext uc;
+	private PreferenceChangeComponent uc1;
+	private PreferenceChangeComponent uc2;
 	private SensorManager sm;
 
 	/**
@@ -122,22 +123,20 @@ public class ContextEngine extends Service {
 	public final IContextsDefinition.Stub contextsBinder = new IContextsDefinition.Stub() {
 
 		public void newComposite(String compositeName) throws RemoteException {
-			// sync = new CompositeComponent(compositeName,
-			// getApplicationContext());
-			bc = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),
-					getApplicationContext());
 
-			// listen to this particular preference change
-			SharedPreferences sp = PreferenceManager
-					.getDefaultSharedPreferences(getApplicationContext());
-			String pref = "remember_pwd";
-			uc = new UserPreferenceContext(sp, pref, getApplicationContext());
+			Context c = getApplicationContext();
+			bc = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
+
+			// listen to these particular preferences change
+			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+			String pref1 = "remember_pwd";
+			String pref2 = "method";
+			uc1 = new PreferenceChangeComponent(sp, pref1,PreferenceChangeComponent.PreferenceType.BOOLEAN, c);
+			uc2 = new PreferenceChangeComponent(sp, pref2, PreferenceChangeComponent.PreferenceType.STRING, c);
 			// lightcontext = new LightContext(sm, getApplicationContext());
-			CompositeComponent cc = new CompositeComponent("testComposite",
-					getApplicationContext());
+			CompositeComponent cc = new CompositeComponent("testComposite",	c);
 			WifiContext wc = new WifiContext(
-					(WifiManager) getSystemService(Context.WIFI_SERVICE),
-					getApplicationContext());
+					(WifiManager) getSystemService(Context.WIFI_SERVICE), c);
 			// ArrayList<String> eithers = new ArrayList<String>();
 			// eithers.add("remember_pwd");
 			// eithers.add("bluetoothON");
@@ -187,13 +186,18 @@ public class ContextEngine extends Service {
 							.getString(Component.CONTEXT_NAME);
 					boolean currentcontext = bundle
 							.getBoolean(Component.CONTEXT_VALUE);
+					String contextvalue = bundle
+							.getString(PreferenceChangeComponent.CONTEXT_VALUE);
 					// if(changeName.equalsIgnoreCase("datasync_ON") &&(
 					// currentcontext ) )
 					// getListView().setBackgroundResource(color.black);
 					// else if (changeName.equalsIgnoreCase("datasync_ON") &&(
 					// !currentcontext ) )
 					// getListView().setBackgroundResource(color.white);
-					showNotification(changeName);
+					if (contextvalue == null)
+						showNotification(changeName+ " "+currentcontext);
+					else
+						showNotification(changeName+ " "+contextvalue);
 				}
 			}
 
@@ -276,8 +280,12 @@ public class ContextEngine extends Service {
 		mNM.cancel(R.string.local_service_started);
 		// lightcontext.stop();
 		// sync.stop();
-		uc.stop();
-		uc = null;
+		bc.stop();
+		bc = null;
+		uc1.stop();
+		uc1 = null;
+		uc2.stop();
+		uc2 = null;
 		// lightcontext= null;
 		// sync=null;
 		unregisterReceiver(contextMonitor);

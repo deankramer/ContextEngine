@@ -4,7 +4,9 @@
  * @author Dean Kramer & Anna Kocurova
  */
 
-package uk.ac.tvu.mdse.contextengine;
+package uk.ac.tvu.mdse.contextengine.db;
+
+import uk.ac.tvu.mdse.contextengine.Component;
 
 public interface ContextDB {
 

@@ -1,13 +1,11 @@
 package uk.ac.tvu.mdse.contextengine.contexts;
 
-import android.content.BroadcastReceiver;
+import uk.ac.tvu.mdse.contextengine.MonitorComponent;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
+import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import uk.ac.tvu.mdse.contextengine.Component;
 
-public class TelephonyContext extends Component {
+public class TelephonyContext extends MonitorComponent {
 
 	private boolean roaming = false;
 	private int connection = 0;
@@ -15,29 +13,13 @@ public class TelephonyContext extends Component {
 	public TelephonyManager tm;
 
 	public TelephonyContext(String name, Context c) {
-		super("TELEPHONY", c);
-		setupMonitor();
-		checkContext();
+		super("TELEPHONY", c, "android.net.conn.CONNECTIVITY_CHANGE");
+		//checkContext();
 	}
-
-	private void setupMonitor() {
-		// TODO Auto-generated method stub
-		contextMonitor = new BroadcastReceiver() {
-
-			@Override
-			public void onReceive(Context c, Intent in) {
-				checkContext();
-			}
-		};
-		context.registerReceiver(contextMonitor, new IntentFilter(
-				"android.net.conn.CONNECTIVITY_CHANGE"));
-	}
-
-	protected void checkContext() {
-		// TODO Auto-generated method stub
+	
+	protected void checkContext(Bundle data) {		
 		checkRoaming();
 		checkConnectionState();
-
 	}
 
 	private void checkConnectionState() {
@@ -48,8 +30,7 @@ public class TelephonyContext extends Component {
 			else
 				sendNotification("telephonyConnectedON", false);
 			connection = v;
-		}
-		
+		}		
 	}
 
 	private void checkRoaming() {
@@ -62,5 +43,4 @@ public class TelephonyContext extends Component {
 			roaming = false;
 		}
 	}
-
 }

@@ -4,10 +4,12 @@
  * @author Dean Kramer & Anna Kocurova
  */
 
-package uk.ac.tvu.mdse.contextengine;
+package uk.ac.tvu.mdse.contextengine.db;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+
+import uk.ac.tvu.mdse.contextengine.Component;
 
 import android.content.ContentValues;
 import android.content.Context;

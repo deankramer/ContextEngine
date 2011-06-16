@@ -28,4 +28,11 @@
         <item>5</item>
         <item>6</item>
     </string-array>
+    
+    <string name="communication_methodsListPreference">Please choose communication method</string>
+	<string-array name="communication_methods">
+		<item>Bluetooth</item>
+		<item>SMS</item>
+		<item>Network</item>
+	</string-array>
 </resources>
