@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.BatteryManager;
+import android.util.Log;
 import uk.ac.tvu.mdse.contextengine.Component;
 
 public class BatteryContext extends Component{
@@ -62,5 +63,7 @@ public class BatteryContext extends Component{
 		}
 		
 	}
+	
+	
 }
 

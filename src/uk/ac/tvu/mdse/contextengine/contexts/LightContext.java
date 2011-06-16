@@ -63,6 +63,7 @@ public class LightContext extends Component implements SensorEventListener {
 		;
 	}
 
+	@Override
 	public void stop() {
 		sensorm.unregisterListener(this, lightSensor);
 		Log.v(contextName, "Stopping");

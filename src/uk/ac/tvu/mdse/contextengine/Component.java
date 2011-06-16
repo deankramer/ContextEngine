@@ -119,4 +119,9 @@ public class Component implements Serializable {
 		date.append(contextDate.get(Calendar.SECOND));
 		return date.toString();
 	}
+	
+	public void stop() {
+		context.unregisterReceiver(contextMonitor);
+		Log.v(contextName, "Stopping");
+	}
 }

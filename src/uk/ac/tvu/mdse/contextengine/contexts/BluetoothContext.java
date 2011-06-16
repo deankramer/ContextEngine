@@ -43,8 +43,4 @@ public class BluetoothContext extends Component {
 
 	}
 
-	public void stop() {
-		context.unregisterReceiver(contextMonitor);
-		Log.v(contextName, "Stopping");
-	}
 }

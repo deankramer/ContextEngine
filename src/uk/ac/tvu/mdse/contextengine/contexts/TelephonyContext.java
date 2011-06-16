@@ -50,8 +50,4 @@ public class TelephonyContext extends Component {
 		}
 	}
 
-	public void stop() {
-		context.unregisterReceiver(contextMonitor);
-		Log.v(contextName, "Stopping");
-	}
 }

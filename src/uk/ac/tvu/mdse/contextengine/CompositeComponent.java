@@ -7,7 +7,6 @@ import java.util.Hashtable;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 public class CompositeComponent extends Component implements Serializable {
 
@@ -162,11 +161,6 @@ public class CompositeComponent extends Component implements Serializable {
 			return eithercontexts.containsValue(eithercontextvalue);
 		else
 			return true;
-	}
-
-	public void stop() {
-		context.unregisterReceiver(contextMonitor);
-		Log.v(contextName, "Stopping");
 	}
 
 }
