@@ -7,6 +7,7 @@
 package uk.ac.tvu.mdse.contextengine.db;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import uk.ac.tvu.mdse.contextengine.Component;
@@ -76,6 +77,24 @@ public class ContextDBSQLite implements ContextDB {
 		return component;
 
 	}
+	
+	public boolean getContextValue(String name) {		
+		boolean value = true;
+		try {
+			SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
+			Cursor crsr = sqlite.rawQuery("Select * from contexts where name="
+					+ name + ";", null);
+			crsr.moveToFirst();
+
+			value = Boolean.valueOf(crsr.getString(3));			
+			crsr.close();
+			sqlite.close();
+		} catch (Exception sqlerror) {
+			Log.v("Table insert error", sqlerror.getMessage());
+		}
+		return value;
+
+	}
 
 	public boolean removeContext(int id) {
 		try {
@@ -109,5 +128,33 @@ public class ContextDBSQLite implements ContextDB {
 			return false;
 		}
 	}
+	
+	public ArrayList<Component> getAllContexts() {
+		ArrayList<Component> contexts = new ArrayList<Component>();
+		try{
+			SQLiteDatabase sqlite = dbHelper.getReadableDatabase();
+			Cursor crsr = sqlite.rawQuery("Select * from contexts", null);
+			Log.v("DBManager", "Found " + crsr.getCount() + " contexts");
+			crsr.moveToFirst();
+			for(int i=0; i< crsr.getCount(); i++){
+				Component contextComponent = new Component(crsr.getString(1), context);
+				contextComponent.contextId=crsr.getInt(0);
+				contextComponent.contextName=crsr.getString(1);
+	        	SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+	        	Calendar cdate = Calendar.getInstance();
+	        	cdate.setTime(dateFormat.parse(crsr.getString(2)));
+	        	contextComponent.contextDate=cdate;
+	        	contextComponent.contextValue=Boolean.valueOf(crsr.getString(3));
+	        	contexts.add(contextComponent);
+	        	crsr.moveToNext();
+			}
+			crsr.close();
+			sqlite.close();
+		}catch(Exception e){
+			Log.v("DBManger Error:", e.getMessage());
+		}
+		return contexts;		
+	}
+
 
 }

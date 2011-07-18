@@ -6,10 +6,15 @@
 
 package uk.ac.tvu.mdse.contextengine;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import uk.ac.tvu.mdse.contextengine.contexts.BluetoothContext;
 import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
 import uk.ac.tvu.mdse.contextengine.contexts.UserPreferenceContext;
 import uk.ac.tvu.mdse.contextengine.contexts.WifiContext;
+import uk.ac.tvu.mdse.contextengine.db.ContextDB;
+import uk.ac.tvu.mdse.contextengine.db.ContextDBSQLite;
 import uk.ac.tvu.mdse.contextengine.test.TestActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -48,6 +53,8 @@ public class ContextEngine extends Service {
 	private PreferenceChangeComponent uc1;
 	private PreferenceChangeComponent uc2;
 	private SensorManager sm;
+	
+	private ContextDB db;
 
 	/**
 	 * This is a list of callbacks that have been registered with the service.
@@ -90,7 +97,9 @@ public class ContextEngine extends Service {
 		// number. Send the first message that is used to perform the
 		// increment.
 		mHandler.sendEmptyMessage(REPORT_MSG);
-
+		
+		// Manage list of all contexts registered with the engine and store the list in the database
+		db = new ContextDBSQLite(getApplicationContext());
 	}
 
 	@Override
@@ -109,6 +118,11 @@ public class ContextEngine extends Service {
 		if (IContextsDefinition.class.getName().equals(intent.getAction())) {
 			Log.d(LOG_TAG, "bind-contextsBinder");
 			return contextsBinder;
+		}
+		
+		if (ISynchronousCommunication.class.getName().equals(intent.getAction())) {
+			Log.d(LOG_TAG, "bind-SynchronousCommunication");
+			return synchronousBinder;
 		}
 
 		return mBinder;
@@ -170,6 +184,25 @@ public class ContextEngine extends Service {
 				mCallbacks.unregister(cb);
 		}
 
+	};
+	
+	public final ISynchronousCommunication.Stub synchronousBinder = new ISynchronousCommunication.Stub() {
+
+		public ArrayList<String> getContextList() throws RemoteException {
+			ArrayList<String> contextList = new ArrayList<String>();
+			ArrayList<Component> contexts = new ArrayList<Component>();
+			contexts = db.getAllContexts();
+			for(Component c: contexts)
+				contextList.add(c.contextName);
+			return contextList;
+		}
+
+		public boolean getContextValue(String componentName)
+				throws RemoteException {
+			//firstly find if context exist in db!
+			return db.getContextValue(componentName);			
+		}
+		
 	};
 
 	private void setupContextMonitor() {

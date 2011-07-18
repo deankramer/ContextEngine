@@ -6,6 +6,8 @@
 
 package uk.ac.tvu.mdse.contextengine.db;
 
+import java.util.ArrayList;
+
 import uk.ac.tvu.mdse.contextengine.Component;
 
 public interface ContextDB {
@@ -17,5 +19,9 @@ public interface ContextDB {
 	boolean updateContext(Component c);
 
 	Component getContext(int id);
+	
+	boolean getContextValue(String name);
+	
+	ArrayList<Component> getAllContexts();
 
 }
