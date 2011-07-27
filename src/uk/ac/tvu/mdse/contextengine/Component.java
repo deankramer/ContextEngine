@@ -7,7 +7,10 @@
 package uk.ac.tvu.mdse.contextengine;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
+
+import uk.ac.tvu.mdse.contextengine.highLevelContext.ContextRange;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,6 +30,9 @@ public class Component implements Serializable {
 	public static final String CONTEXT_NAME = "context_name";
 	public static final String CONTEXT_DATE = "context_date";
 	public static final String CONTEXT_VALUE = "context_value";
+	public static final String CONTEXT_INFORMATION = "context_information";
+	
+	public ArrayList<String> valuesSet = new ArrayList<String>();
 
 	// BroadcastReceiver
 	public BroadcastReceiver contextMonitor = null;
@@ -38,12 +44,14 @@ public class Component implements Serializable {
 	public String contextName;
 	public boolean contextValue;
 	public Calendar contextDate;
-
+	public String contextInformation;
+	
 	// Constructors
 	public Component(String name, Context c) {
 		context = c;
 		contextName = name;
 		contextValue = false;
+		contextInformation = "default";
 	}
 	
 	public void sendNotification(){
@@ -61,6 +69,22 @@ public class Component implements Serializable {
 		intent.putExtra(CONTEXT_NAME, name);
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
 		intent.putExtra(CONTEXT_VALUE, value);
+		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
+		try {
+			context.sendBroadcast(intent);
+		} catch (Exception e) {
+			Log.e(contextName, "not working");
+		}
+	}
+	
+	public void sendNotification(String name, String contextInformation) {
+		Intent intent = new Intent();
+
+		intent.setAction(CONTEXT_INTENT);
+		intent.putExtra(CONTEXT_NAME, name);
+		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+		intent.putExtra(CONTEXT_VALUE, contextValue);
+		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
 		try {
 			context.sendBroadcast(intent);
 		} catch (Exception e) {
@@ -70,6 +94,10 @@ public class Component implements Serializable {
 
 	public boolean getContextValue(){
 		return contextValue;
+	}
+	
+	public String getContextInformation(){
+		return contextInformation;
 	}
 	
 	//re-implement if context value depends on some values
@@ -123,6 +151,27 @@ public class Component implements Serializable {
 		date.append(":");
 		date.append(contextDate.get(Calendar.SECOND));
 		return date.toString();
+	}
+	
+	public boolean addValue(String contextValue){
+		
+		//check if the value already exists in the set
+		if (valuesSet.contains(contextValue))
+			return false;
+		else {
+			valuesSet.add(contextValue);
+			return true;
+		}		
+	}
+	
+	public void addValues(ArrayList<String> values){		
+		for (String newValue: values)
+			addValue(newValue);
+	}
+	
+	public void setupValues(ArrayList<String> values){
+		valuesSet.removeAll(valuesSet.subList(0, valuesSet.size()-1));
+		valuesSet.addAll(values);
 	}
 	
 	public void stop() {		

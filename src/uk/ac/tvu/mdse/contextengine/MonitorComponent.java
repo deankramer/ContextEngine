@@ -1,5 +1,8 @@
 package uk.ac.tvu.mdse.contextengine;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,14 +25,18 @@ public class MonitorComponent extends Component{
     public String monitoringData = "";
     public String monitoringKey;
     
+    
 	public MonitorComponent(String name, Context c){		
-		super(name, c);		
+		super(name, c);	
+		//default set of context values is ON&OFF
+		addValues((ArrayList<String>) Arrays.asList("ON","OFF"));
 		setupMonitor();
 	}
 	
 	public MonitorComponent(String name, Context c, String action){		
 		super(name, c);	
-		this.filterAction = action;			
+		this.filterAction = action;	
+		addValues((ArrayList<String>) Arrays.asList("ON","OFF"));
 		setupMonitor();
 	}
 	
@@ -38,6 +45,7 @@ public class MonitorComponent extends Component{
 		super(name, c);	
 		this.filterAction = action;		
 		this.monitoringKey = key;
+		addValues((ArrayList<String>) Arrays.asList("ON","OFF"));
 		setupMonitor();
 	}
 	

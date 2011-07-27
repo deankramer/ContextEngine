@@ -1,5 +1,8 @@
 package uk.ac.tvu.mdse.contextengine;
 
+import java.util.ArrayList;
+
+import uk.ac.tvu.mdse.contextengine.highLevelContext.ContextRange;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -21,6 +24,8 @@ public class ListenerComponent extends Component implements SensorEventListener{
 	private Sensor theSensor;
 	private int sensorType;
 	private int delayType; 
+	
+	public ArrayList<ContextRange> contextSet = new ArrayList<ContextRange>();
 	
 	public ListenerComponent(String name, Context c, SensorManager sm, int sensorT, int delayT) {
 		super(name, c);
@@ -56,6 +61,25 @@ public class ListenerComponent extends Component implements SensorEventListener{
 		//fire off the rules
 		//set contextValue	
 		sendNotification();		
+	}
+	
+	public boolean addRange(Double minValue, Double maxValue, String contextValue){		
+		
+		if (checkRange(contextValue))
+			return false;
+		else{
+			contextSet.add(new ContextRange(minValue,maxValue,contextValue));			
+			return true;
+		}		
+	}
+	
+	public boolean checkRange(String contextValue){
+		boolean exist = false;
+		for (ContextRange cr: contextSet){
+			if (cr.contextHighValue.equals(contextValue))
+				exist = true;
+		}	
+		return exist;		
 	}
 
 	public void stop() {
