@@ -9,8 +9,10 @@ package uk.ac.tvu.mdse.contextengine;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Vector;
 
 import uk.ac.tvu.mdse.contextengine.highLevelContext.ContextRange;
+import uk.ac.tvu.mdse.contextengine.highLevelContext.Rule;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -32,7 +34,11 @@ public class Component implements Serializable {
 	public static final String CONTEXT_VALUE = "context_value";
 	public static final String CONTEXT_INFORMATION = "context_information";
 	
+	//a set of valid context values
 	public ArrayList<String> valuesSet = new ArrayList<String>();
+	
+	//a set of rules associated with the component, mainly needed for composite component
+	public Vector<Rule> rules = new Vector<Rule>();
 
 	// BroadcastReceiver
 	public BroadcastReceiver contextMonitor = null;
@@ -103,9 +109,13 @@ public class Component implements Serializable {
 	//re-implement if context value depends on some values
 	protected void checkContext(Bundle data) {
 		//check data		
-		//evaluate by firing off the rules
+		//evaluate by firing off the rules - for the compoiste component
 		//set contextValue	
 		sendNotification();
+	}
+	
+	protected boolean checkContextValue(String value){
+		return (valuesSet.contains(value));
 	}
 	
 	@Override

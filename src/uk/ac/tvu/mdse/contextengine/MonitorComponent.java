@@ -64,6 +64,7 @@ public class MonitorComponent extends Component{
 	
 	protected void checkContext(Bundle data) {
 		//check data		
+		checkContextValue(data.toString());
 		//evaluate by firing off the rules
 		//set contextValue
 		//sendNotification

@@ -3,7 +3,7 @@ package uk.ac.tvu.mdse.contextengine.highLevelContext;
 /**
  * @project ContextEngine
  * @date 27 Jul 2011
- * @author Anna Kocurova
+ * @author Dean Kramer & Anna Kocurova
  */
 
 public class ContextRange {
@@ -16,5 +16,9 @@ public class ContextRange {
 		this.minValue = mv;
 		this.maxValue = mxv;
 		this.contextHighValue = value;
+	}
+	
+	public String getContextHighValue(Double currentValue){
+		return ((currentValue<=maxValue)&&(currentValue>=minValue)) ? contextHighValue : null;
 	}
 }
