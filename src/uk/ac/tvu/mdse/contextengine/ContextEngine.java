@@ -49,12 +49,18 @@ public class ContextEngine extends Service {
 	private IntentFilter filter;
 	private LightContext lightcontext;
 	private CompositeComponent sync;
-	private BluetoothContext bc;
+	private BluetoothContext bluetoothContext;
 	private PreferenceChangeComponent uc1;
 	private PreferenceChangeComponent uc2;
 	private SensorManager sm;
 	
 	private ContextDB db;
+	
+	//there are 2 approaches to deal with contexts, this variable serves
+	//as a controller to switch between Anna's and Dean's approach
+	//value = true - Dean
+	//value = false - Anna
+	private boolean controlVariable = false;
 
 	/**
 	 * This is a list of callbacks that have been registered with the service.
@@ -138,30 +144,59 @@ public class ContextEngine extends Service {
 
 		public void newComposite(String compositeName) throws RemoteException {
 
-			Context c = getApplicationContext();
-			bc = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
-
-			// listen to these particular preferences change
-			SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-			String pref1 = "remember_pwd";
-			String pref2 = "method";
-			uc1 = new PreferenceChangeComponent(sp, pref1,PreferenceChangeComponent.PreferenceType.BOOLEAN, c);
-			uc2 = new PreferenceChangeComponent(sp, pref2, PreferenceChangeComponent.PreferenceType.STRING, c);
-			// lightcontext = new LightContext(sm, getApplicationContext());
-			CompositeComponent cc = new CompositeComponent("testComposite",	c);
-			WifiContext wc = new WifiContext(
-					(WifiManager) getSystemService(Context.WIFI_SERVICE), c);
-			// ArrayList<String> eithers = new ArrayList<String>();
-			// eithers.add("remember_pwd");
-			// eithers.add("bluetoothON");
-			cc.registerComponent("bluetoothOn", true);
-			cc.registerComponent("wifiOn", false);
-			// cc.registerComponent("bluetoothON", false);
-			// or listen to any preference change
-			// uc = new UserPreferenceContext(sp, getApplicationContext());
-			// lightcontext = new LightContext(sm, getApplicationContext());
-			if (D)
-				Log.d(LOG_TAG, "newComposite");
+			if (controlVariable){
+				Context c = getApplicationContext();
+				bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
+	
+				// listen to these particular preferences change
+				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
+				String pref1 = "remember_pwd";
+				String pref2 = "method";
+				uc1 = new PreferenceChangeComponent(sp, pref1,PreferenceChangeComponent.PreferenceType.BOOLEAN, c);
+				uc2 = new PreferenceChangeComponent(sp, pref2, PreferenceChangeComponent.PreferenceType.STRING, c);
+				// lightcontext = new LightContext(sm, getApplicationContext());
+				CompositeComponent cc = new CompositeComponent("testComposite",	c);
+				WifiContext wc = new WifiContext(
+						(WifiManager) getSystemService(Context.WIFI_SERVICE), c);
+				// ArrayList<String> eithers = new ArrayList<String>();
+				// eithers.add("remember_pwd");
+				// eithers.add("bluetoothON");
+				cc.registerComponent("bluetoothOn", true);
+				cc.registerComponent("wifiOn", false);
+				// cc.registerComponent("bluetoothON", false);
+				// or listen to any preference change
+				// uc = new UserPreferenceContext(sp, getApplicationContext());
+				// lightcontext = new LightContext(sm, getApplicationContext());
+				if (D)
+					Log.d(LOG_TAG, "Dean's approach");
+			}
+			else{
+				Context c = getApplicationContext();
+				WifiContext wifiContext = new WifiContext(
+						(WifiManager) getSystemService(Context.WIFI_SERVICE), c);
+				
+				bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
+				
+				lightcontext = new LightContext(sm, getApplicationContext());
+				lightcontext.addRange(0.00, 100.00, "LOW");
+				lightcontext.addRange(100.01, 180.00, "MEDIUM");
+				lightcontext.addRange(180.01, 250.00, "HIGH");
+				
+				
+				RuledCompositeComponent rcc = new RuledCompositeComponent("test1", c);
+				
+				rcc.registerComponent(wifiContext);
+				rcc.registerComponent(bluetoothContext);
+				rcc.registerComponent(lightcontext);
+				
+				rcc.addRule(new String[]{"ON","ON","MEDIUM"}, "ON");
+				rcc.addRule(new String[]{"ON","OFF","HIGH"}, "ON");		
+				
+				
+				
+				if (D)
+					Log.d(LOG_TAG, "Anna's approach");
+			}
 
 		}
 
@@ -313,8 +348,8 @@ public class ContextEngine extends Service {
 		mNM.cancel(R.string.local_service_started);
 		// lightcontext.stop();
 		// sync.stop();
-		bc.stop();
-		bc = null;
+		bluetoothContext.stop();
+		bluetoothContext = null;
 		uc1.stop();
 		uc1 = null;
 		uc2.stop();
