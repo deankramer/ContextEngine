@@ -36,9 +36,6 @@ public class Component implements Serializable {
 	
 	//a set of valid context values
 	public ArrayList<String> valuesSet = new ArrayList<String>();
-	
-	//a set of rules associated with the component, mainly needed for composite component
-	public Vector<Rule> rules = new Vector<Rule>();
 
 	// BroadcastReceiver
 	public BroadcastReceiver contextMonitor = null;
@@ -182,7 +179,7 @@ public class Component implements Serializable {
 	public void setupValues(ArrayList<String> values){
 		valuesSet.removeAll(valuesSet.subList(0, valuesSet.size()-1));
 		valuesSet.addAll(values);
-	}
+	}	
 	
 	public void stop() {		
 	}
