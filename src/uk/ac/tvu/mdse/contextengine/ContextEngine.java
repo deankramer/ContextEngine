@@ -45,21 +45,28 @@ public class ContextEngine extends Service {
 	private boolean D = true;
 
 	private NotificationManager mNM;
+	private SensorManager sm;
 	private BroadcastReceiver contextMonitor;
 	private IntentFilter filter;
-	private LightContext lightcontext;
-	private CompositeComponent sync;
-	private BluetoothContext bluetoothContext;
-	private PreferenceChangeComponent uc1;
-	private PreferenceChangeComponent uc2;
-	private SensorManager sm;
 	
+	private WifiContext wifiContext;
+	private LightContext lightcontext;
+	private BluetoothContext bluetoothContext;	
+	private PreferenceChangeComponent uc1;
+	private PreferenceChangeComponent uc2;	
+	
+	private CompositeComponent sync;
+	private RuledCompositeComponent ruledCC;	
+	
+	private Context c;
 	private ContextDB db;
 	
+	private ArrayList<Component> activeContexts = new ArrayList<Component>();
+	
 	//there are 2 approaches to deal with contexts, this variable serves
-	//as a controller to switch between Anna's and Dean's approach
-	//value = true - Dean
-	//value = false - Anna
+	//as a controller to switch between hashtable and rules approach
+	//value = true - hashtable
+	//value = false - rules
 	private boolean controlVariable = false;
 
 	/**
@@ -93,19 +100,22 @@ public class ContextEngine extends Service {
 	public void onCreate() {
 		if (D)
 			Log.d(LOG_TAG, "onCreate");
+		
 		mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		filter = new IntentFilter(
 				"uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED");
 		setupContextMonitor();
 
+		c = getApplicationContext();
+		
 		// While this service is running, it will continually increment a
 		// number. Send the first message that is used to perform the
 		// increment.
 		mHandler.sendEmptyMessage(REPORT_MSG);
 		
 		// Manage list of all contexts registered with the engine and store the list in the database
-		db = new ContextDBSQLite(getApplicationContext());
+		db = new ContextDBSQLite(c);
 	}
 
 	@Override
@@ -168,34 +178,17 @@ public class ContextEngine extends Service {
 				// uc = new UserPreferenceContext(sp, getApplicationContext());
 				// lightcontext = new LightContext(sm, getApplicationContext());
 				if (D)
-					Log.d(LOG_TAG, "Dean's approach");
+					Log.d(LOG_TAG, "Hashtable approach");
 			}
-			else{
-				Context c = getApplicationContext();
-				WifiContext wifiContext = new WifiContext(
-						(WifiManager) getSystemService(Context.WIFI_SERVICE), c);
+			else{				
 				
-				bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
+				ruledCC = new RuledCompositeComponent(compositeName, c);
 				
-				lightcontext = new LightContext(sm, getApplicationContext());
-				lightcontext.addRange(0.00, 100.00, "LOW");
-				lightcontext.addRange(100.01, 180.00, "MEDIUM");
-				lightcontext.addRange(180.01, 250.00, "HIGH");
-				
-				
-				RuledCompositeComponent rcc = new RuledCompositeComponent("test1", c);
-				
-				rcc.registerComponent(wifiContext);
-				rcc.registerComponent(bluetoothContext);
-				rcc.registerComponent(lightcontext);
-				
-				rcc.addRule(new String[]{"ON","ON","MEDIUM"}, "ON");
-				rcc.addRule(new String[]{"ON","OFF","HIGH"}, "ON");		
-				
-				
+				activeContexts.add(ruledCC);
+				db.addContext(ruledCC);
 				
 				if (D)
-					Log.d(LOG_TAG, "Anna's approach");
+					Log.d(LOG_TAG, "Ruled approach");
 			}
 
 		}
@@ -204,9 +197,81 @@ public class ContextEngine extends Service {
 				throws RemoteException {
 			// lightcontext = new LightContext(sm, getApplicationContext());
 			// sync.registerComponent(componentName);
-			// showNotification("light changed");
+			
+			//if contexts not active yet, make them active			
+			if ((componentName.equals("WIFI"))&&!activeContexts.contains(wifiContext)){
+				wifiContext = new WifiContext(
+					(WifiManager) getSystemService(Context.WIFI_SERVICE), c);
+				activeContexts.add(wifiContext);
+				db.addContext(wifiContext);
+			}
+			
+			if ((componentName.equals("BLUETOOTH"))&&!activeContexts.contains(bluetoothContext)){
+				bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
+				activeContexts.add(bluetoothContext);
+				db.addContext(bluetoothContext);
+			}
+			
+			if ((componentName.equals("LIGHT"))&&!activeContexts.contains(lightcontext)){
+				lightcontext = new LightContext(sm, getApplicationContext());
+				activeContexts.add(lightcontext);
+				db.addContext(lightcontext);
+			}
+			
+			RuledCompositeComponent ruledComponent = null;
+			Component copmonent = null;
+			
+			//look up for the composite if created
+			for (Component ac: activeContexts){
+				if (ac.contextName.equals(compositeName))
+					ruledComponent = (RuledCompositeComponent) ac;
+				if (ac.contextName.equals(componentName))
+					copmonent = ac;			
+			}		
+			
+			if ((ruledComponent!=null)&&(copmonent!=null)){
+//				ruledCC.registerComponent(wifiContext);
+//				ruledCC.registerComponent(bluetoothContext);
+//				ruledCC.registerComponent(lightcontext);
+				ruledComponent.registerComponent(copmonent);				
+			}			
+			
 			if (D)
 				Log.d(LOG_TAG, "registerComponent");
+		}
+		
+		public void addRange(String componentName, double minValue, double maxValue, String contextValue){
+//			lightcontext.addRange(0.00, 100.00, "LOW");
+//			lightcontext.addRange(100.01, 180.00, "MEDIUM");
+//			lightcontext.addRange(180.01, 250.00, "HIGH");
+			
+			//look up for the component
+			ListenerComponent component = null;
+			
+			//look up for the composite if created
+			for (Component ac: activeContexts){
+				if (ac.contextName.equals(componentName))
+					component = (ListenerComponent) ac;				
+			}		
+			
+			component.addRange(minValue, maxValue, contextValue);
+			
+		}
+		
+		public void addRule(String componentName, String[] condition, String result){
+//			rcc.addRule(new String[]{"ON","ON","MEDIUM"}, "ON");
+//			rcc.addRule(new String[]{"ON","OFF","HIGH"}, "ON");	
+			
+			RuledCompositeComponent ruledComponent = null;
+			
+			//look up for the composite if created
+			for (Component ac: activeContexts){
+				if (ac.contextName.equals(componentName))
+					ruledComponent = (RuledCompositeComponent) ac;		
+			}	
+			
+			if ((ruledComponent!=null)&&(ruledComponent.getComponentsNo() == condition.length))
+				ruledComponent.addRule(condition, result);
 		}
 
 		public void registerCallback(IRemoteServiceCallback cb) {
@@ -218,7 +283,6 @@ public class ContextEngine extends Service {
 			if (cb != null)
 				mCallbacks.unregister(cb);
 		}
-
 	};
 	
 	public final ISynchronousCommunication.Stub synchronousBinder = new ISynchronousCommunication.Stub() {

@@ -9,6 +9,8 @@ interface IContextsDefinition {
   void registerCallback(IRemoteServiceCallback cb);
   void newComposite(in String compositeName);
   void registerComponent(in String componentName, in String compositeName);  
+  void addRange(in String componentName, in double minValue, in double maxValue, in String contextValue);
+  void addRule(in String componentName, in String[] condition, in String result);
   void unregisterCallback(IRemoteServiceCallback cb);
 }
 

@@ -64,7 +64,7 @@ public class ListenerComponent extends Component implements SensorEventListener{
 		sendNotification();		
 	}
 	
-	public boolean addRange(Double minValue, Double maxValue, String contextValue){		
+	public boolean addRange(double minValue, double maxValue, String contextValue){		
 		
 		if (checkRange(contextValue))
 			return false;

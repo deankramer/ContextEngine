@@ -151,4 +151,8 @@ public class RuledCompositeComponent extends Component implements Serializable {
 		else
 			return false;
 	}
+	
+	public int getComponentsNo(){
+		return this.components.size();
+	}
 }
