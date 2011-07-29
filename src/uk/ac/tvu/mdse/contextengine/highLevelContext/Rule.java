@@ -17,9 +17,17 @@ public class Rule {
 	}
 	
 	public String fireRule(String[] condition){
-		if (condition.equals(ifCondition))
+		int i=0;
+		boolean match = false;
+		if (condition[i].equals(ifCondition[i])){
+			i++;
+			if (i == ifCondition.length-1)
+				match = true;
+		}
+			
+		if (match)
 			return thenStatement;
 		else
-			return null;
+			return "OFF";
 	}
 }

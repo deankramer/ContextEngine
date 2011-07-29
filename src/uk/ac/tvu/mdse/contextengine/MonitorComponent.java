@@ -24,19 +24,20 @@ public class MonitorComponent extends Component{
     public String filterAction = "";
     public String monitoringData = "";
     public String monitoringKey;
+    String[] values = new String[]{"ON","OFF"};
     
     
 	public MonitorComponent(String name, Context c){		
 		super(name, c);	
-		//default set of context values is ON&OFF
-		addValues((ArrayList<String>) Arrays.asList("ON","OFF"));
+		//default set of context values is ON&OFF		
+		addValues(values);
 		setupMonitor();
 	}
 	
 	public MonitorComponent(String name, Context c, String action){		
 		super(name, c);	
 		this.filterAction = action;	
-		addValues((ArrayList<String>) Arrays.asList("ON","OFF"));
+		addValues(values);
 		setupMonitor();
 	}
 	
@@ -45,7 +46,7 @@ public class MonitorComponent extends Component{
 		super(name, c);	
 		this.filterAction = action;		
 		this.monitoringKey = key;
-		addValues((ArrayList<String>) Arrays.asList("ON","OFF"));
+		addValues(values);
 		setupMonitor();
 	}
 	
@@ -64,7 +65,7 @@ public class MonitorComponent extends Component{
 	
 	protected void checkContext(Bundle data) {
 		//check data		
-		checkContextValue(data.toString());
+		//checkContextValue(data.toString());
 		//evaluate by firing off the rules
 		//set contextValue
 		//sendNotification

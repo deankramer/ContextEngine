@@ -44,6 +44,8 @@ public class ContextEngine extends Service {
 	private static final String LOG_TAG = "ContextEngine";
 	private boolean D = true;
 
+	public static final String CONTEXT_INFORMATION = "context_information";
+	
 	private NotificationManager mNM;
 	private SensorManager sm;
 	private BroadcastReceiver contextMonitor;
@@ -183,9 +185,13 @@ public class ContextEngine extends Service {
 			else{				
 				
 				ruledCC = new RuledCompositeComponent(compositeName, c);
+				WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);				
+				wifiContext = new WifiContext(wm, c);
+				bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
+				lightcontext = new LightContext(sm, getApplicationContext());
 				
 				activeContexts.add(ruledCC);
-				db.addContext(ruledCC);
+				//db.addContext(ruledCC);
 				
 				if (D)
 					Log.d(LOG_TAG, "Ruled approach");
@@ -199,51 +205,42 @@ public class ContextEngine extends Service {
 			// sync.registerComponent(componentName);
 			
 			//if contexts not active yet, make them active			
-			if ((componentName.equals("WIFI"))&&!activeContexts.contains(wifiContext)){
-				wifiContext = new WifiContext(
-					(WifiManager) getSystemService(Context.WIFI_SERVICE), c);
+			if (componentName.equals("WIFI")){//&&!activeContexts.contains(wifiContext)){				
 				activeContexts.add(wifiContext);
-				db.addContext(wifiContext);
+				//db.addContext(wifiContext);
 			}
 			
-			if ((componentName.equals("BLUETOOTH"))&&!activeContexts.contains(bluetoothContext)){
-				bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
+			if (componentName.equals("BLUETOOTH")){ //&&!activeContexts.contains(bluetoothContext)){				
 				activeContexts.add(bluetoothContext);
-				db.addContext(bluetoothContext);
+				//db.addContext(bluetoothContext);
 			}
 			
-			if ((componentName.equals("LIGHT"))&&!activeContexts.contains(lightcontext)){
-				lightcontext = new LightContext(sm, getApplicationContext());
+			if (componentName.equals("LIGHT")){ //&&!activeContexts.contains(lightcontext)){				
 				activeContexts.add(lightcontext);
-				db.addContext(lightcontext);
+				Log.d(LOG_TAG, "lightcontext");
+				//db.addContext(lightcontext);
 			}
 			
 			RuledCompositeComponent ruledComponent = null;
-			Component copmonent = null;
+			Component component = null;
 			
 			//look up for the composite if created
 			for (Component ac: activeContexts){
 				if (ac.contextName.equals(compositeName))
 					ruledComponent = (RuledCompositeComponent) ac;
 				if (ac.contextName.equals(componentName))
-					copmonent = ac;			
+					component = ac;			
 			}		
 			
-			if ((ruledComponent!=null)&&(copmonent!=null)){
-//				ruledCC.registerComponent(wifiContext);
-//				ruledCC.registerComponent(bluetoothContext);
-//				ruledCC.registerComponent(lightcontext);
-				ruledComponent.registerComponent(copmonent);				
+			if ((ruledComponent!=null)&&(component!=null)){
+				ruledComponent.registerComponent(component);				
 			}			
 			
 			if (D)
 				Log.d(LOG_TAG, "registerComponent");
 		}
 		
-		public void addRange(String componentName, double minValue, double maxValue, String contextValue){
-//			lightcontext.addRange(0.00, 100.00, "LOW");
-//			lightcontext.addRange(100.01, 180.00, "MEDIUM");
-//			lightcontext.addRange(180.01, 250.00, "HIGH");
+		public void addRange(String componentName, String minValue, String maxValue, String contextValue){
 			
 			//look up for the component
 			ListenerComponent component = null;
@@ -253,8 +250,11 @@ public class ContextEngine extends Service {
 				if (ac.contextName.equals(componentName))
 					component = (ListenerComponent) ac;				
 			}		
-			
-			component.addRange(minValue, maxValue, contextValue);
+			Log.d(LOG_TAG, "addRange" +  componentName);
+			if (component!=null)
+				component.addRange(Integer.valueOf(minValue), Integer.valueOf(maxValue), contextValue);
+			else
+				lightcontext.addRange(Integer.valueOf(minValue), Integer.valueOf(maxValue), contextValue);
 			
 		}
 		
@@ -270,8 +270,10 @@ public class ContextEngine extends Service {
 					ruledComponent = (RuledCompositeComponent) ac;		
 			}	
 			
-			if ((ruledComponent!=null)&&(ruledComponent.getComponentsNo() == condition.length))
+			//if ((ruledComponent!=null)&&(ruledComponent.getComponentsNo() == condition.length))
 				ruledComponent.addRule(condition, result);
+				ruledComponent.fireRules();
+				Log.d(LOG_TAG, "addRule" );
 		}
 
 		public void registerCallback(IRemoteServiceCallback cb) {
@@ -314,21 +316,25 @@ public class ContextEngine extends Service {
 					if (D)
 						Log.d(LOG_TAG, "onReceive");
 					Bundle bundle = intent.getExtras();
+					Message msg = new Message();
+					msg.setData(bundle);
+					mHandler.sendMessage(msg);
+					
 					String changeName = bundle
 							.getString(Component.CONTEXT_NAME);
-					boolean currentcontext = bundle
-							.getBoolean(Component.CONTEXT_VALUE);
+//					boolean currentcontext = bundle
+//							.getBoolean(Component.CONTEXT_VALUE);
 					String contextvalue = bundle
-							.getString(PreferenceChangeComponent.CONTEXT_VALUE);
+							.getString(PreferenceChangeComponent.CONTEXT_INFORMATION);
 					// if(changeName.equalsIgnoreCase("datasync_ON") &&(
 					// currentcontext ) )
 					// getListView().setBackgroundResource(color.black);
 					// else if (changeName.equalsIgnoreCase("datasync_ON") &&(
 					// !currentcontext ) )
 					// getListView().setBackgroundResource(color.white);
-					if (contextvalue == null)
-						showNotification(changeName+ " "+currentcontext);
-					else
+//					if (contextvalue == null)
+//						showNotification(changeName+ " "+currentcontext);
+//					else
 						showNotification(changeName+ " "+contextvalue);
 				}
 			}
@@ -380,13 +386,15 @@ public class ContextEngine extends Service {
 			// It is time to bump the value!
 			case REPORT_MSG: {
 				// Up it goes.
-				int value = ++mValue;
-
+//				int value = ++value;
+				Bundle bundle = msg.getData();
+				String contextInfo = bundle
+				.getString(Component.CONTEXT_NAME);
 				// Broadcast to all clients the new value.
 				final int N = mCallbacks.beginBroadcast();
 				for (int i = 0; i < N; i++) {
 					try {
-						mCallbacks.getBroadcastItem(i).valueChanged(value);
+						mCallbacks.getBroadcastItem(i).valueChanged(contextInfo);
 					} catch (RemoteException e) {
 						// The RemoteCallbackList will take care of removing
 						// the dead object for us.
@@ -395,7 +403,7 @@ public class ContextEngine extends Service {
 				mCallbacks.finishBroadcast();
 
 				// Repeat every 1 second.
-				sendMessageDelayed(obtainMessage(REPORT_MSG), 1 * 1000);
+//				sendMessageDelayed(obtainMessage(REPORT_MSG), 1 * 1000);
 			}
 				break;
 			default:
@@ -412,12 +420,16 @@ public class ContextEngine extends Service {
 		mNM.cancel(R.string.local_service_started);
 		// lightcontext.stop();
 		// sync.stop();
-		bluetoothContext.stop();
-		bluetoothContext = null;
-		uc1.stop();
-		uc1 = null;
-		uc2.stop();
-		uc2 = null;
+		for (Component ac: activeContexts){
+			ac.stop();
+			ac = null;
+		}
+//		bluetoothContext.stop();
+//		bluetoothContext = null;
+//		uc1.stop();
+//		uc1 = null;
+//		uc2.stop();
+//		uc2 = null;
 		// lightcontext= null;
 		// sync=null;
 		unregisterReceiver(contextMonitor);

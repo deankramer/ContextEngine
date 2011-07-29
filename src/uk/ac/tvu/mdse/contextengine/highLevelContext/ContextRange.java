@@ -8,17 +8,17 @@ package uk.ac.tvu.mdse.contextengine.highLevelContext;
 
 public class ContextRange {
 
-	public Double minValue;
-	public Double maxValue;
+	public int minValue;
+	public int maxValue;
 	public String contextHighValue;
 	
-	public ContextRange(Double mv, Double mxv, String value){
+	public ContextRange(int mv, int mxv, String value){
 		this.minValue = mv;
 		this.maxValue = mxv;
 		this.contextHighValue = value;
 	}
 	
-	public String getContextHighValue(Double currentValue){
-		return ((currentValue<=maxValue)&&(currentValue>=minValue)) ? contextHighValue : null;
+	public String getContextHighValue(int currentValue){
+		return ((currentValue<maxValue)&&(currentValue>=minValue)) ? contextHighValue : null;
 	}
 }

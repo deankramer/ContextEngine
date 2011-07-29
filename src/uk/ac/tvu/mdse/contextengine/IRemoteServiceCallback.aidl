@@ -6,5 +6,5 @@ package uk.ac.tvu.mdse.contextengine;
  * one-way interface so the server does not block waiting for the client.
  */
 oneway interface IRemoteServiceCallback { 
-    void valueChanged(int value);
+    void valueChanged(String contextValue);
 }

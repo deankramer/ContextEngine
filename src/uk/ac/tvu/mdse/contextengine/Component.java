@@ -56,8 +56,7 @@ public class Component implements Serializable {
 	public Component(String name, Context c) {
 		context = c;
 		contextName = name;
-		contextValue = false;
-		contextInformation = "default";
+		contextValue = false;		
 	}
 	
 	public void sendNotification(){
@@ -182,26 +181,26 @@ public class Component implements Serializable {
 		}		
 	}
 	
-	public void addValues(ArrayList<String> values){		
+	public void addValues(String[] values){		
 		for (String newValue: values)
 			addValue(newValue);
 	}
 	
-	public void setupValues(ArrayList<String> values){
+	public void setupValues(String[] values){
 		valuesSet.removeAll(valuesSet.subList(0, valuesSet.size()-1));
-		valuesSet.addAll(values);
+		addValues(values);
 	}	
 	
 	
-	public boolean addRange(double minValue, double maxValue, String contextValue){		
+	public boolean addRange(int minValue, int maxValue, String contextValue){		
 		
-		if (checkRange(contextValue))
-			return false;
-		else{
+//		if (checkRange(contextValue))
+//			return false;
+//		else{
 			contextRangeSet.add(new ContextRange(minValue,maxValue,contextValue));		
 			valuesSet.add(contextValue);
 			return true;
-		}		
+		//}		
 	}
 	
 	public boolean checkRange(String contextValue){

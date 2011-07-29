@@ -7,6 +7,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.BatteryManager;
+import android.util.Log;
 
 public class LightContext extends ListenerComponent implements SensorEventListener {
 
@@ -19,10 +20,8 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 	
 	public LightContext(SensorManager sm, Context c) {
 		super("LIGHTCONTEXT", c, sm, Sensor.TYPE_LIGHT,SensorManager.SENSOR_DELAY_NORMAL );		
-		this.addRange(0, 100, "LOW");
-		this.addRange(101, 180, "MEDIUM");
-		this.addRange(181, 500, "HIGH");
 		this.contextInformation = obtainContextInformation(sm);
+		Log.d("LightContext", this.contextInformation);
 	}	
 	
 	protected String obtainContextInformation(SensorManager sm){
@@ -34,25 +33,26 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 
 	public void checkContext(SensorEvent data) {
 		double v = data.values[0];
-		if ((v >= HIGH_LUM_VALUE) && (value != 3)) {
-			value = 3;
-			sendNotification("lightlevelLOW", false);
-			sendNotification("lightlevelMEDIUM", false);
-			sendNotification("lightlevelHIGH", true);
-		} else if ((v >= MEDIUM_LUM_VALUE) && (value != 2)) {
-			value = 2;
-			sendNotification("lightlevelLOW", false);
-			sendNotification("lightlevelMEDIUM", true);
-			sendNotification("lightlevelHIGH", false);
-		} else if ((v < MEDIUM_LUM_VALUE) && (value != 1)) {
-			value = 1;
-			sendNotification("lightlevelLOW", true);
-			sendNotification("lightlevelMEDIUM", false);
-			sendNotification("lightlevelHIGH", false);
-		}	
+//		if ((v >= HIGH_LUM_VALUE) && (value != 3)) {
+//			value = 3;
+//			sendNotification("lightlevelLOW", false);
+//			sendNotification("lightlevelMEDIUM", false);
+//			sendNotification("lightlevelHIGH", true);
+//		} else if ((v >= MEDIUM_LUM_VALUE) && (value != 2)) {
+//			value = 2;
+//			sendNotification("lightlevelLOW", false);
+//			sendNotification("lightlevelMEDIUM", true);
+//			sendNotification("lightlevelHIGH", false);
+//		} else if ((v < MEDIUM_LUM_VALUE) && (value != 1)) {
+//			value = 1;
+//			sendNotification("lightlevelLOW", true);
+//			sendNotification("lightlevelMEDIUM", false);
+//			sendNotification("lightlevelHIGH", false);
+//		}	
 		
 		//send context value - 2nd approach
 		String highContext = this.getContextInformation(v);
+		Log.d("LightContext", "newValue" +highContext);
 		if ((highContext.equals("HIGH")) && (!contextInformation.equals("HIGH"))) {				
 			contextInformation = "HIGH";
 			sendNotification();

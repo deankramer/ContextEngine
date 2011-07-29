@@ -9,6 +9,7 @@ import uk.ac.tvu.mdse.contextengine.highLevelContext.Rule;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 /**
  * @project ContextEngine
@@ -37,17 +38,6 @@ public class RuledCompositeComponent extends Component implements Serializable {
 		setupMonitor();
 	}
 
-//	public RuledCompositeComponent(String name, Context c, ArrayList<String> pc,
-//			ArrayList<String> nc) {
-//		super(name, c);
-//		positivecontexts = new Hashtable<String, Boolean>();
-//		setupMonitor();
-//		for (String cn : pc)
-//			registerComponent(cn, false);
-//		for (String cn : nc)
-//			registerComponent(cn, true);
-//	}
-
 	private void setupMonitor() {
 		// TODO Auto-generated method stub
 		contextMonitor = new BroadcastReceiver() {
@@ -55,9 +45,9 @@ public class RuledCompositeComponent extends Component implements Serializable {
 			@Override
 			public void onReceive(Context c, Intent in) {
 				// TODO Auto-generated method stub
-				String context = in.getExtras().getString(CONTEXT_NAME);
-				boolean value = in.getExtras().getBoolean(CONTEXT_VALUE);
-					checkContext();				
+//				String context = in.getExtras().getString(CONTEXT_NAME);
+//				boolean value = in.getExtras().getBoolean(CONTEXT_VALUE);
+				checkContext();				
 			}
 		};
 		context.registerReceiver(contextMonitor, filter);
@@ -66,12 +56,10 @@ public class RuledCompositeComponent extends Component implements Serializable {
 
 	public void checkContext(){
 		String compositeContextValue  = fireRules();
-		if (!(compositeContextValue.equals(null)||compositeContextValue.equals(this.contextInformation))){
+		if (!((compositeContextValue.equals(null)||compositeContextValue.equals(this.contextInformation)))){
 			this.contextInformation = compositeContextValue;
 			sendNotification();
-		}
-			
-			
+		}			
 	}
 	
 	//ALL or ANY
@@ -104,14 +92,16 @@ public class RuledCompositeComponent extends Component implements Serializable {
 		String[] componentContexts = new String[components.size()];
 		int i =0;
 		for (Component c: components){
-			componentContexts[i++] = c.contextInformation;
+			componentContexts[i] = c.contextInformation;
+			i++;
+			Log.d(LOG_TAG, "fireRules" +  componentContexts[i]);
 		}
 		
 		String thenStatement = "";
 		for(Rule r: rules)
 			thenStatement = r.fireRule(componentContexts);
 		
-		if(thenStatement.equals(null)&&thenStatement.trim().equals(""))
+		if(thenStatement.equals(null)||thenStatement.trim().equals(""))
 			return null;
 		else
 			return thenStatement;

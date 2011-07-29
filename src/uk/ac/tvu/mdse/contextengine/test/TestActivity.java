@@ -95,15 +95,15 @@ public class TestActivity extends Activity {
 				// contextService =
 				// ((ContextEngine.LocalBinder)service).getService();
 				contextService = IContextsDefinition.Stub.asInterface(service);
-				try {
-
-					contextService.newComposite("datasync_ON");
-					contextService.registerComponent("datasync_ON",
-							"lightlevelHIGH");
-				} catch (RemoteException e) {
-
-					e.printStackTrace();
-				}
+//				try {
+//
+//					contextService.newComposite("datasync_ON");
+//					contextService.registerComponent("datasync_ON",
+//							"lightlevelHIGH");
+//				} catch (RemoteException e) {
+//
+//					e.printStackTrace();
+//				}
 
 			} catch (NotFoundException e) {
 

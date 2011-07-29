@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 
 public class BluetoothContext extends MonitorComponent {
 
@@ -17,6 +18,8 @@ public class BluetoothContext extends MonitorComponent {
 		super("BLUETOOTH", c, "android.bluetooth.adapter.action.STATE_CHANGED", "bluetoothAdapter.getState()" );	
 		this.bluetoothAdapter = ba;
 		this.contextInformation = obtainContextInformation();
+		//this.contextInformation = "ON";
+		Log.d("BluetoothContext", this.contextInformation);
 	}
 	
 	protected String obtainContextInformation(){
@@ -32,13 +35,13 @@ public class BluetoothContext extends MonitorComponent {
 		//evaluate by firing off the rules
 		//set contextValue	
 		int bluetoothValue = bluetoothAdapter.getState();
-		if (bluetoothValue == BluetoothAdapter.STATE_ON) {
-			sendNotification("bluetoothON", true);
-			sendNotification("bluetoothOFF", false);
-		} else {
-			sendNotification("bluetoothON", false);
-			sendNotification("bluetoothOFF", true);
-		}
+//		if (bluetoothValue == BluetoothAdapter.STATE_ON) {
+//			sendNotification("bluetoothON", true);
+//			sendNotification("bluetoothOFF", false);
+//		} else {
+//			sendNotification("bluetoothON", false);
+//			sendNotification("bluetoothOFF", true);
+//		}
 		
 		//send context information - 2nd approach
 		if ((bluetoothValue == BluetoothAdapter.STATE_ON)&&(!contextInformation.equals("ON"))) {
