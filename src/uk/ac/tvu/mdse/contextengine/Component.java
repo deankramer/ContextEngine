@@ -37,6 +37,9 @@ public class Component implements Serializable {
 	//a set of valid context values
 	public ArrayList<String> valuesSet = new ArrayList<String>();
 
+	//to hold high level contexts with its range of values
+	public ArrayList<ContextRange> contextRangeSet = new ArrayList<ContextRange>();
+	
 	// BroadcastReceiver
 	public BroadcastReceiver contextMonitor = null;
 
@@ -100,6 +103,14 @@ public class Component implements Serializable {
 	}
 	
 	public String getContextInformation(){
+		return contextInformation;
+	}
+	
+	public String getContextInformation(double contextInput){
+		for (ContextRange cr: contextRangeSet){
+			if ((cr.maxValue>contextInput)&&(cr.minValue<contextInput))
+				contextInformation = cr.contextHighValue;
+		}
 		return contextInformation;
 	}
 	
@@ -180,6 +191,27 @@ public class Component implements Serializable {
 		valuesSet.removeAll(valuesSet.subList(0, valuesSet.size()-1));
 		valuesSet.addAll(values);
 	}	
+	
+	
+	public boolean addRange(double minValue, double maxValue, String contextValue){		
+		
+		if (checkRange(contextValue))
+			return false;
+		else{
+			contextRangeSet.add(new ContextRange(minValue,maxValue,contextValue));		
+			valuesSet.add(contextValue);
+			return true;
+		}		
+	}
+	
+	public boolean checkRange(String contextValue){
+		boolean exist = false;
+		for (ContextRange cr: contextRangeSet){
+			if (cr.contextHighValue.equals(contextValue))
+				exist = true;
+		}	
+		return exist;		
+	}
 	
 	public void stop() {		
 	}

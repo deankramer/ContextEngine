@@ -25,8 +25,6 @@ public class ListenerComponent extends Component implements SensorEventListener{
 	private int sensorType;
 	private int delayType; 
 	
-	//to hold high level contexts with its range of values
-	public ArrayList<ContextRange> contextRangeSet = new ArrayList<ContextRange>();
 	
 	public ListenerComponent(String name, Context c, SensorManager sm, int sensorT, int delayT) {
 		super(name, c);
@@ -62,26 +60,6 @@ public class ListenerComponent extends Component implements SensorEventListener{
 		//fire off the rules
 		//set contextValue	
 		sendNotification();		
-	}
-	
-	public boolean addRange(double minValue, double maxValue, String contextValue){		
-		
-		if (checkRange(contextValue))
-			return false;
-		else{
-			contextRangeSet.add(new ContextRange(minValue,maxValue,contextValue));		
-			valuesSet.add(contextValue);
-			return true;
-		}		
-	}
-	
-	public boolean checkRange(String contextValue){
-		boolean exist = false;
-		for (ContextRange cr: contextRangeSet){
-			if (cr.contextHighValue.equals(contextValue))
-				exist = true;
-		}	
-		return exist;		
 	}
 
 	public void stop() {

@@ -15,7 +15,23 @@ public class BatteryContext extends MonitorComponent{
 	
 	public BatteryContext(String name, Context c) {
 		super("BATTERY_LEVEL", c, "Intent.ACTION_BATTERY_CHANGED", "BatteryManager.EXTRA_STATUS");		
+		this.addRange(0, 30, "LOW");
+		this.addRange(31, 80, "MEDIUM");
+		this.addRange(81, 200, "HIGH");
+		this.contextInformation = obtainContextInformation();
 	}	
+	
+	protected String obtainContextInformation(){
+		BatteryManager bm = new BatteryManager();
+		
+		int rawlevel = Integer.valueOf(bm.EXTRA_LEVEL);
+        int scale = Integer.valueOf(bm.EXTRA_SCALE);
+        
+        if (rawlevel >= 0 && scale > 0) 
+            v = (rawlevel * 100) / scale; 
+        
+        return this.getContextInformation(v);
+	}
 	
 	protected void checkContext(Bundle data) {
 		int rawlevel = data.getInt(BatteryManager.EXTRA_LEVEL, -1);
@@ -40,8 +56,19 @@ public class BatteryContext extends MonitorComponent{
 				sendNotification("batterylevelHIGH", false);
 			}
         }
-	}
-	
-	
+        
+      //send context value - 2nd approach
+		String highContext = this.getContextInformation(v);
+		if ((highContext.equals("HIGH")) && (!contextInformation.equals("HIGH"))) {				
+			contextInformation = "HIGH";
+			sendNotification();
+		} else if ((highContext.equals("MEDIUM")) && (!contextInformation.equals("MEDIUM"))) {
+			contextInformation = "MEDIUM";
+			sendNotification();
+		} else if ((highContext.equals("LOW")) && (!contextInformation.equals("LOW"))) {				
+			contextInformation = "LOW";
+			sendNotification();
+		}
+	}	
 }
 

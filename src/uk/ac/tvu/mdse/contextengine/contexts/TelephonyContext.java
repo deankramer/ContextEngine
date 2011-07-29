@@ -13,7 +13,7 @@ public class TelephonyContext extends MonitorComponent {
 	public TelephonyManager tm;
 
 	public TelephonyContext(String name, Context c) {
-		super("TELEPHONY", c, "android.net.conn.CONNECTIVITY_CHANGE");
+		super("TELEPHONY_CONNECTED", c, "android.net.conn.CONNECTIVITY_CHANGE");
 		//checkContext();
 		this.tm = (TelephonyManager) c.getSystemService(Context.TELEPHONY_SERVICE);
 	}

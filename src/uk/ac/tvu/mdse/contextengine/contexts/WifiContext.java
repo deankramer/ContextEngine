@@ -1,6 +1,7 @@
 package uk.ac.tvu.mdse.contextengine.contexts;
 
 import uk.ac.tvu.mdse.contextengine.MonitorComponent;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.net.wifi.WifiManager;
 
@@ -13,6 +14,15 @@ public class WifiContext extends MonitorComponent {
 		super("WIFI", c, "android.net.wifi.WIFI_STATE_CHANGED");
 		this.wm = wm;		
 		checkContext();
+		this.contextInformation = obtainContextInformation();
+	}
+	
+	protected String obtainContextInformation(){
+		Boolean wifiEnabled = wm.isWifiEnabled();
+		if (wifiEnabled) 
+			return "ON";
+		else
+			return "OFF";
 	}
 
 	protected void checkContext() {
@@ -26,13 +36,12 @@ public class WifiContext extends MonitorComponent {
 		}
 
 		//send context value - 2nd approach
-//		Boolean wifiEnabled = wm.isWifiEnabled();
-//		if (wifiEnabled & (!contextValue.equals("ON"))) {			
-//			contextValue = "ON";
-//		} else if ((!wifiEnabled) & (!contextValue.equals("OFF"))) {			
-//			contextValue = "OFF";
-//		}
-//		sendNotification();
+		if (wifiEnabled & (!contextInformation.equals("ON"))) {			
+			contextInformation = "ON";
+		} else if ((!wifiEnabled) & (!contextInformation.equals("OFF"))) {			
+			contextInformation = "OFF";
+		}
+		sendNotification();
 	}
 
 
