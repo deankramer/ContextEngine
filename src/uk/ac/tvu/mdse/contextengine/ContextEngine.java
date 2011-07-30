@@ -63,6 +63,8 @@ public class ContextEngine extends Service {
 	private Context c;
 	private ContextDB db;
 	
+	int defined = 0;
+	
 	private ArrayList<Component> activeContexts = new ArrayList<Component>();
 	
 	//there are 2 approaches to deal with contexts, this variable serves
@@ -107,14 +109,14 @@ public class ContextEngine extends Service {
 		sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		filter = new IntentFilter(
 				"uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED");
-		setupContextMonitor();
+		//setupContextMonitor();
 
 		c = getApplicationContext();
 		
 		// While this service is running, it will continually increment a
 		// number. Send the first message that is used to perform the
 		// increment.
-		mHandler.sendEmptyMessage(REPORT_MSG);
+		//mHandler.sendEmptyMessage(REPORT_MSG);
 		
 		// Manage list of all contexts registered with the engine and store the list in the database
 		db = new ContextDBSQLite(c);
@@ -185,14 +187,19 @@ public class ContextEngine extends Service {
 			else{				
 				
 				ruledCC = new RuledCompositeComponent(compositeName, c);
-				WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);				
-				wifiContext = new WifiContext(wm, c);
-				bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
-				lightcontext = new LightContext(sm, getApplicationContext());
+				
 				
 				activeContexts.add(ruledCC);
 				//db.addContext(ruledCC);
-				
+				try{
+				WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);				
+				wifiContext = new WifiContext(wm, c);
+				bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
+				lightcontext = new LightContext(sm, getApplicationContext()); 
+				}
+				catch(Exception e){
+					Log.d(LOG_TAG, e.getLocalizedMessage());
+				}
 				if (D)
 					Log.d(LOG_TAG, "Ruled approach");
 			}
@@ -272,8 +279,14 @@ public class ContextEngine extends Service {
 			
 			//if ((ruledComponent!=null)&&(ruledComponent.getComponentsNo() == condition.length))
 				ruledComponent.addRule(condition, result);
-				ruledComponent.fireRules();
+				//ruledComponent.fireRules();
 				Log.d(LOG_TAG, "addRule" );
+				defined++;
+				if (defined == 2){
+					setupContextMonitor();
+					ruledComponent.componentDefined();
+				}
+				
 		}
 
 		public void registerCallback(IRemoteServiceCallback cb) {
@@ -316,16 +329,16 @@ public class ContextEngine extends Service {
 					if (D)
 						Log.d(LOG_TAG, "onReceive");
 					Bundle bundle = intent.getExtras();
-					Message msg = new Message();
-					msg.setData(bundle);
-					mHandler.sendMessage(msg);
+//					Message msg = new Message();
+//					msg.setData(bundle);
+//					mHandler.sendMessage(msg);
 					
 					String changeName = bundle
 							.getString(Component.CONTEXT_NAME);
 //					boolean currentcontext = bundle
 //							.getBoolean(Component.CONTEXT_VALUE);
 					String contextvalue = bundle
-							.getString(PreferenceChangeComponent.CONTEXT_INFORMATION);
+							.getString(Component.CONTEXT_INFORMATION);
 					// if(changeName.equalsIgnoreCase("datasync_ON") &&(
 					// currentcontext ) )
 					// getListView().setBackgroundResource(color.black);
@@ -372,45 +385,45 @@ public class ContextEngine extends Service {
 		mNM.notify(count, notification);
 	}
 
-	private static final int REPORT_MSG = 1;
-
-	/**
-	 * Our Handler used to execute operations on the main thread. This is used
-	 * to schedule increments of our value.
-	 */
-	private final Handler mHandler = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-
-			// It is time to bump the value!
-			case REPORT_MSG: {
-				// Up it goes.
-//				int value = ++value;
-				Bundle bundle = msg.getData();
-				String contextInfo = bundle
-				.getString(Component.CONTEXT_NAME);
-				// Broadcast to all clients the new value.
-				final int N = mCallbacks.beginBroadcast();
-				for (int i = 0; i < N; i++) {
-					try {
-						mCallbacks.getBroadcastItem(i).valueChanged(contextInfo);
-					} catch (RemoteException e) {
-						// The RemoteCallbackList will take care of removing
-						// the dead object for us.
-					}
-				}
-				mCallbacks.finishBroadcast();
-
-				// Repeat every 1 second.
-//				sendMessageDelayed(obtainMessage(REPORT_MSG), 1 * 1000);
-			}
-				break;
-			default:
-				super.handleMessage(msg);
-			}
-		}
-	};
+//	private static final int REPORT_MSG = 1;
+//
+//	/**
+//	 * Our Handler used to execute operations on the main thread. This is used
+//	 * to schedule increments of our value.
+//	 */
+//	private final Handler mHandler = new Handler() {
+//		@Override
+//		public void handleMessage(Message msg) {
+//			switch (msg.what) {
+//
+//			// It is time to bump the value!
+//			case REPORT_MSG: {
+//				// Up it goes.
+////				int value = ++value;
+//				Bundle bundle = msg.getData();
+//				String contextInfo = bundle
+//				.getString(Component.CONTEXT_NAME);
+//				// Broadcast to all clients the new value.
+//				final int N = mCallbacks.beginBroadcast();
+//				for (int i = 0; i < N; i++) {
+//					try {
+//						mCallbacks.getBroadcastItem(i).valueChanged(contextInfo);
+//					} catch (RemoteException e) {
+//						// The RemoteCallbackList will take care of removing
+//						// the dead object for us.
+//					}
+//				}
+//				mCallbacks.finishBroadcast();
+//
+//				// Repeat every 1 second.
+////				sendMessageDelayed(obtainMessage(REPORT_MSG), 1 * 1000);
+//			}
+//				break;
+//			default:
+//				super.handleMessage(msg);
+//			}
+//		}
+//	};
 
 	@Override
 	public void onDestroy() {
@@ -439,7 +452,7 @@ public class ContextEngine extends Service {
 
 		// Remove the next pending message to increment the counter, stopping
 		// the increment loop.
-		mHandler.removeMessages(REPORT_MSG);
+		//mHandler.removeMessages(REPORT_MSG);
 
 		// Tell the user we stopped.
 		Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT)

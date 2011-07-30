@@ -34,7 +34,12 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	public Expression simplerRule;
 
 	public RuledCompositeComponent(String name, Context c) {
-		super(name, c);		
+		super(name, c);
+		this.contextInformation = "default";
+		
+	}
+	
+	public void componentDefined(){
 		setupMonitor();
 	}
 
@@ -55,9 +60,10 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	}
 
 	public void checkContext(){
-		String compositeContextValue  = fireRules();
-		if (!((compositeContextValue.equals(null)||compositeContextValue.equals(this.contextInformation)))){
+		String compositeContextValue  = fireRules(); //"ON";//
+		if (!compositeContextValue.equals(this.contextInformation))	{		//((compositeContextValue.equals(null)||compositeContextValue.equals(this.contextInformation)))){
 			this.contextInformation = compositeContextValue;
+			Log.d("Rule", contextInformation);
 			sendNotification();
 		}			
 	}
@@ -74,11 +80,14 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	}
 	
 	public void addRule(String[] conditions, String statement){
-		if (!checkRule(conditions, statement))
-			rules.add(new Rule(conditions, statement));
+		//if (!checkRule(conditions, statement))
+		Rule r = new Rule(conditions, statement);
+			rules.add(r);
+			Log.d("Rule", r.toString());
 	}
 	
 	public boolean checkRule(String[] conditions, String statement){
+		//this is not good
 		Rule rule = new Rule(conditions, statement);
 		return rules.contains(rule);
 	}
@@ -90,19 +99,21 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	
 	public String fireRules(){
 		String[] componentContexts = new String[components.size()];
+		Log.d("fireRules", String.valueOf(componentContexts.length));
 		int i =0;
 		for (Component c: components){
-			componentContexts[i] = c.contextInformation;
-			i++;
+			componentContexts[i] = c.getContextInformation();			
 			Log.d(LOG_TAG, "fireRules" +  componentContexts[i]);
+			i++;
+		}
+		String thenStatement = "";
+		if (!componentContexts.equals(null)){			
+			for(Rule r: rules)
+				thenStatement = r.fireRule(componentContexts);
 		}
 		
-		String thenStatement = "";
-		for(Rule r: rules)
-			thenStatement = r.fireRule(componentContexts);
-		
 		if(thenStatement.equals(null)||thenStatement.trim().equals(""))
-			return null;
+			return "default";
 		else
 			return thenStatement;
 	}
@@ -110,7 +121,7 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	//add a new component to composite
 	public void registerComponent(Component c) {
 	
-		if (!checkComponent(c))
+		//if (!checkComponent(c))
 			components.add(c);
 	}
 	

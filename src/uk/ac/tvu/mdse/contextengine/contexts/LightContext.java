@@ -52,16 +52,19 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 		
 		//send context value - 2nd approach
 		String highContext = this.getContextInformation(v);
-		Log.d("LightContext", "newValue" +highContext);
-		if ((highContext.equals("HIGH")) && (!contextInformation.equals("HIGH"))) {				
+		Log.d("LightContext", "newValue" + v +" "+highContext);
+		if (highContext.equals("HIGH")){// && (!contextInformation.equals("HIGH"))) {				
 			contextInformation = "HIGH";
 			sendNotification();
-		} else if ((highContext.equals("MEDIUM")) && (!contextInformation.equals("MEDIUM"))) {
+			Log.d("LightContext", "newValue set HIGH" );
+		} else if (highContext.equals("MEDIUM")){// && (!contextInformation.equals("MEDIUM"))) {
 			contextInformation = "MEDIUM";
 			sendNotification();
-		} else if ((highContext.equals("LOW")) && (!contextInformation.equals("LOW"))) {				
+			Log.d("LightContext", "newValue set medium");
+		} else if (highContext.equals("LOW")){// && (!contextInformation.equals("LOW"))) {				
 			contextInformation = "LOW";
 			sendNotification();
+			Log.d("LightContext", "newValue set low");
 		}
 	}
 }
