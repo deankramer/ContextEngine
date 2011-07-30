@@ -63,7 +63,7 @@ public class RuledCompositeComponent extends Component implements Serializable {
 		String compositeContextValue  = fireRules(); //"ON";//
 		if (!compositeContextValue.equals(this.contextInformation))	{		//((compositeContextValue.equals(null)||compositeContextValue.equals(this.contextInformation)))){
 			this.contextInformation = compositeContextValue;
-			Log.d("Rule", contextInformation);
+			Log.d("checkContext", contextInformation);
 			sendNotification();
 		}			
 	}
@@ -106,15 +106,18 @@ public class RuledCompositeComponent extends Component implements Serializable {
 			Log.d(LOG_TAG, "fireRules" +  componentContexts[i]);
 			i++;
 		}
-		String thenStatement = "";
+		String thenStatement = "OFF";
 		if (!componentContexts.equals(null)){			
-			for(Rule r: rules)
-				thenStatement = r.fireRule(componentContexts);
+			for(Rule r: rules){
+				if(r.fireRule(componentContexts))
+					thenStatement = r.thenStatement;
+					Log.d(LOG_TAG, "fireRules" +  r.thenStatement);
+			}
 		}
 		
-		if(thenStatement.equals(null)||thenStatement.trim().equals(""))
-			return "default";
-		else
+//		if(thenStatement.equals(null)||thenStatement.trim().equals(""))
+//			return "default";
+//		else
 			return thenStatement;
 	}
 	

@@ -240,7 +240,8 @@ public class ContextEngine extends Service {
 			}		
 			
 			if ((ruledComponent!=null)&&(component!=null)){
-				ruledComponent.registerComponent(component);				
+				ruledComponent.registerComponent(component);	
+				Log.d(LOG_TAG, component.contextName);
 			}			
 			
 			if (D)

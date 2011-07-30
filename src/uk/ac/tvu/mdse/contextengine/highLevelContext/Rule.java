@@ -19,24 +19,21 @@ public class Rule {
 		Log.d("Rule", String.valueOf(ifCondition.length)+" "+ifCondition[0]);
 	}
 	
-	public String fireRule(String[] condition){
+	public boolean fireRule(String[] condition){
 		int i=0;
 		int j =0;
 		boolean match = false;
-		while (i<ifCondition.length-1){
+		while (i<ifCondition.length){
 			if (condition[i].equals(ifCondition[i])){
 				j++;
-				if (j == ifCondition.length-1)
+				if (j == ifCondition.length)
 					match = true;
 				Log.d("Rule", "fire rule" +String.valueOf(j));
 			}
 			i++;
 		}
-			
-		if (match)
-			return thenStatement;
-		else
-			return "OFF";
+		Log.d("Rule", "fire rule" +String.valueOf(match));
+		return match;
 	}
 	
 	public String toString(){

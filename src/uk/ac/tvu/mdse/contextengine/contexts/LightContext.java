@@ -19,9 +19,9 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 	private int value = 0;
 	
 	public LightContext(SensorManager sm, Context c) {
-		super("LIGHTCONTEXT", c, sm, Sensor.TYPE_LIGHT,SensorManager.SENSOR_DELAY_NORMAL );		
+		super("LIGHT", c, sm, Sensor.TYPE_LIGHT,SensorManager.SENSOR_DELAY_NORMAL );		
 		this.contextInformation = obtainContextInformation(sm);
-		Log.d("LightContext", this.contextInformation);
+		Log.d("LIGHT", this.contextInformation);
 	}	
 	
 	protected String obtainContextInformation(SensorManager sm){
