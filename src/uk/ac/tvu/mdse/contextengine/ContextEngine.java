@@ -6,8 +6,17 @@
 
 package uk.ac.tvu.mdse.contextengine;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
+
+import dalvik.system.DexClassLoader;
+import dalvik.system.PathClassLoader;
 
 import uk.ac.tvu.mdse.contextengine.contexts.BluetoothContext;
 import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
@@ -26,6 +35,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.hardware.SensorManager;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
@@ -47,7 +57,6 @@ public class ContextEngine extends Service {
 	public static final String CONTEXT_INFORMATION = "context_information";
 	
 	private NotificationManager mNM;
-	private SensorManager sm;
 	private BroadcastReceiver contextMonitor;
 	private IntentFilter filter;
 	
@@ -106,9 +115,9 @@ public class ContextEngine extends Service {
 			Log.d(LOG_TAG, "onCreate");
 		
 		mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		filter = new IntentFilter(
 				"uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED");
+		copyDexFile();
 		//setupContextMonitor();
 
 		c = getApplicationContext();
@@ -160,7 +169,7 @@ public class ContextEngine extends Service {
 
 			if (controlVariable){
 				Context c = getApplicationContext();
-				bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
+				//bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
 	
 				// listen to these particular preferences change
 				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
@@ -170,8 +179,8 @@ public class ContextEngine extends Service {
 				uc2 = new PreferenceChangeComponent(sp, pref2, PreferenceChangeComponent.PreferenceType.STRING, c);
 				// lightcontext = new LightContext(sm, getApplicationContext());
 				CompositeComponent cc = new CompositeComponent("testComposite",	c);
-				WifiContext wc = new WifiContext(
-						(WifiManager) getSystemService(Context.WIFI_SERVICE), c);
+				//WifiContext wc = new WifiContext(
+				//		(WifiManager) getSystemService(Context.WIFI_SERVICE), c);
 				// ArrayList<String> eithers = new ArrayList<String>();
 				// eithers.add("remember_pwd");
 				// eithers.add("bluetoothON");
@@ -191,11 +200,10 @@ public class ContextEngine extends Service {
 				
 				activeContexts.add(ruledCC);
 				//db.addContext(ruledCC);
-				try{
-				WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);				
-				wifiContext = new WifiContext(wm, c);
-				bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
-				lightcontext = new LightContext(sm, getApplicationContext()); 
+				try{				
+				//wifiContext = new WifiContext(c);
+				//bluetoothContext = new BluetoothContext(c);
+				//lightcontext = new LightContext(getApplicationContext()); 
 				}
 				catch(Exception e){
 					Log.d(LOG_TAG, e.getLocalizedMessage());
@@ -208,25 +216,8 @@ public class ContextEngine extends Service {
 
 		public void registerComponent(String componentName, String compositeName)
 				throws RemoteException {
-			// lightcontext = new LightContext(sm, getApplicationContext());
-			// sync.registerComponent(componentName);
 			
-			//if contexts not active yet, make them active			
-			if (componentName.equals("WIFI")){//&&!activeContexts.contains(wifiContext)){				
-				activeContexts.add(wifiContext);
-				//db.addContext(wifiContext);
-			}
-			
-			if (componentName.equals("BLUETOOTH")){ //&&!activeContexts.contains(bluetoothContext)){				
-				activeContexts.add(bluetoothContext);
-				//db.addContext(bluetoothContext);
-			}
-			
-			if (componentName.equals("LIGHT")){ //&&!activeContexts.contains(lightcontext)){				
-				activeContexts.add(lightcontext);
-				Log.d(LOG_TAG, "lightcontext");
-				//db.addContext(lightcontext);
-			}
+			loadClass(componentName);
 			
 			RuledCompositeComponent ruledComponent = null;
 			Component component = null;
@@ -356,6 +347,56 @@ public class ContextEngine extends Service {
 		};
 		registerReceiver(contextMonitor, filter);
 	}
+	
+	public void copyDexFile(){
+		File dexInternalStoragePath = new File(getDir("dex", Context.MODE_PRIVATE),
+		          "classes.dex");
+		
+		  BufferedInputStream bis = null;
+		  OutputStream dexWriter = null;
+
+		  final int BUF_SIZE = 8 * 1024;
+		  try {
+		      bis = new BufferedInputStream(getAssets().open("classes.dex"));
+		      dexWriter = new BufferedOutputStream(new FileOutputStream(dexInternalStoragePath));
+		      byte[] buf = new byte[BUF_SIZE];
+		      int len;
+		      while((len = bis.read(buf, 0, BUF_SIZE)) > 0) {
+		          dexWriter.write(buf, 0, len);
+		      }
+		      dexWriter.close();
+		      bis.close();
+		      
+		  } catch (Exception e){
+			  Log.e("Error", e.getStackTrace().toString());
+		  }
+	}
+
+	protected void loadClass(String componentName) {
+		final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
+		File dexInternalStoragePath = new File(getDir("dex", Context.MODE_PRIVATE),
+          "classes.dex");
+		  DexClassLoader cl = new DexClassLoader(dexInternalStoragePath.getAbsolutePath(),
+		                                         optimizedDexOutputPath.getAbsolutePath(),
+		                                         null,
+		                                         getClassLoader());
+		  Class contextClass = null;
+		  Class[] parameterTypes = {Context.class};
+			String classpath = "uk.ac.tvu.mdse.contextengine.contexts.";
+			  try {
+			      // Load the Class
+			      contextClass =
+			          cl.loadClass(classpath.concat(componentName));
+			      Constructor contextConstructor = contextClass.getConstructor(parameterTypes);
+			      
+			      Component context = (Component) contextConstructor.newInstance(c);
+			      activeContexts.add(context);
+			
+			  } catch (Exception e) {
+				  Log.e("Error", e.getStackTrace().toString());
+			  } 
+		
+	}
 
 	private void showNotification(String contextChange) {
 		// In this sample, we'll use the same text for the ticker and the
@@ -460,5 +501,7 @@ public class ContextEngine extends Service {
 				.show();
 
 	}
+	
+	
 
 }

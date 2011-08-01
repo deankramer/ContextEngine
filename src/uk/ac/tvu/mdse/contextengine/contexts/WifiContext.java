@@ -11,9 +11,9 @@ public class WifiContext extends MonitorComponent {
 	private static final long serialVersionUID = -6833408704101539915L;
 	private WifiManager wm;
 
-	public WifiContext(WifiManager wm, Context c) {
-		super("WIFI", c, "android.net.wifi.WIFI_STATE_CHANGED");
-		this.wm = wm;				
+	public WifiContext(Context c) {
+		super("WifiContext", c, "android.net.wifi.WIFI_STATE_CHANGED");
+		this.wm = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);					
 		this.contextInformation = obtainContextInformation();
 		//this.contextInformation = "ON";
 		Log.d("WifiContext", this.contextInformation);

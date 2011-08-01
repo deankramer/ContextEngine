@@ -6,7 +6,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.BatteryManager;
 import android.util.Log;
 
 public class LightContext extends ListenerComponent implements SensorEventListener {
@@ -15,13 +14,13 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 	private static final long serialVersionUID = -8230486605325209599L;
 	private static final double HIGH_LUM_VALUE = 180;
 	private static final double MEDIUM_LUM_VALUE = 100;
-
 	private int value = 0;
 	
-	public LightContext(SensorManager sm, Context c) {
-		super("LIGHT", c, sm, Sensor.TYPE_LIGHT,SensorManager.SENSOR_DELAY_NORMAL );		
-		this.contextInformation = obtainContextInformation(sm);
-		Log.d("LIGHT", this.contextInformation);
+	public LightContext(Context c) {
+		
+		super("LightContext", c, Sensor.TYPE_LIGHT,SensorManager.SENSOR_DELAY_NORMAL );		
+		this.contextInformation = obtainContextInformation(sensorManager);
+		Log.d("LightContext", this.contextInformation);
 	}	
 	
 	protected String obtainContextInformation(SensorManager sm){
@@ -66,5 +65,9 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 			sendNotification();
 			Log.d("LightContext", "newValue set low");
 		}
+		
+		//	contextInformation = highContext;
+		//	sendNotification();
+		//	Log.d("LightContext", "newValue set ".concat(contextInformation));
 	}
 }

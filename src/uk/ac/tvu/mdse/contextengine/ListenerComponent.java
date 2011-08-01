@@ -20,15 +20,15 @@ public class ListenerComponent extends Component implements SensorEventListener{
 
 	private static final long serialVersionUID = 14671122599992688L;
 
-	private SensorManager sensorManager;
+	protected SensorManager sensorManager;
 	private Sensor theSensor;
 	private int sensorType;
 	private int delayType; 
 	
 	
-	public ListenerComponent(String name, Context c, SensorManager sm, int sensorT, int delayT) {
+	public ListenerComponent(String name, Context c, int sensorT, int delayT) {
 		super(name, c);
-		this.sensorManager = sm;		
+		this.sensorManager = (SensorManager) c.getSystemService(Context.SENSOR_SERVICE);		
 		this.sensorType = sensorT;
 		theSensor = sensorManager.getDefaultSensor(sensorType);
 		this.delayType = delayT;

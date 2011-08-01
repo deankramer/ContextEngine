@@ -197,6 +197,7 @@ public class Component implements Serializable {
 //		if (checkRange(contextValue))
 //			return false;
 //		else{
+		Log.v("test", "havent crashed yet");
 			contextRangeSet.add(new ContextRange(minValue,maxValue,contextValue));		
 			valuesSet.add(contextValue);
 			return true;
