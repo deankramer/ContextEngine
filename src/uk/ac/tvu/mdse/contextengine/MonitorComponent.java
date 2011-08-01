@@ -1,8 +1,5 @@
 package uk.ac.tvu.mdse.contextengine;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

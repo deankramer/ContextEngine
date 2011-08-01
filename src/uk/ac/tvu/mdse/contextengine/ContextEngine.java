@@ -13,15 +13,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.List;
 
-import dalvik.system.DexClassLoader;
-import dalvik.system.PathClassLoader;
-
-import uk.ac.tvu.mdse.contextengine.contexts.BluetoothContext;
-import uk.ac.tvu.mdse.contextengine.contexts.LightContext;
-import uk.ac.tvu.mdse.contextengine.contexts.UserPreferenceContext;
-import uk.ac.tvu.mdse.contextengine.contexts.WifiContext;
 import uk.ac.tvu.mdse.contextengine.db.ContextDB;
 import uk.ac.tvu.mdse.contextengine.db.ContextDBSQLite;
 import uk.ac.tvu.mdse.contextengine.test.TestActivity;
@@ -29,25 +21,20 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.hardware.SensorManager;
-import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+import dalvik.system.DexClassLoader;
 
 public class ContextEngine extends Service {
 
@@ -59,10 +46,6 @@ public class ContextEngine extends Service {
 	private NotificationManager mNM;
 	private BroadcastReceiver contextMonitor;
 	private IntentFilter filter;
-	
-	private WifiContext wifiContext;
-	private LightContext lightcontext;
-	private BluetoothContext bluetoothContext;	
 	private PreferenceChangeComponent uc1;
 	private PreferenceChangeComponent uc2;	
 	
@@ -252,8 +235,6 @@ public class ContextEngine extends Service {
 			Log.d(LOG_TAG, "addRange" +  componentName);
 			if (component!=null)
 				component.addRange(Integer.valueOf(minValue), Integer.valueOf(maxValue), contextValue);
-			else
-				lightcontext.addRange(Integer.valueOf(minValue), Integer.valueOf(maxValue), contextValue);
 			
 		}
 		
@@ -380,14 +361,14 @@ public class ContextEngine extends Service {
 		                                         optimizedDexOutputPath.getAbsolutePath(),
 		                                         null,
 		                                         getClassLoader());
-		  Class contextClass = null;
-		  Class[] parameterTypes = {Context.class};
+		  Class<?> contextClass = null;
+		  Class<?>[] parameterTypes = {Context.class};
 			String classpath = "uk.ac.tvu.mdse.contextengine.contexts.";
 			  try {
 			      // Load the Class
 			      contextClass =
 			          cl.loadClass(classpath.concat(componentName));
-			      Constructor contextConstructor = contextClass.getConstructor(parameterTypes);
+			      Constructor<?> contextConstructor = contextClass.getConstructor(parameterTypes);
 			      
 			      Component context = (Component) contextConstructor.newInstance(c);
 			      activeContexts.add(context);

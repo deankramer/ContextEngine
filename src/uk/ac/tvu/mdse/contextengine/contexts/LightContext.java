@@ -12,9 +12,13 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 
 	// Attributes
 	private static final long serialVersionUID = -8230486605325209599L;
+	
+	//Will be kept incase of future "default" values.
+	/*
 	private static final double HIGH_LUM_VALUE = 180;
 	private static final double MEDIUM_LUM_VALUE = 100;
-	private int value = 0;
+	*/
+	private String lastC;
 	
 	public LightContext(Context c) {
 		
@@ -27,47 +31,20 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 		        
 		//should obtain real light
 		//for demo using HIGH as the obtained one
+		lastC="MEDIUM";
         return "MEDIUM";
 	}
 
 	public void checkContext(SensorEvent data) {
 		double v = data.values[0];
-//		if ((v >= HIGH_LUM_VALUE) && (value != 3)) {
-//			value = 3;
-//			sendNotification("lightlevelLOW", false);
-//			sendNotification("lightlevelMEDIUM", false);
-//			sendNotification("lightlevelHIGH", true);
-//		} else if ((v >= MEDIUM_LUM_VALUE) && (value != 2)) {
-//			value = 2;
-//			sendNotification("lightlevelLOW", false);
-//			sendNotification("lightlevelMEDIUM", true);
-//			sendNotification("lightlevelHIGH", false);
-//		} else if ((v < MEDIUM_LUM_VALUE) && (value != 1)) {
-//			value = 1;
-//			sendNotification("lightlevelLOW", true);
-//			sendNotification("lightlevelMEDIUM", false);
-//			sendNotification("lightlevelHIGH", false);
-//		}	
 		
 		//send context value - 2nd approach
 		String highContext = this.getContextInformation(v);
 		Log.d("LightContext", "newValue" + v +" "+highContext);
-		if (highContext.equals("HIGH")){// && (!contextInformation.equals("HIGH"))) {				
-			contextInformation = "HIGH";
+		if(!contextInformation.equalsIgnoreCase(lastC)){
+			lastC=highContext;
 			sendNotification();
-			Log.d("LightContext", "newValue set HIGH" );
-		} else if (highContext.equals("MEDIUM")){// && (!contextInformation.equals("MEDIUM"))) {
-			contextInformation = "MEDIUM";
-			sendNotification();
-			Log.d("LightContext", "newValue set medium");
-		} else if (highContext.equals("LOW")){// && (!contextInformation.equals("LOW"))) {				
-			contextInformation = "LOW";
-			sendNotification();
-			Log.d("LightContext", "newValue set low");
+			Log.d("LightContext", "newValue set ".concat(contextInformation));
 		}
-		
-		//	contextInformation = highContext;
-		//	sendNotification();
-		//	Log.d("LightContext", "newValue set ".concat(contextInformation));
 	}
 }

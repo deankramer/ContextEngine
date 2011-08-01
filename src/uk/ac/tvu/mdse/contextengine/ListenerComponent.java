@@ -1,8 +1,5 @@
 package uk.ac.tvu.mdse.contextengine;
 
-import java.util.ArrayList;
-
-import uk.ac.tvu.mdse.contextengine.highLevelContext.ContextRange;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

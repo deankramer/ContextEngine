@@ -9,11 +9,7 @@ package uk.ac.tvu.mdse.contextengine;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Vector;
-
 import uk.ac.tvu.mdse.contextengine.highLevelContext.ContextRange;
-import uk.ac.tvu.mdse.contextengine.highLevelContext.Rule;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
