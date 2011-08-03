@@ -25,13 +25,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 import dalvik.system.DexClassLoader;
@@ -63,7 +61,6 @@ public class ContextEngine extends Service {
 	//as a controller to switch between hashtable and rules approach
 	//value = true - hashtable
 	//value = false - rules
-	private boolean controlVariable = false;
 
 	/**
 	 * This is a list of callbacks that have been registered with the service.
@@ -100,7 +97,7 @@ public class ContextEngine extends Service {
 		mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		filter = new IntentFilter(
 				"uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED");
-		copyDexFile();
+		//copyDexFile();
 		//setupContextMonitor();
 
 		c = getApplicationContext();
@@ -148,35 +145,7 @@ public class ContextEngine extends Service {
 
 	public final IContextsDefinition.Stub contextsBinder = new IContextsDefinition.Stub() {
 
-		public void newComposite(String compositeName) throws RemoteException {
-
-			if (controlVariable){
-				Context c = getApplicationContext();
-				//bluetoothContext = new BluetoothContext(BluetoothAdapter.getDefaultAdapter(),c);
-	
-				// listen to these particular preferences change
-				SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(c);
-				String pref1 = "remember_pwd";
-				String pref2 = "method";
-				uc1 = new PreferenceChangeComponent(sp, pref1,PreferenceChangeComponent.PreferenceType.BOOLEAN, c);
-				uc2 = new PreferenceChangeComponent(sp, pref2, PreferenceChangeComponent.PreferenceType.STRING, c);
-				// lightcontext = new LightContext(sm, getApplicationContext());
-				CompositeComponent cc = new CompositeComponent("testComposite",	c);
-				//WifiContext wc = new WifiContext(
-				//		(WifiManager) getSystemService(Context.WIFI_SERVICE), c);
-				// ArrayList<String> eithers = new ArrayList<String>();
-				// eithers.add("remember_pwd");
-				// eithers.add("bluetoothON");
-				cc.registerComponent("bluetoothOn", true);
-				cc.registerComponent("wifiOn", false);
-				// cc.registerComponent("bluetoothON", false);
-				// or listen to any preference change
-				// uc = new UserPreferenceContext(sp, getApplicationContext());
-				// lightcontext = new LightContext(sm, getApplicationContext());
-				if (D)
-					Log.d(LOG_TAG, "Hashtable approach");
-			}
-			else{				
+		public void newComposite(String compositeName) throws RemoteException {				
 				
 				ruledCC = new RuledCompositeComponent(compositeName, c);
 				
@@ -193,11 +162,11 @@ public class ContextEngine extends Service {
 				}
 				if (D)
 					Log.d(LOG_TAG, "Ruled approach");
-			}
+			
 
 		}
 
-		public void registerComponent(String componentName, String compositeName)
+		public void addToComposite(String componentName, String compositeName)
 				throws RemoteException {
 			
 			loadClass(componentName);
@@ -225,12 +194,12 @@ public class ContextEngine extends Service {
 		public void addRange(String componentName, String minValue, String maxValue, String contextValue){
 			
 			//look up for the component
-			ListenerComponent component = null;
+			Component component = null;
 			
 			//look up for the composite if created
 			for (Component ac: activeContexts){
 				if (ac.contextName.equals(componentName))
-					component = (ListenerComponent) ac;				
+					component = (Component) ac;				
 			}		
 			Log.d(LOG_TAG, "addRange" +  componentName);
 			if (component!=null)
@@ -254,11 +223,11 @@ public class ContextEngine extends Service {
 				ruledComponent.addRule(condition, result);
 				//ruledComponent.fireRules();
 				Log.d(LOG_TAG, "addRule" );
-				defined++;
-				if (defined == 2){
-					setupContextMonitor();
-					ruledComponent.componentDefined();
-				}
+			//	defined++;
+			//	if (defined == 2){
+			//		setupContextMonitor();
+			//		ruledComponent.componentDefined();
+			//	}
 				
 		}
 
@@ -270,6 +239,32 @@ public class ContextEngine extends Service {
 		public void unregisterCallback(IRemoteServiceCallback cb) {
 			if (cb != null)
 				mCallbacks.unregister(cb);
+		}
+
+		public void registerComponent(String componentName)
+				throws RemoteException {
+			
+			for (Component ac: activeContexts){
+				if (! ac.contextName.equals(componentName))
+					loadClass(componentName);		
+			}
+			
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void startComposite(String compositeName) throws RemoteException {
+			// TODO Auto-generated method stub
+			RuledCompositeComponent ruledComponent = null;
+			
+			//look up for the composite if created
+			for (Component ac: activeContexts){
+				if (ac.contextName.equals(compositeName)){
+					ruledComponent = (RuledCompositeComponent) ac;
+					setupContextMonitor();
+					ruledComponent.componentDefined();
+				}
+			}
 		}
 	};
 	
@@ -302,25 +297,11 @@ public class ContextEngine extends Service {
 					if (D)
 						Log.d(LOG_TAG, "onReceive");
 					Bundle bundle = intent.getExtras();
-//					Message msg = new Message();
-//					msg.setData(bundle);
-//					mHandler.sendMessage(msg);
 					
 					String changeName = bundle
 							.getString(Component.CONTEXT_NAME);
-//					boolean currentcontext = bundle
-//							.getBoolean(Component.CONTEXT_VALUE);
 					String contextvalue = bundle
 							.getString(Component.CONTEXT_INFORMATION);
-					// if(changeName.equalsIgnoreCase("datasync_ON") &&(
-					// currentcontext ) )
-					// getListView().setBackgroundResource(color.black);
-					// else if (changeName.equalsIgnoreCase("datasync_ON") &&(
-					// !currentcontext ) )
-					// getListView().setBackgroundResource(color.white);
-//					if (contextvalue == null)
-//						showNotification(changeName+ " "+currentcontext);
-//					else
 						showNotification(changeName+ " "+contextvalue);
 				}
 			}
@@ -374,7 +355,8 @@ public class ContextEngine extends Service {
 			      activeContexts.add(context);
 			
 			  } catch (Exception e) {
-				  Log.e("Error", e.getStackTrace().toString());
+				  //Log.e("Error", e.getStackTrace().toString());
+				  e.printStackTrace();
 			  } 
 		
 	}

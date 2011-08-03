@@ -109,6 +109,14 @@ public class Component implements Serializable {
 		return contextInformation;
 	}
 	
+	public String getContextInformation(int contextInput){
+		for (ContextRange cr: contextRangeSet){
+			if ((cr.maxValue>contextInput)&&(cr.minValue<contextInput))
+				contextInformation = cr.contextHighValue;
+		}
+		return contextInformation;
+	}
+	
 	//re-implement if context value depends on some values
 	protected void checkContext(Bundle data) {
 		//check data		

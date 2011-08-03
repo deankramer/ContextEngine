@@ -37,6 +37,10 @@ public class Rule {
 	}
 	
 	public String toString(){
-		return ifCondition[0] + ifCondition[1] + ifCondition[2] + thenStatement;
+		StringBuffer strbuf = new StringBuffer();
+		for (String str : ifCondition)
+			strbuf.append(str);
+		strbuf.append(thenStatement);
+		return strbuf.toString();
 	}
 }
