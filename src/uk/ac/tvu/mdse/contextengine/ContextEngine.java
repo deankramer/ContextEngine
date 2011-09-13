@@ -44,11 +44,11 @@ public class ContextEngine extends Service {
 	private NotificationManager mNM;
 	private BroadcastReceiver contextMonitor;
 	private IntentFilter filter;
-	private PreferenceChangeComponent uc1;
-	private PreferenceChangeComponent uc2;	
+	//private PreferenceChangeComponent uc1;
+	//private PreferenceChangeComponent uc2;	
 	
-	private CompositeComponent sync;
-	private RuledCompositeComponent ruledCC;	
+	//private CompositeComponent sync;
+	//private RuledCompositeComponent ruledCC;	
 	
 	private Context c;
 	private ContextDB db;
@@ -147,10 +147,10 @@ public class ContextEngine extends Service {
 
 		public void newComposite(String compositeName) throws RemoteException {				
 				
-				ruledCC = new RuledCompositeComponent(compositeName, c);
+				RuledCompositeComponent ruledComponent = new RuledCompositeComponent(compositeName, c);
 				
 				
-				activeContexts.add(ruledCC);
+				activeContexts.add(ruledComponent);
 				//db.addContext(ruledCC);
 				try{				
 				//wifiContext = new WifiContext(c);
@@ -249,12 +249,10 @@ public class ContextEngine extends Service {
 					loadClass(componentName);		
 			}
 			
-			// TODO Auto-generated method stub
 			
 		}
 
 		public void startComposite(String compositeName) throws RemoteException {
-			// TODO Auto-generated method stub
 			RuledCompositeComponent ruledComponent = null;
 			
 			//look up for the composite if created
