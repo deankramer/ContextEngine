@@ -1,5 +1,8 @@
 package uk.ac.tvu.mdse.contextengine.contexts;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import uk.ac.tvu.mdse.contextengine.Component;
 import android.content.Context;
 import android.location.Criteria;
@@ -18,36 +21,51 @@ public class LocationContext extends Component implements LocationListener{
 	private LocationManager locationManager;
 	private Location location;
 	private String provider;
+	private Map<String, Location> locationSet;
+	//What do we define as nearby (in meters)
+	private float distancebetween = 1000; 
 	
 	public LocationContext(String name, Context c) {
 		super(name, c);
-		// Get the location manager
-				locationManager = (LocationManager) c.getSystemService(c.LOCATION_SERVICE);
-				// Define the criteria how to select the locatioin provider -> use
-				// default
-				Criteria criteria = new Criteria();
-				provider = locationManager.getBestProvider(criteria, false);
-				location = locationManager.getLastKnownLocation(provider);
-		// TODO Auto-generated constructor stub
+		
+	    locationManager = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
+	    Criteria criteria = new Criteria();
+		provider = locationManager.getBestProvider(criteria, false);
+		location = locationManager.getLastKnownLocation(provider);
+		Log.v(contextName, "Latitude= " + location.getLatitude() + " Longitude= " + location.getLongitude());
+		Log.v(contextName, "Location accuracy: " + location.getAccuracy());
 	}
 
 	public void onLocationChanged(Location locale) {
-		// TODO Auto-generated method stub
-		
+		checkContext(locale);
 	}
 
 	public void onProviderDisabled(String prv) {
-		// TODO Auto-generated method stub
 		Log.v(contextName, "Provider " + prv + " disabled");
 	}
 
 	public void onProviderEnabled(String prv) {
-		// TODO Auto-generated method stub
 		Log.v(contextName, "Provider " + prv + " enabled");
 	}
 
-	public void onStatusChanged(String prv, int stat, Bundle extras) {
-		// TODO Auto-generated method stub
+	public void onStatusChanged(String prv, int stat, Bundle extras) {	
+	}
+	
+	protected Map<String,Location> isNearby(Location locale){
+		Map<String, Location> nearbys = new HashMap<String, Location>();
+		for(Map.Entry<String, Location> entry: locationSet.entrySet()){
+			if(location.distanceTo(entry.getValue()) <= distancebetween)
+				nearbys.put(entry.getKey(), entry.getValue());
+		}
+		return nearbys;
+	}
+	
+	protected void checkContext(Location locale){
+		Map<String, Location> nearbys = isNearby(locale);
+		
+		if(nearbys.size()>0){
+			sendNotification();
+		}
 		
 	}
 	
