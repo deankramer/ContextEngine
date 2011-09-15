@@ -1,10 +1,12 @@
 package uk.ac.tvu.mdse.contextengine.contexts;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Map;
 
 import uk.ac.tvu.mdse.contextengine.Component;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -14,9 +16,6 @@ import android.util.Log;
 
 public class LocationContext extends Component implements LocationListener{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -6360309106992426663L;
 	private LocationManager locationManager;
 	private Location location;
@@ -25,8 +24,8 @@ public class LocationContext extends Component implements LocationListener{
 	//What do we define as nearby (in meters)
 	private float distancebetween = 1000; 
 	
-	public LocationContext(String name, Context c) {
-		super(name, c);
+	public LocationContext(Context c) {
+		super("LOCATIONCONTEXT", c);
 		
 	    locationManager = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
 	    Criteria criteria = new Criteria();
@@ -50,7 +49,7 @@ public class LocationContext extends Component implements LocationListener{
 
 	public void onStatusChanged(String prv, int stat, Bundle extras) {	
 	}
-	
+/*	
 	protected Map<String,Location> isNearby(Location locale){
 		Map<String, Location> nearbys = new HashMap<String, Location>();
 		for(Map.Entry<String, Location> entry: locationSet.entrySet()){
@@ -59,7 +58,30 @@ public class LocationContext extends Component implements LocationListener{
 		}
 		return nearbys;
 	}
+*/	
+	protected ArrayList<String> isNearby(Location locale){
+		ArrayList<String> nearbys = new ArrayList<String>();
+		for(Map.Entry<String, Location> entry: locationSet.entrySet()){
+			if(location.distanceTo(entry.getValue()) <= distancebetween)
+				nearbys.add(entry.getKey());
+		}
+		return nearbys;
+	}
 	
+	protected void checkContext(Location locale){
+		ArrayList<String> nearbys = isNearby(locale);
+		
+		if((! contextValue) && (nearbys.size()>0)){
+			contextValue=true;
+			sendNotification(nearbys);
+		}
+		else if((contextValue) && (nearbys.size()<1)){
+			contextValue=false;
+			sendNotification(nearbys);
+		}
+		
+	}
+/*	
 	protected void checkContext(Location locale){
 		Map<String, Location> nearbys = isNearby(locale);
 		
@@ -67,6 +89,21 @@ public class LocationContext extends Component implements LocationListener{
 			sendNotification();
 		}
 		
+	}
+	*/
+	public void sendNotification(ArrayList<String> nearbys) {
+		Intent intent = new Intent();
+
+		intent.setAction(CONTEXT_INTENT);
+		intent.putExtra(CONTEXT_NAME, contextName);
+		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+		intent.putExtra(CONTEXT_VALUE, contextValue);
+		intent.putExtra(CONTEXT_INFORMATION, nearbys);
+		try {
+			context.sendBroadcast(intent);
+		} catch (Exception e) {
+			Log.e(contextName, "not working");
+		}
 	}
 	
 	public void stop() {
