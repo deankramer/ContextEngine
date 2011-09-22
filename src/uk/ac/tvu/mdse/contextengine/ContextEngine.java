@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
+import uk.ac.tvu.mdse.contextengine.contexts.LocationContext;
 import uk.ac.tvu.mdse.contextengine.db.ContextDB;
 import uk.ac.tvu.mdse.contextengine.db.ContextDBSQLite;
 import uk.ac.tvu.mdse.contextengine.test.TestActivity;
@@ -50,12 +51,15 @@ public class ContextEngine extends Service {
 	//private CompositeComponent sync;
 	//private RuledCompositeComponent ruledCC;	
 	
+	private LocationServices locationServices = null;;
+	
 	private Context c;
 	private ContextDB db;
 	
 	int defined = 0;
 	
 	private ArrayList<Component> activeContexts = new ArrayList<Component>();
+	private ArrayList<LocationContext> locationContexts = new ArrayList<LocationContext>();
 	
 	//there are 2 approaches to deal with contexts, this variable serves
 	//as a controller to switch between hashtable and rules approach
@@ -208,8 +212,6 @@ public class ContextEngine extends Service {
 		}
 		
 		public void addRule(String componentName, String[] condition, String result){
-//			rcc.addRule(new String[]{"ON","ON","MEDIUM"}, "ON");
-//			rcc.addRule(new String[]{"ON","OFF","HIGH"}, "ON");	
 			
 			RuledCompositeComponent ruledComponent = null;
 			
@@ -219,15 +221,8 @@ public class ContextEngine extends Service {
 					ruledComponent = (RuledCompositeComponent) ac;		
 			}	
 			
-			//if ((ruledComponent!=null)&&(ruledComponent.getComponentsNo() == condition.length))
 				ruledComponent.addRule(condition, result);
-				//ruledComponent.fireRules();
 				Log.d(LOG_TAG, "addRule" );
-			//	defined++;
-			//	if (defined == 2){
-			//		setupContextMonitor();
-			//		ruledComponent.componentDefined();
-			//	}
 				
 		}
 
@@ -263,6 +258,27 @@ public class ContextEngine extends Service {
 					ruledComponent.componentDefined();
 				}
 			}
+		}
+
+		public void addLocationComponent(String key) throws RemoteException {
+			
+			if (locationServices == null)
+				locationServices = new LocationServices(c);
+			
+			LocationContext locationContext = new LocationContext(c, key, locationServices);
+			locationContexts.add(locationContext);
+			activeContexts.add(locationContext);
+			
+		}
+
+		public void addLocation(String locationKey, String identifier, double latitude,
+				double longitude) throws RemoteException {
+			
+			for (LocationContext lc: locationContexts){
+				if (lc.key.equals(locationKey)){
+					lc.addLocation(identifier, latitude, longitude);
+				}
+			}			
 		}
 	};
 	

@@ -5,56 +5,80 @@ import java.util.Calendar;
 import java.util.Map;
 
 import uk.ac.tvu.mdse.contextengine.Component;
+import uk.ac.tvu.mdse.contextengine.LocationServices;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
 import android.util.Log;
 
-public class LocationContext extends Component implements LocationListener{
+public class LocationContext extends Component{
 
 	private static final long serialVersionUID = -6360309106992426663L;
-	private LocationManager locationManager;
-	private Location location;
-	private String provider;
-	private Map<String, Location> locationSet;
+	
+	// Each application listens only to particular location context determined by its key
+	public static final String CONTEXT_LOCATION_KEY = "context_location_key";		
+		
+	public LocationServices locationServices;
+
+	//application specific data
+	public String key;
+
+	//	in real life you *DO NOT* want to do this, it may consume too many resources
+    // (time less than 60000ms for minTime is NOT recommended, used only for testing)
+	private int minTime = 3000; //in milliseconds
+	private int minDistance = 1000; //in meters
+	private Map<String, Location> locationSet;	
+	
 	//What do we define as nearby (in meters)
 	private float distancebetween = 1000; 
+
+	public LocationContext(Context c, String identifier, LocationServices locServices) {
+		super("LocationContext", c);		
+		this.contextValue = false;		
+		this.key = key;		
+		this.locationServices = locServices;
+		locationSet = getLocationSet();		  
+	}
 	
-	public LocationContext(Context c) {
-		super("LOCATIONCONTEXT", c);
-		
-	    locationManager = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
-	    Criteria criteria = new Criteria();
-		provider = locationManager.getBestProvider(criteria, false);
-		location = locationManager.getLastKnownLocation(provider);
-		Log.v(contextName, "Latitude= " + location.getLatitude() + " Longitude= " + location.getLongitude());
-		Log.v(contextName, "Location accuracy: " + location.getAccuracy());
+	public void setUpdatesCriteria(int time, int distance){
+		this.minTime = time;
+		this.minDistance = distance;
+		locationServices.setUpdatesCriteria(minTime, minDistance);
+	}
+	
+	public void setDistanceBetween(float distance){
+		this.distancebetween = distance;
+	}
+	
+	public void addLocation(String identifier, double latitude, double longitude ){
+		Location location = new Location(identifier);
+		location.setLatitude(latitude);
+		location.setLongitude(longitude);
+		locationSet.put(identifier, location);
+	}
+	
+	public void addLocationSet(Map<String, Location> locSet){
+		this.locationSet = locSet;
+	}
+	
+	public Map<String, Location> getLocationSet(){
+		return locationSet;
+	}
+	
+	public Location getLastLocation(){
+		return locationServices.getLocation();
 	}
 
 	public void onLocationChanged(Location locale) {
 		checkContext(locale);
 	}
 
-	public void onProviderDisabled(String prv) {
-		Log.v(contextName, "Provider " + prv + " disabled");
-	}
-
-	public void onProviderEnabled(String prv) {
-		Log.v(contextName, "Provider " + prv + " enabled");
-	}
-
-	public void onStatusChanged(String prv, int stat, Bundle extras) {	
-	}
 /*	
 	protected Map<String,Location> isNearby(Location locale){
 		Map<String, Location> nearbys = new HashMap<String, Location>();
 		for(Map.Entry<String, Location> entry: locationSet.entrySet()){
 			if(location.distanceTo(entry.getValue()) <= distancebetween)
-				nearbys.put(entry.getKey(), entry.getValue());
+				nearbys.put(entry.getidentifier(), entry.getValue());
 		}
 		return nearbys;
 	}
@@ -62,7 +86,7 @@ public class LocationContext extends Component implements LocationListener{
 	protected ArrayList<String> isNearby(Location locale){
 		ArrayList<String> nearbys = new ArrayList<String>();
 		for(Map.Entry<String, Location> entry: locationSet.entrySet()){
-			if(location.distanceTo(entry.getValue()) <= distancebetween)
+			if(locale.distanceTo(entry.getValue()) <= distancebetween)
 				nearbys.add(entry.getKey());
 		}
 		return nearbys;
@@ -96,6 +120,7 @@ public class LocationContext extends Component implements LocationListener{
 
 		intent.setAction(CONTEXT_INTENT);
 		intent.putExtra(CONTEXT_NAME, contextName);
+		intent.putExtra(CONTEXT_LOCATION_KEY, this.key);
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
 		intent.putExtra(CONTEXT_VALUE, contextValue);
 		intent.putExtra(CONTEXT_INFORMATION, nearbys);
@@ -107,7 +132,6 @@ public class LocationContext extends Component implements LocationListener{
 	}
 	
 	public void stop() {
-		locationManager.removeUpdates(this);
 		Log.v(contextName, "Stopping");
 	}
 
