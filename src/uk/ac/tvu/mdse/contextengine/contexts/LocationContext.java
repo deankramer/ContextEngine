@@ -2,7 +2,11 @@ package uk.ac.tvu.mdse.contextengine.contexts;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Vector;
 
 import uk.ac.tvu.mdse.contextengine.Component;
 import uk.ac.tvu.mdse.contextengine.LocationServices;
@@ -84,12 +88,31 @@ public class LocationContext extends Component{
 	}
 */	
 	protected ArrayList<String> isNearby(Location locale){
-		ArrayList<String> nearbys = new ArrayList<String>();
+		//ArrayList<String> nearbys = new ArrayList<String>();
+		String[] nearbys = new String[locationSet.size()];
+		float [] distances = new float[locationSet.size()];
+		Hashtable<Float, String> h = new Hashtable<Float, String>();
+		int i=0;
 		for(Map.Entry<String, Location> entry: locationSet.entrySet()){
 			if(locale.distanceTo(entry.getValue()) <= distancebetween)
-				nearbys.add(entry.getKey());
+				//nearbys.add(entry.getKey());
+				nearbys[i] = entry.getKey();
+				distances[i] = locale.distanceTo(entry.getValue());
+				h.put(distances[i],nearbys[i]);				
 		}
-		return nearbys;
+		return sortHashtable(h);
+	}
+	
+	protected ArrayList<String> sortHashtable(Hashtable<Float, String> h){
+		Vector<Float> v = new Vector<Float>(h.keySet());
+	    Collections.sort(v);
+	    ArrayList<String> nearbyPlaces = new ArrayList<String>();
+	    Iterator<Float> it;
+	    it = v.iterator();
+	    while (it.hasNext()) {
+	    	nearbyPlaces.add((String)h.get(it.next()));
+	    }
+	    return nearbyPlaces;
 	}
 	
 	protected void checkContext(Location locale){
