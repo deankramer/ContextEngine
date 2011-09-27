@@ -51,7 +51,7 @@ public class ContextEngine extends Service {
 	//private CompositeComponent sync;
 	//private RuledCompositeComponent ruledCC;	
 	
-	private LocationServices locationServices = null;;
+	private LocationServices locationServices = null;
 	
 	private Context c;
 	private ContextDB db;
@@ -60,6 +60,7 @@ public class ContextEngine extends Service {
 	
 	private ArrayList<Component> activeContexts = new ArrayList<Component>();
 	private ArrayList<LocationContext> locationContexts = new ArrayList<LocationContext>();
+	LocationContext locationContext;
 	
 	//there are 2 approaches to deal with contexts, this variable serves
 	//as a controller to switch between hashtable and rules approach
@@ -104,8 +105,14 @@ public class ContextEngine extends Service {
 		//copyDexFile();
 		//setupContextMonitor();
 
-		c = getApplicationContext();
 		
+		c = getApplicationContext();
+		try{
+		locationServices = new LocationServices(c);
+		}catch(Exception e){
+			if (D)
+				Log.e(LOG_TAG, e.getLocalizedMessage());
+		}
 		// While this service is running, it will continually increment a
 		// number. Send the first message that is used to perform the
 		// increment.
@@ -265,20 +272,27 @@ public class ContextEngine extends Service {
 			if (locationServices == null)
 				locationServices = new LocationServices(c);
 			
-			LocationContext locationContext = new LocationContext(c, key, locationServices);
+			locationContext = new LocationContext(c, key, locationServices);
 			locationContexts.add(locationContext);
 			activeContexts.add(locationContext);
+			if (D)
+				Log.d(LOG_TAG, "onaddLocationComponent -success");
 			
 		}
 
-		public void addLocation(String locationKey, String identifier, double latitude,
-				double longitude) throws RemoteException {
-			
+		public void addLocation(String locationKey, String identifier, String latitude,
+				String longitude) throws RemoteException {
+			if (D)
+				Log.d(LOG_TAG, "addLocation -success");
+			try{
 			for (LocationContext lc: locationContexts){
 				if (lc.key.equals(locationKey)){
-					lc.addLocation(identifier, latitude, longitude);
+					lc.addLocation(identifier, Double.valueOf(latitude), Double.valueOf(longitude));
 				}
 			}			
+			}catch(Exception e){
+				Log.e(LOG_TAG, e.getLocalizedMessage());
+			}
 		}
 	};
 	
@@ -403,6 +417,7 @@ public class ContextEngine extends Service {
 		++count;
 		mNM.notify(count, notification);
 	}
+	
 
 //	private static final int REPORT_MSG = 1;
 //
@@ -450,22 +465,17 @@ public class ContextEngine extends Service {
 		Log.d(LOG_TAG, "onDestroy");
 		// Cancel the persistent notification.
 		mNM.cancel(R.string.local_service_started);
-		// lightcontext.stop();
-		// sync.stop();
+
 		for (Component ac: activeContexts){
 			ac.stop();
 			ac = null;
 		}
-//		bluetoothContext.stop();
-//		bluetoothContext = null;
-//		uc1.stop();
-//		uc1 = null;
-//		uc2.stop();
-//		uc2 = null;
-		// lightcontext= null;
-		// sync=null;
-		unregisterReceiver(contextMonitor);
 
+		unregisterReceiver(contextMonitor);
+		
+		locationServices.stop();
+		locationServices = null;
+		
 		// Unregister all callbacks.
 		mCallbacks.kill();
 

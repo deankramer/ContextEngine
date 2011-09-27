@@ -3,6 +3,7 @@ package uk.ac.tvu.mdse.contextengine.contexts;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
@@ -18,6 +19,9 @@ import android.util.Log;
 public class LocationContext extends Component{
 
 	private static final long serialVersionUID = -6360309106992426663L;
+	
+	private static final String LOG_TAG = "LocationContext";
+	private boolean D = true;
 	
 	// Each application listens only to particular location context determined by its key
 	public static final String CONTEXT_LOCATION_KEY = "context_location_key";		
@@ -36,12 +40,13 @@ public class LocationContext extends Component{
 	//What do we define as nearby (in meters)
 	private float distancebetween = 1000; 
 
-	public LocationContext(Context c, String identifier, LocationServices locServices) {
+	public LocationContext(Context c, String key, LocationServices locServices) {		
 		super("LocationContext", c);		
 		this.contextValue = false;		
 		this.key = key;		
 		this.locationServices = locServices;
-		locationSet = getLocationSet();		  
+		locationSet = new HashMap<String, Location>();
+		if (D) Log.d(LOG_TAG, "constructor");
 	}
 	
 	public void setUpdatesCriteria(int time, int distance){
@@ -55,10 +60,11 @@ public class LocationContext extends Component{
 	}
 	
 	public void addLocation(String identifier, double latitude, double longitude ){
-		Location location = new Location(identifier);
+		if (D) Log.d(LOG_TAG, "addLocation " + identifier + " " +latitude+ " " +longitude);
+		Location location = new Location("");		
 		location.setLatitude(latitude);
 		location.setLongitude(longitude);
-		locationSet.put(identifier, location);
+		locationSet.put(identifier, location);		
 	}
 	
 	public void addLocationSet(Map<String, Location> locSet){

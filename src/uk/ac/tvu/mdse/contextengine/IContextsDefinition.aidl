@@ -10,7 +10,7 @@ interface IContextsDefinition {
   void newComposite(in String compositeName);
   void registerComponent(in String componentName);
   void addLocationComponent(in String key);
-  void addLocation(in String key, in String identifier, in double latitude, in double longitude);
+  void addLocation(in String key, in String identifier, in String latitude, in String longitude);
   void addToComposite(in String componentName, in String compositeName);  
   void startComposite(in String compositeName);
   void addRange(in String componentName, in String minValue, in String maxValue, in String contextValue);
