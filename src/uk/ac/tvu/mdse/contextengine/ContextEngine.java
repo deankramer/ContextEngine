@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import uk.ac.tvu.mdse.contextengine.contexts.LocationContext;
 import uk.ac.tvu.mdse.contextengine.db.ContextDB;
@@ -39,8 +40,14 @@ public class ContextEngine extends Service {
 
 	private static final String LOG_TAG = "ContextEngine";
 	private boolean D = true;
+	
+	public static final String CONTEXT_INTENT = "uk.ac.tvu.mdse.contextengine.REMOTE_SERVICE";
 
 	public static final String CONTEXT_INFORMATION = "context_information";
+	public static final String CONTEXT_NAME = "context_name";
+	public static final String CONTEXT_DATE = "context_date";
+	public static final String CONTEXT_VALUE = "context_value";
+	public static final String CONTEXT_LOCATION_KEY = "context_location_key";	
 	
 	private NotificationManager mNM;
 	private BroadcastReceiver contextMonitor;
@@ -326,6 +333,10 @@ public class ContextEngine extends Service {
 						Log.d(LOG_TAG, "onReceive");
 					Bundle bundle = intent.getExtras();
 					
+					//send broadcast to apps
+					sendBroadcastToApps(bundle);
+					
+					//show notification - just for testing
 					String changeName = bundle
 							.getString(Component.CONTEXT_NAME);
 					String contextvalue = bundle
@@ -418,6 +429,24 @@ public class ContextEngine extends Service {
 		mNM.notify(count, notification);
 	}
 	
+	public void sendBroadcastToApps(Bundle bundle){
+		Intent intent = new Intent();
+
+		intent.setAction(CONTEXT_INTENT);
+		intent.putExtra(CONTEXT_NAME,bundle.getString(CONTEXT_NAME));
+		if (!bundle.getString(CONTEXT_LOCATION_KEY).equals(null))
+			intent.putExtra(CONTEXT_LOCATION_KEY, bundle.getString(CONTEXT_LOCATION_KEY));
+		intent.putExtra(CONTEXT_DATE, bundle.getString(CONTEXT_DATE));
+		if (!bundle.getString(CONTEXT_VALUE).equals(null))
+			intent.putExtra(CONTEXT_VALUE, bundle.getBoolean(CONTEXT_VALUE));
+		if (!bundle.getString(CONTEXT_INFORMATION).equals(null))
+			intent.putExtra(CONTEXT_INFORMATION, bundle.getString(CONTEXT_INFORMATION));
+		try {
+			c.sendBroadcast(intent);
+		} catch (Exception e) {
+			Log.e("ContextEngine", "broadcasting to apps not working");
+		}
+	}
 
 //	private static final int REPORT_MSG = 1;
 //
