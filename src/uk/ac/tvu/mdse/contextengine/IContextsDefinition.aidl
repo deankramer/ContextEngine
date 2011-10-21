@@ -22,15 +22,47 @@ import uk.ac.tvu.mdse.contextengine.IRemoteServiceCallback;
 // Deals with registering of contexts
 
 interface IContextsDefinition {
+
   void registerCallback(IRemoteServiceCallback cb);
-  void newComposite(in String compositeName);
+  
+  //***application registers its unique key***
+  void registerApplicationKey(String key);
+  
+  //***add an atomic component***
   void registerComponent(in String componentName);
-  void addLocationComponent(in String key);
-  void addLocation(in String key, in String identifier, in String latitude, in String longitude);
+  
+  //***add context values to a component***
+  void addContextValues(in String componentName, in String[] contextValues);
+  
+  //***add a context value***
+  void addContextValue(in String componentName, in String contextValue);
+  
+  //***add a specific context value described by two numeric coordinates (e.g.location)***
+  //TO DO: void addSpecificContextValues(in String componentName, in String contextValue, sets of values);
+  
+  //***add a set of specific context values described by two numeric coordinates***
+  void addSpecificContextValue(in String componentName, in String contextValue, in String numericData1, in String numericData2);  
+    
+  //***define higher context value - in case of numeric values specify range of values***  
+  void addRange(in String componentName, in String minValue, in String maxValue, in String contextValue);  
+    
+  //***create a composite component***
+  void newComposite(in String compositeName);
+  
+  //***add context to a composite context component
   void addToComposite(in String componentName, in String compositeName);  
-  void startComposite(in String compositeName);
-  void addRange(in String componentName, in String minValue, in String maxValue, in String contextValue);
+ 
+  //***specify context value of the composite context based on values of context it is composed of***
   void addRule(in String componentName, in String[] condition, in String result);
+  
+   //***notify that the composite context has been fully identified***
+  void startComposite(in String compositeName);   
+  
   void unregisterCallback(IRemoteServiceCallback cb);
+  
+  //***taken out and replaced - REMOVE once tested!***
+  //void addLocationComponent(in String key);
+ //void addLocation(in String key, in String identifier, in String latitude, in String longitude);
 }
+
 

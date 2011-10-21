@@ -28,6 +28,7 @@ import java.util.Calendar;
 import uk.ac.tvu.mdse.contextengine.contexts.LocationContext;
 import uk.ac.tvu.mdse.contextengine.db.ContextDB;
 import uk.ac.tvu.mdse.contextengine.db.ContextDBSQLite;
+import uk.ac.tvu.mdse.contextengine.reasoning.ApplicationKey;
 import uk.ac.tvu.mdse.contextengine.test.TestActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -57,16 +58,11 @@ public class ContextEngine extends Service {
 	public static final String CONTEXT_NAME = "context_name";
 	public static final String CONTEXT_DATE = "context_date";
 	public static final String CONTEXT_VALUE = "context_value";
-	public static final String CONTEXT_LOCATION_KEY = "context_location_key";	
+	public static final String CONTEXT_APPLICATION_KEY = "context_location_key";	
 	
 	private NotificationManager mNM;
 	private BroadcastReceiver contextMonitor;
 	private IntentFilter filter;
-	//private PreferenceChangeComponent uc1;
-	//private PreferenceChangeComponent uc2;	
-	
-	//private CompositeComponent sync;
-	//private RuledCompositeComponent ruledCC;	
 	
 	private LocationServices locationServices = null;
 	
@@ -75,7 +71,16 @@ public class ContextEngine extends Service {
 	
 	int defined = 0;
 	
+	//hold the info about running components
 	private ArrayList<Component> activeContexts = new ArrayList<Component>();
+	
+	//holding info about subscribed apps
+	private ArrayList<ApplicationKey> applicationKeys = new ArrayList<ApplicationKey>();
+	
+	//it is assumed that only one app define context
+	//composition at the time - it needs to gets synchronised later on!
+	ApplicationKey newAppKey;
+	
 	private ArrayList<LocationContext> locationContexts = new ArrayList<LocationContext>();
 	LocationContext locationContext;
 	
@@ -172,26 +177,91 @@ public class ContextEngine extends Service {
 	}
 
 	public final IContextsDefinition.Stub contextsBinder = new IContextsDefinition.Stub() {
+		
+		public void registerApplicationKey(String key){
+			newAppKey = new ApplicationKey(key);
+			applicationKeys.add(newAppKey);
+		}
+		
+		public void registerComponent(String componentName)
+				throws RemoteException {
+			
+			//FOR LOCATION:
+			if (componentName.equals("LocationContext")){
+				if (locationServices == null)
+					locationServices = new LocationServices(c);
+			}
+			
+			for (Component ac: activeContexts){
+				if (! ac.contextName.equals(componentName))
+					loadClass(componentName);		
+			}			
+		}
+		
+		//***add context values to a component***
+		public  void addContextValues(String componentName, String[] contextValues){			
+			
+			for (Component ac: activeContexts){
+				if (ac.contextName.equals(componentName))
+					ac.setupNewValuesSet(newAppKey, contextValues);	
+			}
+		 }
+		  
+		  //***add a context value***
+		public void addContextValue(String componentName, String contextValue){
+			try{
+				for (Component ac: activeContexts){
+					if (ac.contextName.equals(componentName))
+						ac.addContextValue(newAppKey, contextValue);	
+				}		
+			}catch(Exception e){
+				Log.e(LOG_TAG, e.getLocalizedMessage());
+			}
+		}
+		  
+		  //***add a specific context value described by two numeric coordinates (e.g.location)***
+		public void addSpecificContextValue(String componentName, String contextValue, String numericData1, String numericData2){
+			if (D)
+				Log.d(LOG_TAG, "addSpecificContextValue");
+			try{
+				for (Component ac: activeContexts){
+					if (ac.contextName.equals(componentName))
+						ac.addSpecificContextValue(newAppKey, contextValue, Double.valueOf(numericData1), Double.valueOf(numericData2));	
+				}		
+			}catch(Exception e){
+				Log.e(LOG_TAG, e.getLocalizedMessage());
+			}
+		}
+		
+		//***define higher context value - in case of numeric values specify range of values***  
+		public void addRange(String componentName, String minValue, String maxValue, String contextValue){
+			
+			//look up for the component
+			Component component = null;
+			
+			//look up for the composite if created
+			for (Component ac: activeContexts){
+				if (ac.contextName.equals(componentName))
+					component = (Component) ac;				
+			}		
+			Log.d(LOG_TAG, "addRange" +  componentName);
+			if (component!=null)
+				component.addRange(newAppKey, Integer.valueOf(minValue), Integer.valueOf(maxValue), contextValue);
+			
+		}
+		
 
 		public void newComposite(String compositeName) throws RemoteException {				
-				
-				RuledCompositeComponent ruledComponent = new RuledCompositeComponent(compositeName, c);
-				
-				
+			try{
+				RuledCompositeComponent ruledComponent = new RuledCompositeComponent(compositeName, c);				
 				activeContexts.add(ruledComponent);
-				//db.addContext(ruledCC);
-				try{				
-				//wifiContext = new WifiContext(c);
-				//bluetoothContext = new BluetoothContext(c);
-				//lightcontext = new LightContext(getApplicationContext()); 
+				//db.addContext(ruledCC);			
 				}
 				catch(Exception e){
 					Log.d(LOG_TAG, e.getLocalizedMessage());
 				}
 				if (D)
-					Log.d(LOG_TAG, "Ruled approach");
-			
-
+					Log.d(LOG_TAG, "Ruled comnponent added: " + compositeName);
 		}
 
 		public void addToComposite(String componentName, String compositeName)
@@ -219,22 +289,7 @@ public class ContextEngine extends Service {
 				Log.d(LOG_TAG, "registerComponent");
 		}
 		
-		public void addRange(String componentName, String minValue, String maxValue, String contextValue){
-			
-			//look up for the component
-			Component component = null;
-			
-			//look up for the composite if created
-			for (Component ac: activeContexts){
-				if (ac.contextName.equals(componentName))
-					component = (Component) ac;				
-			}		
-			Log.d(LOG_TAG, "addRange" +  componentName);
-			if (component!=null)
-				component.addRange(Integer.valueOf(minValue), Integer.valueOf(maxValue), contextValue);
-			
-		}
-		
+
 		public void addRule(String componentName, String[] condition, String result){
 			
 			RuledCompositeComponent ruledComponent = null;
@@ -249,28 +304,7 @@ public class ContextEngine extends Service {
 				Log.d(LOG_TAG, "addRule" );
 				
 		}
-
-		public void registerCallback(IRemoteServiceCallback cb) {
-			if (cb != null)
-				mCallbacks.register(cb);
-		}
-
-		public void unregisterCallback(IRemoteServiceCallback cb) {
-			if (cb != null)
-				mCallbacks.unregister(cb);
-		}
-
-		public void registerComponent(String componentName)
-				throws RemoteException {
-			
-			for (Component ac: activeContexts){
-				if (! ac.contextName.equals(componentName))
-					loadClass(componentName);		
-			}
-			
-			
-		}
-
+		
 		public void startComposite(String compositeName) throws RemoteException {
 			RuledCompositeComponent ruledComponent = null;
 			
@@ -284,32 +318,14 @@ public class ContextEngine extends Service {
 			}
 		}
 
-		public void addLocationComponent(String key) throws RemoteException {
-			
-			if (locationServices == null)
-				locationServices = new LocationServices(c);
-			
-			locationContext = new LocationContext(c, key, locationServices);
-			locationContexts.add(locationContext);
-			activeContexts.add(locationContext);
-			if (D)
-				Log.d(LOG_TAG, "onaddLocationComponent -success");
-			
+		public void registerCallback(IRemoteServiceCallback cb) {
+			if (cb != null)
+				mCallbacks.register(cb);
 		}
 
-		public void addLocation(String locationKey, String identifier, String latitude,
-				String longitude) throws RemoteException {
-			if (D)
-				Log.d(LOG_TAG, "addLocation -success");
-			try{
-			for (LocationContext lc: locationContexts){
-				if (lc.key.equals(locationKey)){
-					lc.addLocation(identifier, Double.valueOf(latitude), Double.valueOf(longitude));
-				}
-			}			
-			}catch(Exception e){
-				Log.e(LOG_TAG, e.getLocalizedMessage());
-			}
+		public void unregisterCallback(IRemoteServiceCallback cb) {
+			if (cb != null)
+				mCallbacks.unregister(cb);
 		}
 	};
 	
@@ -444,8 +460,8 @@ public class ContextEngine extends Service {
 
 		intent.setAction(CONTEXT_INTENT);
 		intent.putExtra(CONTEXT_NAME,bundle.getString(CONTEXT_NAME));
-		if (!bundle.getString(CONTEXT_LOCATION_KEY).equals(null))
-			intent.putExtra(CONTEXT_LOCATION_KEY, bundle.getString(CONTEXT_LOCATION_KEY));
+		if (!bundle.getString(CONTEXT_APPLICATION_KEY).equals(null))
+			intent.putExtra(CONTEXT_APPLICATION_KEY, bundle.getString(CONTEXT_APPLICATION_KEY));
 		intent.putExtra(CONTEXT_DATE, bundle.getString(CONTEXT_DATE));
 		if (!bundle.getString(CONTEXT_VALUE).equals(null))
 			intent.putExtra(CONTEXT_VALUE, bundle.getBoolean(CONTEXT_VALUE));
@@ -458,45 +474,7 @@ public class ContextEngine extends Service {
 		}
 	}
 
-//	private static final int REPORT_MSG = 1;
-//
-//	/**
-//	 * Our Handler used to execute operations on the main thread. This is used
-//	 * to schedule increments of our value.
-//	 */
-//	private final Handler mHandler = new Handler() {
-//		@Override
-//		public void handleMessage(Message msg) {
-//			switch (msg.what) {
-//
-//			// It is time to bump the value!
-//			case REPORT_MSG: {
-//				// Up it goes.
-////				int value = ++value;
-//				Bundle bundle = msg.getData();
-//				String contextInfo = bundle
-//				.getString(Component.CONTEXT_NAME);
-//				// Broadcast to all clients the new value.
-//				final int N = mCallbacks.beginBroadcast();
-//				for (int i = 0; i < N; i++) {
-//					try {
-//						mCallbacks.getBroadcastItem(i).valueChanged(contextInfo);
-//					} catch (RemoteException e) {
-//						// The RemoteCallbackList will take care of removing
-//						// the dead object for us.
-//					}
-//				}
-//				mCallbacks.finishBroadcast();
-//
-//				// Repeat every 1 second.
-////				sendMessageDelayed(obtainMessage(REPORT_MSG), 1 * 1000);
-//			}
-//				break;
-//			default:
-//				super.handleMessage(msg);
-//			}
-//		}
-//	};
+
 
 	@Override
 	public void onDestroy() {
@@ -527,7 +505,74 @@ public class ContextEngine extends Service {
 				.show();
 
 	}
-	
-	
-
 }
+
+//REMOVED FROM CONTEXT DEFINITION:
+//public void addLocationComponent(String key) throws RemoteException {
+//	
+//	if (locationServices == null)
+//		locationServices = new LocationServices(c);
+//	
+//	locationContext = new LocationContext(c, key, locationServices);
+//	locationContexts.add(locationContext);
+//	activeContexts.add(locationContext);
+//	if (D)
+//		Log.d(LOG_TAG, "onaddLocationComponent -success");
+//	
+//}
+//
+//public void addLocation(String locationKey, String identifier, String latitude,
+//		String longitude) throws RemoteException {
+//	if (D)
+//		Log.d(LOG_TAG, "addLocation -success");
+//	try{
+//	for (LocationContext lc: locationContexts){
+//		if (lc.key.equals(locationKey)){
+//			lc.addLocation(identifier, Double.valueOf(latitude), Double.valueOf(longitude));
+//		}
+//	}			
+//	}catch(Exception e){
+//		Log.e(LOG_TAG, e.getLocalizedMessage());
+//	}
+//}
+
+//USED TO TEST CONNECTION TO APP:
+//private static final int REPORT_MSG = 1;
+//
+///**
+// * Our Handler used to execute operations on the main thread. This is used
+// * to schedule increments of our value.
+// */
+//private final Handler mHandler = new Handler() {
+//	@Override
+//	public void handleMessage(Message msg) {
+//		switch (msg.what) {
+//
+//		// It is time to bump the value!
+//		case REPORT_MSG: {
+//			// Up it goes.
+////			int value = ++value;
+//			Bundle bundle = msg.getData();
+//			String contextInfo = bundle
+//			.getString(Component.CONTEXT_NAME);
+//			// Broadcast to all clients the new value.
+//			final int N = mCallbacks.beginBroadcast();
+//			for (int i = 0; i < N; i++) {
+//				try {
+//					mCallbacks.getBroadcastItem(i).valueChanged(contextInfo);
+//				} catch (RemoteException e) {
+//					// The RemoteCallbackList will take care of removing
+//					// the dead object for us.
+//				}
+//			}
+//			mCallbacks.finishBroadcast();
+//
+//			// Repeat every 1 second.
+////			sendMessageDelayed(obtainMessage(REPORT_MSG), 1 * 1000);
+//		}
+//			break;
+//		default:
+//			super.handleMessage(msg);
+//		}
+//	}
+//};

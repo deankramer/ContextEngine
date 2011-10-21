@@ -32,9 +32,9 @@ public class BatteryContext extends MonitorComponent{
 	
 	public BatteryContext(Context c) {
 		super("BatteryContext", c, "Intent.ACTION_BATTERY_CHANGED", "BatteryManager.EXTRA_STATUS");		
-		this.addRange(0, 30, "LOW");
-		this.addRange(31, 80, "MEDIUM");
-		this.addRange(81, 200, "HIGH"); 
+//		this.addRange(0, 30, "LOW");
+//		this.addRange(31, 80, "MEDIUM");
+//		this.addRange(81, 200, "HIGH"); 
 		this.contextInformation = obtainContextInformation();
 	}	
 	

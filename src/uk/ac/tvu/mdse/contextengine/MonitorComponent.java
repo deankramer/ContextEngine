@@ -16,6 +16,7 @@
 
 package uk.ac.tvu.mdse.contextengine;
 
+import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,15 +38,15 @@ public class MonitorComponent extends Component{
     
 	public MonitorComponent(String name, Context c){		
 		super(name, c);	
-		//default set of context values is ON&OFF		
-		addValues(values);
+		//default set of context values is ON&OFF			
+		valuesSets.add(new ContextValues(values));
 		setupMonitor();
 	}
 	
 	public MonitorComponent(String name, Context c, String action){		
 		super(name, c);	
 		this.filterAction = action;	
-		addValues(values);
+		valuesSets.add(new ContextValues(values));
 		setupMonitor();
 	}
 	
@@ -54,7 +55,7 @@ public class MonitorComponent extends Component{
 		super(name, c);	
 		this.filterAction = action;		
 		this.monitoringKey = key;
-		addValues(values);
+		valuesSets.add(new ContextValues(values));
 		setupMonitor();
 	}
 	

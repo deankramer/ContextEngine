@@ -99,16 +99,6 @@ public class LocationContext extends Component{
 		checkContext(locale);
 	}
 
-/*	
-	protected Map<String,Location> isNearby(Location locale){
-		Map<String, Location> nearbys = new HashMap<String, Location>();
-		for(Map.Entry<String, Location> entry: locationSet.entrySet()){
-			if(location.distanceTo(entry.getValue()) <= distancebetween)
-				nearbys.put(entry.getidentifier(), entry.getValue());
-		}
-		return nearbys;
-	}
-*/	
 	protected ArrayList<String> isNearby(Location locale){
 		//ArrayList<String> nearbys = new ArrayList<String>();
 		String[] nearbys = new String[locationSet.size()];
@@ -147,19 +137,9 @@ public class LocationContext extends Component{
 		else if((contextValue) && (nearbys.size()<1)){
 			contextValue=false;
 			sendNotification(nearbys);
-		}
-		
+		}		
 	}
-/*	
-	protected void checkContext(Location locale){
-		Map<String, Location> nearbys = isNearby(locale);
-		
-		if(nearbys.size()>0){
-			sendNotification();
-		}
-		
-	}
-	*/
+
 	public void sendNotification(ArrayList<String> nearbys) {
 		Intent intent = new Intent();
 
@@ -179,5 +159,27 @@ public class LocationContext extends Component{
 	public void stop() {
 		Log.v(contextName, "Stopping");
 	}
-
 }
+
+
+/*	
+	protected Map<String,Location> isNearby(Location locale){
+		Map<String, Location> nearbys = new HashMap<String, Location>();
+		for(Map.Entry<String, Location> entry: locationSet.entrySet()){
+			if(location.distanceTo(entry.getValue()) <= distancebetween)
+				nearbys.put(entry.getidentifier(), entry.getValue());
+		}
+		return nearbys;
+	}
+*/	
+
+/*	
+protected void checkContext(Location locale){
+	Map<String, Location> nearbys = isNearby(locale);
+	
+	if(nearbys.size()>0){
+		sendNotification();
+	}
+	
+}
+*/

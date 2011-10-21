@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import uk.ac.tvu.mdse.contextengine.highLevelContext.ContextRange;
+import uk.ac.tvu.mdse.contextengine.reasoning.ApplicationKey;
+import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +35,9 @@ public class Component implements Serializable {
 	private static final long serialVersionUID = -4339043280287205031L;
 	public static final String LOG_TAG = "CONTEXT";
 	public static final boolean D = true;
+	
+	// Each application listens only to particular location context determined by its key
+	public static final String CONTEXT_APPLICATION_KEY = "context_application_key";
 
 	// Key names for context change
 	public static final String CONTEXT_NAME = "context_name";
@@ -41,10 +46,7 @@ public class Component implements Serializable {
 	public static final String CONTEXT_INFORMATION = "context_information";
 	
 	//a set of valid context values
-	public ArrayList<String> valuesSet = new ArrayList<String>();
-
-	//to hold high level contexts with its range of values
-	public ArrayList<ContextRange> contextRangeSet = new ArrayList<ContextRange>();
+	public ArrayList<ContextValues> valuesSets = new ArrayList<ContextValues>();
 	
 	// BroadcastReceiver
 	public BroadcastReceiver contextMonitor = null;
@@ -62,9 +64,27 @@ public class Component implements Serializable {
 	public Component(String name, Context c) {
 		context = c;
 		contextName = name;
-		contextValue = false;		
+		contextValue = false;				
 	}
 	
+	//send notification for particular context values and application keys set
+	public void sendNotification(ContextValues contextValues) {
+		Intent intent = new Intent();
+
+		intent.setAction(CONTEXT_INTENT);
+		intent.putExtra(CONTEXT_NAME, contextName);
+		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+		intent.putExtra(CONTEXT_VALUE, contextValue);
+		intent.putExtra(CONTEXT_INFORMATION, contextValues.getContextInformation(0));
+		
+		intent.putExtra(CONTEXT_APPLICATION_KEY, contextValues.keys);
+		try {
+			context.sendBroadcast(intent);
+		} catch (Exception e) {
+			Log.e(contextName, "not working");
+		}
+	}
+
 	public void sendNotification(){
 		sendNotification(contextName, contextValue);
 	}
@@ -72,7 +92,7 @@ public class Component implements Serializable {
 	public void sendNotification(boolean value) {
 		sendNotification(contextName, value);
 	}
-
+	
 	public void sendNotification(String name, boolean value) {
 		Intent intent = new Intent();
 
@@ -96,6 +116,7 @@ public class Component implements Serializable {
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
 		intent.putExtra(CONTEXT_VALUE, contextValue);
 		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
+
 		try {
 			context.sendBroadcast(intent);
 		} catch (Exception e) {
@@ -111,34 +132,20 @@ public class Component implements Serializable {
 		return contextInformation;
 	}
 	
-	public String getContextInformation(double contextInput){
-		for (ContextRange cr: contextRangeSet){
-			if ((cr.maxValue>contextInput)&&(cr.minValue<contextInput))
-				contextInformation = cr.contextHighValue;
-		}
-		return contextInformation;
-	}
-	
-	public String getContextInformation(int contextInput){
-		for (ContextRange cr: contextRangeSet){
-			if ((cr.maxValue>contextInput)&&(cr.minValue<contextInput))
-				contextInformation = cr.contextHighValue;
-		}
-		return contextInformation;
+
+	public String getContextInformation(double v) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 	//re-implement if context value depends on some values
 	protected void checkContext(Bundle data) {
 		//check data		
-		//evaluate by firing off the rules - for the compoiste component
+		//evaluate by firing off the rules - for the composite component
 		//set contextValue	
-		sendNotification();
+//		sendNotification();
 	}
-	
-	protected boolean checkContextValue(String value){
-		return (valuesSet.contains(value));
-	}
-	
+
 	@Override
 	public String toString() {
 		return "Component [contextName=" + contextName + "]";
@@ -184,49 +191,115 @@ public class Component implements Serializable {
 		return date.toString();
 	}
 	
-	public boolean addValue(String contextValue){
+	public void setupNewValuesSet(ApplicationKey key, String[] values){
 		
-		//check if the value already exists in the set
-		if (valuesSet.contains(contextValue))
-			return false;
-		else {
-			valuesSet.add(contextValue);
-			return true;
+		//TO DO:
+		//check whether such a set already exist
+		//if yes, just add app key to it!
+		
+		//if not,create new one:
+		valuesSets.add(new ContextValues(key, values));		
+	}
+	
+
+	public void addContextValue(ApplicationKey appKey, String newContextValue) {
+		for (ContextValues cv: valuesSets){
+			if (cv.keys.contains(appKey))
+				cv.addValue(newContextValue);	
 		}		
 	}
 	
-	public void addValues(String[] values){		
-		for (String newValue: values)
-			addValue(newValue);
-	}
-	
-	public void setupValues(String[] values){
-		valuesSet.removeAll(valuesSet.subList(0, valuesSet.size()-1));
-		addValues(values);
+	public void addSpecificContextValue(ApplicationKey appKey,
+			String newContextValue, Double value1, Double value2) {		
+		for (ContextValues cv: valuesSets){
+			if (cv.keys.contains(appKey))
+				cv.addLocation(newContextValue, value1, value2);	
+		}
 	}	
 	
-	
-	public boolean addRange(int minValue, int maxValue, String contextValue){		
+	public void addRange(ApplicationKey appKey, Integer minValue,
+			Integer maxValue, String newContextValue) {
+		for (ContextValues cv: valuesSets){
+			if (cv.keys.contains(appKey))
+				cv.addRange(minValue, maxValue, newContextValue);	
+		}
 		
-//		if (checkRange(contextValue))
-//			return false;
-//		else{
-		Log.v("test", "havent crashed yet");
-			contextRangeSet.add(new ContextRange(minValue,maxValue,contextValue));		
-			valuesSet.add(contextValue);
-			return true;
-		//}		
-	}
-	
-	public boolean checkRange(String contextValue){
-		boolean exist = false;
-		for (ContextRange cr: contextRangeSet){
-			if (cr.contextHighValue.equals(contextValue))
-				exist = true;
-		}	
-		return exist;		
 	}
 	
 	public void stop() {		
 	}
 }
+	
+	//REMOVE THE FOLLOWING CODE IF TESTING OK!
+	
+//	//a set of valid context values
+//	public ArrayList<String> valuesSet = new ArrayList<String>();
+//
+//	//to hold high level contexts with its range of values
+//	public ArrayList<ContextRange> contextRangeSet = new ArrayList<ContextRange>();
+	
+	
+	
+//	protected boolean checkContextValue(String value){
+//		return (valuesSet.contains(value));
+//	}
+	
+//	public String getContextInformation(double contextInput){
+//		for (ContextRange cr: contextRangeSet){
+//			if ((cr.maxValue>contextInput)&&(cr.minValue<contextInput))
+//				contextInformation = cr.contextHighValue;
+//		}
+//		return contextInformation;
+//	}
+//	
+//	public String getContextInformation(int contextInput){
+//		for (ContextRange cr: contextRangeSet){
+//			if ((cr.maxValue>contextInput)&&(cr.minValue<contextInput))
+//				contextInformation = cr.contextHighValue;
+//		}
+//		return contextInformation;
+//	}
+	
+//	public boolean addValue(String contextValue){
+//	
+//	//check if the value already exists in the set
+//	if (valuesSet.contains(contextValue))
+//		return false;
+//	else {
+//		valuesSet.add(contextValue);
+//		return true;
+//	}		
+//}
+	
+//	public void addValues(String[] values){		
+//		for (String newValue: values)
+//			addValue(newValue);
+//	}
+//	
+//	public void setupValues(String[] values){
+//		valuesSet.removeAll(valuesSet.subList(0, valuesSet.size()-1));
+//		addValues(values);
+//	}	
+	
+	
+//	public boolean addRange(int minValue, int maxValue, String contextValue){		
+//		
+//		if (checkRange(contextValue))
+//			return false;
+//		else{
+//		Log.v("test", "havent crashed yet");
+//			contextRangeSet.add(new ContextRange(minValue,maxValue,contextValue));		
+//			valuesSet.add(contextValue);
+//			return true;
+//		}		
+//	}
+	
+//	public boolean checkRange(String contextValue){
+//		boolean exist = false;
+//		for (ContextRange cr: contextRangeSet){
+//			if (cr.contextHighValue.equals(contextValue))
+//				exist = true;
+//		}	
+//		return exist;		
+//	}
+	
