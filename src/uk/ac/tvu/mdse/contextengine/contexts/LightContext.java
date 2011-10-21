@@ -17,6 +17,7 @@
 package uk.ac.tvu.mdse.contextengine.contexts;
 
 import uk.ac.tvu.mdse.contextengine.ListenerComponent;
+import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -52,15 +53,21 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 	}
 
 	public void checkContext(SensorEvent data) {
-		double v = data.values[0];
+		int v = (int) data.values[0];
 		
+		for (ContextValues cv: this.valuesSets){
+			if (cv.setNewContextValue(v))
+				sendNotification(cv);
+		}		
+		
+//		double v  = data.values[0];
 		//send context value - 2nd approach
-		String highContext = this.getContextInformation(v);
-		Log.d("LightContext", "newValue" + v +" "+highContext);
-		if(!contextInformation.equalsIgnoreCase(lastC)){
-			lastC=highContext;
-			sendNotification();
-			Log.d("LightContext", "newValue set ".concat(contextInformation));
-		}
+//		String highContext = this.getContextInformation(v);
+//		Log.d("LightContext", "newValue" + v +" "+highContext);
+//		if(!contextInformation.equalsIgnoreCase(lastC)){
+//			lastC=highContext;
+//			sendNotification();
+//			Log.d("LightContext", "newValue set ".concat(contextInformation));
+//		}
 	}
 }

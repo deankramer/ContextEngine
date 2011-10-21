@@ -17,6 +17,7 @@
 package uk.ac.tvu.mdse.contextengine.contexts;
 
 import uk.ac.tvu.mdse.contextengine.MonitorComponent;
+import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.net.NetworkInfo;
@@ -40,33 +41,37 @@ public class BluetoothContext extends MonitorComponent {
 	
 	protected String obtainContextInformation(){
 		int bluetoothValue = bluetoothAdapter.getState();
-		if (bluetoothValue == BluetoothAdapter.STATE_ON) 
-			return "ON";
-		else
-			return "OFF";
+		return (bluetoothValue == BluetoothAdapter.STATE_ON) ? "ON" : "OFF";
 	}
 	
 	protected void checkContext(Bundle data) {
 		//check data		
 		//evaluate by firing off the rules
 		//set contextValue	
-		int bluetoothValue = bluetoothAdapter.getState();
-//		if (bluetoothValue == BluetoothAdapter.STATE_ON) {
-//			sendNotification("bluetoothON", true);
-//			sendNotification("bluetoothOFF", false);
-//		} else {
-//			sendNotification("bluetoothON", false);
-//			sendNotification("bluetoothOFF", true);
-//		}
+		String bluetoothValue = (bluetoothAdapter.getState() == BluetoothAdapter.STATE_ON) ? "ON" : "OFF";
+
+		for (ContextValues cv: this.valuesSets){
+			if (cv.setNewContextInformation(bluetoothValue))
+				sendNotification(cv);
+		}
 		
-		//send context information - 2nd approach
-		if ((bluetoothValue == BluetoothAdapter.STATE_ON)&&(!contextInformation.equals("ON"))) {
-			contextInformation = "ON";
-			sendNotification();
-		} 
-		if ((bluetoothValue == BluetoothAdapter.STATE_OFF)&&(!contextInformation.equals("OFF"))) {
-			contextInformation = "OFF";
-			sendNotification();
-		}		
+//		int bluetoothValue = bluetoothAdapter.getState();
+//		//send context information - 2nd approach
+//		if ((bluetoothValue == BluetoothAdapter.STATE_ON)&&(!contextInformation.equals("ON"))) {
+//			contextInformation = "ON";
+//			sendNotification();
+//		} 
+//		if ((bluetoothValue == BluetoothAdapter.STATE_OFF)&&(!contextInformation.equals("OFF"))) {
+//			contextInformation = "OFF";
+//			sendNotification();
+//		}	
+		
+//		if (bluetoothValue == BluetoothAdapter.STATE_ON) {
+//		sendNotification("bluetoothON", true);
+//		sendNotification("bluetoothOFF", false);
+//	} else {
+//		sendNotification("bluetoothON", false);
+//		sendNotification("bluetoothOFF", true);
+//	}
 	}
 }

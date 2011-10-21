@@ -17,6 +17,7 @@
 package uk.ac.tvu.mdse.contextengine.contexts;
 
 import uk.ac.tvu.mdse.contextengine.MonitorComponent;
+import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import android.content.Context;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -48,6 +49,8 @@ public class BatteryContext extends MonitorComponent{
         if (rawlevel >= 0 && scale > 0) 
             v = (rawlevel * 100) / scale; 
        */
+		
+		//set as default
 		int v=50;
         return this.getContextInformation(v);
 	}
@@ -57,18 +60,26 @@ public class BatteryContext extends MonitorComponent{
         int scale = data.getInt(BatteryManager.EXTRA_SCALE, -1);
         
         if (rawlevel >= 0 && scale > 0) {
-            v = (rawlevel * 100) / scale;        
-            String highContext = this.getContextInformation(v);
-    		if ((highContext.equals("HIGH")) && (!contextInformation.equals("HIGH"))) {				
-    			contextInformation = "HIGH";
-    			sendNotification();
-    		} else if ((highContext.equals("MEDIUM")) && (!contextInformation.equals("MEDIUM"))) {
-    			contextInformation = "MEDIUM";
-    			sendNotification();
-    		} else if ((highContext.equals("LOW")) && (!contextInformation.equals("LOW"))) {				
-    			contextInformation = "LOW";
-    			sendNotification();
+            v = (rawlevel * 100) / scale; 
+            
+            //go through all context sets and send notification 
+            //only for sets in which info changed
+        	for (ContextValues cv: this.valuesSets){
+    			if (cv.setNewContextValue(v))
+    				sendNotification(cv);
     		}
+        	
+//            String highContext = this.getContextInformation(v);
+//    		if ((highContext.equals("HIGH")) && (!contextInformation.equals("HIGH"))) {				
+//    			contextInformation = "HIGH";
+//    			sendNotification();
+//    		} else if ((highContext.equals("MEDIUM")) && (!contextInformation.equals("MEDIUM"))) {
+//    			contextInformation = "MEDIUM";
+//    			sendNotification();
+//    		} else if ((highContext.equals("LOW")) && (!contextInformation.equals("LOW"))) {				
+//    			contextInformation = "LOW";
+//    			sendNotification();
+//    		}
         }
 	}	
 }

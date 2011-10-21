@@ -75,7 +75,7 @@ public class Component implements Serializable {
 		intent.putExtra(CONTEXT_NAME, contextName);
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
 		intent.putExtra(CONTEXT_VALUE, contextValue);
-		intent.putExtra(CONTEXT_INFORMATION, contextValues.getContextInformation(0));
+		intent.putExtra(CONTEXT_INFORMATION, contextValues.contextInformation);
 		
 		intent.putExtra(CONTEXT_APPLICATION_KEY, contextValues.keys);
 		try {
@@ -226,7 +226,8 @@ public class Component implements Serializable {
 		
 	}
 	
-	public void stop() {		
+	public void stop() {	
+		Log.v(contextName, "Stopping");
 	}
 }
 	

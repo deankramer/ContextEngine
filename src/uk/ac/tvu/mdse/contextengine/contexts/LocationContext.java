@@ -155,10 +155,6 @@ public class LocationContext extends Component{
 			Log.e(contextName, "not working");
 		}
 	}
-	
-	public void stop() {
-		Log.v(contextName, "Stopping");
-	}
 }
 
 

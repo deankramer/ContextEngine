@@ -25,6 +25,9 @@ import uk.ac.tvu.mdse.contextengine.highLevelContext.ContextRange;
 import uk.ac.tvu.mdse.contextengine.highLevelContext.LocationIdentifier;
 
 public class ContextValues {
+	
+	//current contextInformation of this context value set
+	public String contextInformation;
 
 	//a set of applications listening to the context values
 	public ArrayList<ApplicationKey> keys = new ArrayList<ApplicationKey>();
@@ -49,6 +52,27 @@ public class ContextValues {
 		keys.add(key);
 	}
 
+	public boolean setNewContextInformation(String newContextInformation){
+		
+		//only inform&change it if different from previous context value		
+		if (!(contextInformation.equals(newContextInformation))) {				
+			contextInformation = newContextInformation;
+			return true;
+		}
+		else 
+			return false;
+	}
+	
+	public boolean setNewContextValue(int newContextValue){
+		
+		boolean newInformation = false;
+		
+		for (ContextRange cr: contextRangeSet)
+			if (cr.getContextHighValue(newContextValue) != null)
+				if (setNewContextInformation(cr.getContextHighValue(newContextValue)))
+					newInformation = true;				
+		return newInformation;					
+	}
 
 	public boolean addRange(int minValue, int maxValue, String contextValue){		
 

@@ -17,6 +17,7 @@
 package uk.ac.tvu.mdse.contextengine.contexts;
 
 import uk.ac.tvu.mdse.contextengine.MonitorComponent;
+import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.net.wifi.WifiManager;
@@ -37,30 +38,33 @@ public class WifiContext extends MonitorComponent {
 	
 	protected String obtainContextInformation(){
 		Boolean wifiEnabled = wm.isWifiEnabled();
-		if (wifiEnabled) 
-			return "ON";
-		else
-			return "OFF";
+		return (wifiEnabled) ? "ON" : "OFF";
 	}
 
 	protected void checkContext() {
-		Boolean wifiEnabled = wm.isWifiEnabled();
-//		if (wifiEnabled & (!contextValue)) {
-//			sendNotification("wifiON", true);
-//			contextValue = true;
-//		} else if ((!wifiEnabled) & (contextValue)) {
-//			sendNotification("wifiON", false);
-//			contextValue = false;
-//		}
-
-		//send context value - 2nd approach
-		if (wifiEnabled & (!contextInformation.equals("ON"))) {			
-			contextInformation = "ON";
-		} else if ((!wifiEnabled) & (!contextInformation.equals("OFF"))) {			
-			contextInformation = "OFF";
+		String wifiEnabled = wm.isWifiEnabled() ? "ON" : "OFF" ;		
+		
+		for (ContextValues cv: this.valuesSets){
+			if (cv.setNewContextInformation(wifiEnabled))
+				sendNotification(cv);
 		}
-		sendNotification();
+
+//		Boolean wifiEnabled = wm.isWifiEnabled() ;	
+//		//send context value - 2nd approach
+//		if (wifiEnabled & (!contextInformation.equals("ON"))) {			
+//			contextInformation = "ON";
+//		} else if ((!wifiEnabled) & (!contextInformation.equals("OFF"))) {			
+//			contextInformation = "OFF";
+//		}
+//		sendNotification();
+		
+//		if (wifiEnabled & (!contextValue)) {
+//		sendNotification("wifiON", true);
+//		contextValue = true;
+//	} else if ((!wifiEnabled) & (contextValue)) {
+//		sendNotification("wifiON", false);
+//		contextValue = false;
+//	}
+
 	}
-
-
 }
