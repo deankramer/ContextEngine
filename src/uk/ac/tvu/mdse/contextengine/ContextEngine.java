@@ -23,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import uk.ac.tvu.mdse.contextengine.contexts.LocationContext;
 import uk.ac.tvu.mdse.contextengine.db.ContextDB;
@@ -185,17 +184,21 @@ public class ContextEngine extends Service {
 		
 		public void registerComponent(String componentName)
 				throws RemoteException {
-			
 			//FOR LOCATION:
 			if (componentName.equals("LocationContext")){
 				if (locationServices == null)
 					locationServices = new LocationServices(c);
 			}
 			
-			for (Component ac: activeContexts){
-				if (! ac.contextName.equals(componentName))
-					loadClass(componentName);		
-			}			
+			if(activeContexts.isEmpty())
+				loadClass(componentName);
+			else{
+				for (Component ac: activeContexts){
+					if (! ac.contextName.equals(componentName))
+						loadClass(componentName);	
+				}
+			}
+			
 		}
 		
 		//***add context values to a component***
