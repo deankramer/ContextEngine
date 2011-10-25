@@ -19,19 +19,24 @@ package uk.ac.tvu.mdse.contextengine.contexts;
 import uk.ac.tvu.mdse.contextengine.PreferenceChangeComponent;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 public class UserPreferenceContext extends PreferenceChangeComponent{	
 
 	private static final long serialVersionUID = 2997863934263820784L;
+	public static final String LOG_TAG = "UserPreferenceContext";
+	public static final boolean D = true;
 	private String preference;
 
 	//for check box, ...boolean value
 	public UserPreferenceContext(SharedPreferences pm, String pref, Context c) {
 		super(pm, pref, PreferenceChangeComponent.PreferenceType.BOOLEAN, c);	
+		if (D) Log.d(LOG_TAG, "constructor");
 		this.preference = pref;
 	}	
 
-	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {		
+	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
+		if (D) Log.d(LOG_TAG, "onSharedPreferenceChanged");
 		if (preference.equals(arg1))
 			sendNotification(arg1, true);
 	}

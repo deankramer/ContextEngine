@@ -27,12 +27,16 @@ import android.util.Log;
 public class BluetoothContext extends MonitorComponent {
 
 	private static final long serialVersionUID = -8852296839608708684L;
+	public static final String LOG_TAG = "BluetoothContext";
+	public static final boolean D = true;
+	
 	BluetoothAdapter bluetoothAdapter;
 	static NetworkInfo netInfo;
 
 
 	public BluetoothContext(Context c) {
-		super("BluetoothContext", c, "android.bluetooth.adapter.action.STATE_CHANGED", "bluetoothAdapter.getState()" );	
+		super("BluetoothContext", c, "android.bluetooth.adapter.action.STATE_CHANGED", "bluetoothAdapter.getState()" );
+		if (D) Log.d(LOG_TAG, "constructor");
 		this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		this.contextInformation = obtainContextInformation();
 		//this.contextInformation = "ON";
@@ -40,11 +44,13 @@ public class BluetoothContext extends MonitorComponent {
 	}
 	
 	protected String obtainContextInformation(){
+		if (D) Log.d(LOG_TAG, "obtainContextInformation");
 		int bluetoothValue = bluetoothAdapter.getState();
 		return (bluetoothValue == BluetoothAdapter.STATE_ON) ? "ON" : "OFF";
 	}
 	
 	protected void checkContext(Bundle data) {
+		if (D) Log.d(LOG_TAG, "checkContext");
 		//check data		
 		//evaluate by firing off the rules
 		//set contextValue	

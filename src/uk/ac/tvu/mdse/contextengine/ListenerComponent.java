@@ -27,6 +27,8 @@ import android.util.Log;
 public class ListenerComponent extends Component implements SensorEventListener{
 
 	private static final long serialVersionUID = 14671122599992688L;
+	public static final String LOG_TAG = "ListenerComponent";
+	public static final boolean D = true;
 
 	protected SensorManager sensorManager;
 	private Sensor theSensor;
@@ -34,8 +36,9 @@ public class ListenerComponent extends Component implements SensorEventListener{
 	private int delayType; 
 	
 	
-	public ListenerComponent(String name, Context c, int sensorT, int delayT) {
+	public ListenerComponent(String name, Context c, int sensorT, int delayT) {		
 		super(name, c);
+		if (D) Log.d(LOG_TAG, "constructor");
 		this.sensorManager = (SensorManager) c.getSystemService(Context.SENSOR_SERVICE);		
 		this.sensorType = sensorT;
 		theSensor = sensorManager.getDefaultSensor(sensorType);
@@ -44,26 +47,30 @@ public class ListenerComponent extends Component implements SensorEventListener{
 	}	
 
 	public void setDelaytype(int delaytype) {
+		if (D) Log.d(LOG_TAG, "setDelaytype");
 		this.delayType = delaytype;
 		sensorManager.unregisterListener(this, theSensor);
 		sensorManager.registerListener(this, theSensor, delayType);
 	}
 
 	public int getDelaytype() {
+		if (D) Log.d(LOG_TAG, "getDelaytype");
 		return delayType;
 	}
 
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
-
+		if (D) Log.d(LOG_TAG, "onAccuracyChanged");
 	}
 
 	public void onSensorChanged(SensorEvent arg0) {		
+		if (D) Log.d(LOG_TAG, "onSensorChanged");
 		if (arg0.sensor.getType() == sensorType) 
 			checkContext(arg0);				
 	};
 	
 	//re-implement if context value depends on some values
 	public void checkContext(SensorEvent data) {
+		if (D) Log.d(LOG_TAG, "checkContext");
 		//check data		
 		//fire off the rules
 		//set contextValue	
@@ -71,8 +78,7 @@ public class ListenerComponent extends Component implements SensorEventListener{
 	}
 
 	public void stop() {
+		if (D) Log.d(LOG_TAG, "stop");
 		sensorManager.unregisterListener(this, theSensor);
-		Log.v(contextName, "Stopping");
 	}
-
 }

@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import uk.ac.tvu.mdse.contextengine.highLevelContext.Rule;
+import uk.ac.tvu.mdse.contextengine.reasoning.ApplicationKey;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,10 +38,15 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 5268211078370074986L;
+	public static final String LOG_TAG = "RuledCompositeComponent";
+	public static final boolean D = true;
 
 	public ArrayList<Component> components = new ArrayList<Component>();
 	
 	public ArrayList<Rule> rules = new ArrayList<Rule>();
+	
+	//a set of valid context values
+	public ArrayList<String> valuesSet = new ArrayList<String>();
 	
 	//to make easier if AND or OR can be applied
 	public enum Expression {ALL, ANY}; 
@@ -49,11 +55,12 @@ public class RuledCompositeComponent extends Component implements Serializable {
 
 	public RuledCompositeComponent(String name, Context c) {
 		super(name, c);
-		this.contextInformation = "default";
-		
+		if (D) Log.d(LOG_TAG, "constructor");
+		this.contextInformation = "default";		
 	}
 	
 	public void componentDefined(){
+		if (D) Log.d(LOG_TAG, "componentDefined");
 		setupMonitor();
 	}
 
@@ -63,9 +70,11 @@ public class RuledCompositeComponent extends Component implements Serializable {
 
 			@Override
 			public void onReceive(Context c, Intent in) {
+				if (D) Log.d(LOG_TAG, "onReceive");
 				// TODO Auto-generated method stub
 //				String context = in.getExtras().getString(CONTEXT_NAME);
 //				boolean value = in.getExtras().getBoolean(CONTEXT_VALUE);
+				in.getExtras().getStringArrayList(CONTEXT_APPLICATION_KEY);
 				checkContext();				
 			}
 		};
@@ -74,6 +83,7 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	}
 
 	public void checkContext(){
+		if (D) Log.d(LOG_TAG, "checkContext");
 		String compositeContextValue  = fireRules(); //"ON";//
 		if (!compositeContextValue.equals(this.contextInformation))	{		//((compositeContextValue.equals(null)||compositeContextValue.equals(this.contextInformation)))){
 			this.contextInformation = compositeContextValue;
@@ -84,6 +94,7 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	
 	//ALL or ANY
 	public boolean addSimplerRule(String s){
+		if (D) Log.d(LOG_TAG, "addSimplerRule");
 		try{
 			this.simplerRule = Expression.valueOf(s);
 			return true;
@@ -94,6 +105,7 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	}
 	
 	public void addRule(String[] conditions, String statement){
+		if (D) Log.d(LOG_TAG, "addRule");
 		//if (!checkRule(conditions, statement))
 		Rule r = new Rule(conditions, statement);
 			rules.add(r);
@@ -101,17 +113,20 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	}
 	
 	public boolean checkRule(String[] conditions, String statement){
+		if (D) Log.d(LOG_TAG, "checkRule");
 		//this is not good
 		Rule rule = new Rule(conditions, statement);
 		return rules.contains(rule);
 	}
 	
 	public void addRules(ArrayList<Rule> newRules){
+		if (D) Log.d(LOG_TAG, "addRules");
 		for(Rule r: newRules)
 			addRule(r.ifCondition,r.thenStatement);
 	}
 	
 	public String fireRules(){
+		if (D) Log.d(LOG_TAG, "fireRules");
 		String[] componentContexts = new String[components.size()];
 		Log.d("fireRules", String.valueOf(componentContexts.length));
 		int i =0;
@@ -137,18 +152,19 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	
 	//add a new component to composite
 	public void registerComponent(Component c) {
-	
+		if (D) Log.d(LOG_TAG, "registerComponent");
 		//if (!checkComponent(c))
 			components.add(c);
 	}
 	
 	//check whether the component has been already added
 	public boolean checkComponent(Component c){
+		if (D) Log.d(LOG_TAG, "checkComponent");
 		return components.contains(c);
 	}
 
 	public void registerComponents(ArrayList<Component> componentList) {
-
+		if (D) Log.d(LOG_TAG, "registerComponents");
 		for (Component c: componentList)
 			if (!checkComponent(c))
 				components.add(c);
@@ -156,7 +172,7 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	}
 
 	public boolean unregisterComponent(Component c) {
-
+		if (D) Log.d(LOG_TAG, "unregisterComponent");
 		if (checkComponent(c))
 			return components.remove(c);
 		else
@@ -164,6 +180,7 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	}
 
 	public boolean isComposite() {
+		if (D) Log.d(LOG_TAG, "isComposite");
 		if (components.size() > 1)
 			return true;
 		else
@@ -171,6 +188,7 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	}
 	
 	public int getComponentsNo(){
+		if (D) Log.d(LOG_TAG, "getComponentsNo");
 		return this.components.size();
 	}
 }

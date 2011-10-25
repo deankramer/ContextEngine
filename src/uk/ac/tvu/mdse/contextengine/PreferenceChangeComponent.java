@@ -29,7 +29,7 @@ public class PreferenceChangeComponent extends Component implements
 
 	private static final long serialVersionUID = 560933927152794610L;
 	// Monitoring
-	private static final String LOG_TAG = "UserPreferenceContext";
+	private static final String LOG_TAG = "PreferenceChangeComponent";
 	private static final boolean D = true;
 
 	private SharedPreferences sharedPreferences;
@@ -41,6 +41,7 @@ public class PreferenceChangeComponent extends Component implements
 
 	public PreferenceChangeComponent(SharedPreferences sp, String pref, PreferenceType prefT, Context c) {
 		super(pref, c);
+		if (D) Log.d(LOG_TAG, "constructor1");
 		// might be option to work just with one preference a time, or register
 		// a number of preferences
 		preference = pref;
@@ -51,6 +52,7 @@ public class PreferenceChangeComponent extends Component implements
 
 	public PreferenceChangeComponent(SharedPreferences pm, Context c) {
 		super("USER_PREFERENCE", c);
+		if (D) Log.d(LOG_TAG, "constructor2");
 		sharedPreferences = pm;
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 	}
@@ -68,7 +70,7 @@ public class PreferenceChangeComponent extends Component implements
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
-		if (D) Log.v(LOG_TAG, "onPreferenceChange");
+		if (D) Log.v(LOG_TAG, "onSharedPreferenceChanged");
 		if (preference.equals(arg1)){
 			switch (prefType){
 			case BOOLEAN:
@@ -91,6 +93,7 @@ public class PreferenceChangeComponent extends Component implements
 	}
 	
 	public void sendNotification(String preferenceValue) {
+		if (D) Log.v(LOG_TAG, "sendNotification");
 		Intent intent = new Intent();
 
 		intent.setAction(CONTEXT_INTENT);

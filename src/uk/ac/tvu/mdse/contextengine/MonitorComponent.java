@@ -22,11 +22,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 
 
 public class MonitorComponent extends Component{
 
 	private static final long serialVersionUID = -222900547936864703L;
+	public static final String LOG_TAG = "MonitorComponent";
+	public static final boolean D = true;
 
     //BroadcastReceiver
     public BroadcastReceiver contextMonitor = null;    
@@ -38,6 +41,7 @@ public class MonitorComponent extends Component{
     
 	public MonitorComponent(String name, Context c){		
 		super(name, c);	
+		if (D) Log.d(LOG_TAG, "constructor1");
 		//default set of context values is ON&OFF			
 		valuesSets.add(new ContextValues(values));
 		setupMonitor();
@@ -45,6 +49,7 @@ public class MonitorComponent extends Component{
 	
 	public MonitorComponent(String name, Context c, String action){		
 		super(name, c);	
+		if (D) Log.d(LOG_TAG, "constructor2");
 		this.filterAction = action;	
 		valuesSets.add(new ContextValues(values));
 		setupMonitor();
@@ -53,6 +58,7 @@ public class MonitorComponent extends Component{
 	
 	public MonitorComponent(String name, Context c, String action, String key){		
 		super(name, c);	
+		if (D) Log.d(LOG_TAG, "constructor3");
 		this.filterAction = action;		
 		this.monitoringKey = key;
 		valuesSets.add(new ContextValues(values));
@@ -64,7 +70,8 @@ public class MonitorComponent extends Component{
 	private void setupMonitor() {
 		contextMonitor = new BroadcastReceiver() {
 			@Override
-			public void onReceive(Context c, Intent in) {				
+			public void onReceive(Context c, Intent in) {	
+				if (D) Log.d(LOG_TAG, "onReceive");
                 Bundle data =  in.getExtras();
                 checkContext(data);
             }			
@@ -73,6 +80,7 @@ public class MonitorComponent extends Component{
 	}
 	
 	protected void checkContext(Bundle data) {
+		if (D) Log.d(LOG_TAG, "checkContext");
 		//check data		
 		//checkContextValue(data.toString());
 		//evaluate by firing off the rules
@@ -90,6 +98,7 @@ public class MonitorComponent extends Component{
 //	}
 	
 	public void stop() {
+		if (D) Log.d(LOG_TAG, "stop");
 		context.unregisterReceiver(contextMonitor);
 	}
 }

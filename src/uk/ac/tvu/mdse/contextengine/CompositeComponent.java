@@ -30,6 +30,9 @@ public class CompositeComponent extends Component implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -493221379660180723L;
+	public static final String LOG_TAG = "Composite_Component";
+	public static final boolean D = true;
+	
 	// Attributes
 	public Hashtable<String, Boolean> positivecontexts;
 	public Hashtable<String, Boolean> negativecontexts;

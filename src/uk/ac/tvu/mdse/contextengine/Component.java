@@ -33,7 +33,7 @@ public class Component implements Serializable {
 
 	// Attributes
 	private static final long serialVersionUID = -4339043280287205031L;
-	public static final String LOG_TAG = "CONTEXT";
+	public static final String LOG_TAG = "Component";
 	public static final boolean D = true;
 	
 	// Each application listens only to particular location context determined by its key
@@ -62,6 +62,7 @@ public class Component implements Serializable {
 	
 	// Constructors
 	public Component(String name, Context c) {
+		if (D) Log.d(LOG_TAG, "constructor");
 		context = c;
 		contextName = name;
 		contextValue = false;				
@@ -69,6 +70,7 @@ public class Component implements Serializable {
 	
 	//send notification for particular context values and application keys set
 	public void sendNotification(ContextValues contextValues) {
+		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)");
 		Intent intent = new Intent();
 
 		intent.setAction(CONTEXT_INTENT);
@@ -77,7 +79,7 @@ public class Component implements Serializable {
 		intent.putExtra(CONTEXT_VALUE, contextValue);
 		intent.putExtra(CONTEXT_INFORMATION, contextValues.contextInformation);
 		
-		intent.putExtra(CONTEXT_APPLICATION_KEY, contextValues.keys);
+		intent.putExtra(CONTEXT_APPLICATION_KEY, contextValues.getKeysList());
 		try {
 			context.sendBroadcast(intent);
 		} catch (Exception e) {
@@ -94,6 +96,7 @@ public class Component implements Serializable {
 	}
 	
 	public void sendNotification(String name, boolean value) {
+		if (D) Log.d(LOG_TAG, "sendNotification(name,value)");
 		Intent intent = new Intent();
 
 		intent.setAction(CONTEXT_INTENT);
@@ -109,6 +112,7 @@ public class Component implements Serializable {
 	}
 	
 	public void sendNotification(String name, String contextInformation) {
+		if (D) Log.d(LOG_TAG, "sendNotification(name,contextInformation)");
 		Intent intent = new Intent();
 
 		intent.setAction(CONTEXT_INTENT);
@@ -125,21 +129,25 @@ public class Component implements Serializable {
 	}
 
 	public boolean getContextValue(){
+		if (D) Log.d(LOG_TAG, "getContextValue");
 		return contextValue;
 	}
 	
 	public String getContextInformation(){
+		if (D) Log.d(LOG_TAG, "getContextInformation");
 		return contextInformation;
 	}
 	
 
 	public String getContextInformation(double v) {
+		if (D) Log.d(LOG_TAG, "getContextInformation(v)");
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	//re-implement if context value depends on some values
 	protected void checkContext(Bundle data) {
+		if (D) Log.d(LOG_TAG, "checkContext");
 		//check data		
 		//evaluate by firing off the rules - for the composite component
 		//set contextValue	
@@ -152,6 +160,7 @@ public class Component implements Serializable {
 	}
 
 	public String getDateToString() {
+		if (D) Log.d(LOG_TAG, "getDateToString");
 		StringBuffer date = new StringBuffer();
 		date.append(contextDate.get(Calendar.DATE));
 		date.append("-");
@@ -162,6 +171,7 @@ public class Component implements Serializable {
 	}
 
 	public String getTimeToString() {
+		if (D) Log.d(LOG_TAG, "getTimeToString");
 		int mMinute = contextDate.get(Calendar.MINUTE);
 		int mHour = contextDate.get(Calendar.HOUR_OF_DAY);
 
@@ -176,6 +186,7 @@ public class Component implements Serializable {
 	}
 
 	public String getDateTimeString() {
+		if (D) Log.d(LOG_TAG, "getDateTimeString");
 		StringBuffer date = new StringBuffer();
 		date.append(contextDate.get(Calendar.DATE));
 		date.append("-");
@@ -192,17 +203,17 @@ public class Component implements Serializable {
 	}
 	
 	public void setupNewValuesSet(ApplicationKey key, String[] values){
-		
+		if (D) Log.d(LOG_TAG, "setupNewValuesSet");
 		//TO DO:
 		//check whether such a set already exist
 		//if yes, just add app key to it!
 		
 		//if not,create new one:
 		valuesSets.add(new ContextValues(key, values));		
-	}
-	
+	}	
 
 	public void addContextValue(ApplicationKey appKey, String newContextValue) {
+		if (D) Log.d(LOG_TAG, "addContextValue");
 		for (ContextValues cv: valuesSets){
 			if (cv.keys.contains(appKey))
 				cv.addValue(newContextValue);	
@@ -210,7 +221,8 @@ public class Component implements Serializable {
 	}
 	
 	public void addSpecificContextValue(ApplicationKey appKey,
-			String newContextValue, Double value1, Double value2) {		
+			String newContextValue, Double value1, Double value2) {	
+		if (D) Log.d(LOG_TAG, "addSpecificContextValue");
 		for (ContextValues cv: valuesSets){
 			if (cv.keys.contains(appKey))
 				cv.addLocation(newContextValue, value1, value2);	
@@ -219,6 +231,7 @@ public class Component implements Serializable {
 	
 	public void addRange(ApplicationKey appKey, Integer minValue,
 			Integer maxValue, String newContextValue) {
+		if (D) Log.d(LOG_TAG, "addRange");
 		for (ContextValues cv: valuesSets){
 			if (cv.keys.contains(appKey))
 				cv.addRange(minValue, maxValue, newContextValue);	
@@ -227,7 +240,7 @@ public class Component implements Serializable {
 	}
 	
 	public void stop() {	
-		Log.v(contextName, "Stopping");
+		if (D) Log.d(LOG_TAG, "stop");
 	}
 }
 	

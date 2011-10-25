@@ -35,6 +35,9 @@ public class LocationServices implements LocationListener{
 		private String provider;		
 		private Location location;
 		
+		public static final String LOG_TAG = "LocationServices";
+		public static final boolean D = true;
+		
 		Context context;
 
 		//	in real life you *DO NOT* want to do this, it may consume too many resources
@@ -45,7 +48,7 @@ public class LocationServices implements LocationListener{
 		private ArrayList<LocationContext> locationContexts = new ArrayList<LocationContext>();
 
 		public LocationServices(Context c) {
-			
+			if (D) Log.d(LOG_TAG, "constructor");
 			this.context = c;
 			
 		    locationManager = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
@@ -75,6 +78,7 @@ public class LocationServices implements LocationListener{
 		}
 		
 		public void setUpdatesCriteria(int time, int distance){
+			if (D) Log.d(LOG_TAG, "setUpdatesCriteria");
 			if ((time<minTime)||(distance<minDistance)){
 				this.minTime = time;
 				this.minDistance = distance;
@@ -84,22 +88,25 @@ public class LocationServices implements LocationListener{
 		}
 		
 		public void addLocationContext(LocationContext locationContext){
+			if (D) Log.d(LOG_TAG, "addLocationContext");
 			locationContexts.add(locationContext);
 		}
 		
 		public Location getLocation(){
+			if (D) Log.d(LOG_TAG, "getLocation");
 			return location;
 		}
 		
 		public void onLocationChanged(Location locale) {
+			if (D) Log.d(LOG_TAG, "onLocationChanged");
 			for (LocationContext locationContext:locationContexts){
 				locationContext.onLocationChanged(locale);
 			}			
 			this.location = locale;
 		}
 
-		public void onProviderDisabled(String prv) {
-			Log.v("LocationServices", "Provider " + prv + " disabled");
+		public void onProviderDisabled(String prv) {			
+			if (D) Log.v(LOG_TAG, "Provider " + prv + " disabled");
 			
 			//if best provider disabled, make GPS default
 			provider = locationManager.GPS_PROVIDER;
@@ -112,13 +119,13 @@ public class LocationServices implements LocationListener{
 		}
 
 		public void onProviderEnabled(String prv) {
-			Log.v("LocationServices", "Provider " + prv + " enabled");
+			if (D) Log.v(LOG_TAG, "Provider " + prv + " enabled");
 			locationManager.removeUpdates(this);
 			locationManager.requestLocationUpdates(provider, minTime, minDistance, this);   
 			
 			location = locationManager.getLastKnownLocation(provider);
-			Log.v("provE-LocationServices", "Latitude= " + location.getLatitude() + " Longitude= " + location.getLongitude());
-			Log.v("LocationServices", "Location accuracy: " + location.getAccuracy());
+			if (D) Log.v(LOG_TAG, "Latitude= " + location.getLatitude() + " Longitude= " + location.getLongitude());
+			if (D) Log.v(LOG_TAG, "Location accuracy: " + location.getAccuracy());
 		}
 
 		public void onStatusChanged(String prv, int stat, Bundle extras) {	
@@ -127,13 +134,13 @@ public class LocationServices implements LocationListener{
 				locationManager.requestLocationUpdates(provider, minTime, minDistance, this);   
 				
 				location = locationManager.getLastKnownLocation(provider);
-				Log.v("statC-LocationServices", "Latitude= " + location.getLatitude() + " Longitude= " + location.getLongitude());
-				Log.v("LocationServices", "Location accuracy: " + location.getAccuracy());
+				if (D) Log.v(LOG_TAG, "Latitude= " + location.getLatitude() + " Longitude= " + location.getLongitude());
+				if (D) Log.v(LOG_TAG, "Location accuracy: " + location.getAccuracy());
 			}
 		}	
 		
 		public void stop() {
 			locationManager.removeUpdates(this);
-			Log.v("LocationServices", "Stopping");
+			if (D) Log.v(LOG_TAG, "Stopping");
 		}
 }

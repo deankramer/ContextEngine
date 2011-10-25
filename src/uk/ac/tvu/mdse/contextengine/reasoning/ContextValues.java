@@ -26,6 +26,9 @@ import uk.ac.tvu.mdse.contextengine.highLevelContext.LocationIdentifier;
 
 public class ContextValues {
 	
+	public static final String LOG_TAG = "ContextValues";
+	public static final boolean D = true;
+	
 	//current contextInformation of this context value set
 	public String contextInformation;
 
@@ -42,18 +45,20 @@ public class ContextValues {
 	public ArrayList<LocationIdentifier> locationsSet = new ArrayList<LocationIdentifier>();
 	
 	public ContextValues(String[] values){
+		if (D) Log.d(LOG_TAG, "constructor1");
 		for (String newValue: values)
 			addValue(newValue);
 	}
 	
 	public ContextValues(ApplicationKey key, String[] values){
+		if (D) Log.d(LOG_TAG, "constructor2");
 		for (String newValue: values)
 			addValue(newValue);
 		keys.add(key);
 	}
 
 	public boolean setNewContextInformation(String newContextInformation){
-		
+		if (D) Log.d(LOG_TAG, "setNewContextInformation");
 		//only inform&change it if different from previous context value		
 		if (!(contextInformation.equals(newContextInformation))) {				
 			contextInformation = newContextInformation;
@@ -64,7 +69,7 @@ public class ContextValues {
 	}
 	
 	public boolean setNewContextValue(int newContextValue){
-		
+		if (D) Log.d(LOG_TAG, "setNewContextValue");
 		boolean newInformation = false;
 		
 		for (ContextRange cr: contextRangeSet)
@@ -75,7 +80,7 @@ public class ContextValues {
 	}
 
 	public boolean addRange(int minValue, int maxValue, String contextValue){		
-
+		if (D) Log.d(LOG_TAG, "addRange");
 		if (checkRange(contextValue))
 			return false;
 		else{
@@ -87,6 +92,7 @@ public class ContextValues {
 	}
 	
 	public boolean checkRange(String contextValue){
+		if (D) Log.d(LOG_TAG, "checkRange");
 		boolean exist = false;
 		for (ContextRange cr: contextRangeSet){
 			if (cr.contextHighValue.equals(contextValue))
@@ -96,12 +102,13 @@ public class ContextValues {
 	}
 
 	public void addLocation(String identifier, double latitude, double longitude ){
-		Log.v("ContextValues", "addLocation " + identifier + " " +latitude+ " " +longitude);
+		if (D) Log.d(LOG_TAG, "addLocation " + identifier + " " +latitude+ " " +longitude);
 		locationsSet.add(new LocationIdentifier(identifier, latitude, longitude));
 		valuesSet.add(identifier);
 	}
 	
 	public String getContextInformation(double contextInput){
+		if (D) Log.d(LOG_TAG, "getContextInformation");
 		String contextInformation = "";
 		if (!contextRangeSet.isEmpty())
 			for (ContextRange cr: contextRangeSet){
@@ -112,7 +119,7 @@ public class ContextValues {
 	}
 	
 	public boolean addValue(String contextValue){
-		
+		if (D) Log.d(LOG_TAG, "addValue");
 		//check if the value already exists in the set
 		if (valuesSet.contains(contextValue))
 			return false;
@@ -122,17 +129,28 @@ public class ContextValues {
 		}		
 	}
 	
-	public void addValues(String[] values){		
+	public void addValues(String[] values){	
+		if (D) Log.d(LOG_TAG, "addValues");
 		for (String newValue: values)
 			addValue(newValue);
 	}
 	
 	public void setupValues(String[] values){
+		if (D) Log.d(LOG_TAG, "setupValues");
 		valuesSet.removeAll(valuesSet.subList(0, valuesSet.size()-1));
 		addValues(values);
 	}	
 	
 	protected boolean checkContextValue(String value){
+		if (D) Log.d(LOG_TAG, "checkContextValue");
 		return (valuesSet.contains(value));
+	}
+	
+	public ArrayList<String> getKeysList(){
+		if (D) Log.d(LOG_TAG, "getKeysList");
+		ArrayList<String> keysList = new ArrayList<String>();
+		for (ApplicationKey appKey: keys)
+			keysList.add(appKey.key);
+		return keysList;
 	}
 }

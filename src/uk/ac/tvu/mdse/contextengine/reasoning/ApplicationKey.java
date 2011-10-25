@@ -16,7 +16,12 @@
 
 package uk.ac.tvu.mdse.contextengine.reasoning;
 
+import android.util.Log;
+
 public class ApplicationKey {
+	
+	public static final String LOG_TAG = "ApplicationKey";
+	public static final boolean D = true;
 
 	//unique identifier for each context-aware application
 	//that uses the context engine
@@ -27,6 +32,7 @@ public class ApplicationKey {
 	public boolean running;
 	
 	public ApplicationKey(String appKey){
+		if (D) Log.d(LOG_TAG, "constructor");
 		this.key = appKey;
 		running = true;
 	}

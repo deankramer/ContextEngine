@@ -26,10 +26,13 @@ import android.util.Log;
 public class WifiContext extends MonitorComponent {
 
 	private static final long serialVersionUID = -6833408704101539915L;
+	public static final String LOG_TAG = "WifiContext";
+	public static final boolean D = true;
 	private WifiManager wm;
 
 	public WifiContext(Context c) {
 		super("WifiContext", c, "android.net.wifi.WIFI_STATE_CHANGED");
+		if (D) Log.d(LOG_TAG, "constructor");
 		this.wm = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);					
 		this.contextInformation = obtainContextInformation();
 		//this.contextInformation = "ON";
@@ -37,11 +40,13 @@ public class WifiContext extends MonitorComponent {
 	}
 	
 	protected String obtainContextInformation(){
+		if (D) Log.d(LOG_TAG, "obtainContextInformation");
 		Boolean wifiEnabled = wm.isWifiEnabled();
 		return (wifiEnabled) ? "ON" : "OFF";
 	}
 
 	protected void checkContext() {
+		if (D) Log.d(LOG_TAG, "checkContext");
 		String wifiEnabled = wm.isWifiEnabled() ? "ON" : "OFF" ;		
 		
 		for (ContextValues cv: this.valuesSets){

@@ -29,6 +29,8 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 
 	// Attributes
 	private static final long serialVersionUID = -8230486605325209599L;
+	public static final String LOG_TAG = "LightContext";
+	public static final boolean D = true;
 	
 	//Will be kept incase of future "default" values.
 	/*
@@ -40,12 +42,13 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 	public LightContext(Context c) {
 		
 		super("LightContext", c, Sensor.TYPE_LIGHT,SensorManager.SENSOR_DELAY_NORMAL );		
+		if (D) Log.d(LOG_TAG, "constructor");
 		this.contextInformation = obtainContextInformation(sensorManager);
 		Log.d("LightContext", this.contextInformation);
 	}	
 	
 	protected String obtainContextInformation(SensorManager sm){
-		        
+		if (D) Log.d(LOG_TAG, "obtainContextInformation");
 		//should obtain real light
 		//for demo using HIGH as the obtained one
 		lastC="MEDIUM";
@@ -53,6 +56,7 @@ public class LightContext extends ListenerComponent implements SensorEventListen
 	}
 
 	public void checkContext(SensorEvent data) {
+		if (D) Log.d(LOG_TAG, "checkContext");
 		int v = (int) data.values[0];
 		
 		for (ContextValues cv: this.valuesSets){

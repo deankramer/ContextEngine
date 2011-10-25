@@ -20,6 +20,9 @@ import android.location.Location;
 import android.util.Log;
 
 public class LocationIdentifier {
+	
+	public static final String LOG_TAG = "LocationIdentifier";
+	public static final boolean D = true;
 
 	public String identifier;
 	public Location location;
@@ -27,6 +30,7 @@ public class LocationIdentifier {
 	public double longitude; 
 	
 	public LocationIdentifier(String identifier, double latitude, double longitude ){
+		if (D) Log.d(LOG_TAG, "constructor");
 		
 		this.identifier = identifier;
 		this.latitude = latitude;

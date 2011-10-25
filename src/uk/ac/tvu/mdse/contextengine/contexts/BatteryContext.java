@@ -30,9 +30,12 @@ public class BatteryContext extends MonitorComponent{
 	int v = -1;
 	int value = 0;
 	private static final long serialVersionUID = -7034400776638700530L;
+	public static final String LOG_TAG = "BatteryContext";
+	public static final boolean D = true;
 	
 	public BatteryContext(Context c) {
-		super("BatteryContext", c, "Intent.ACTION_BATTERY_CHANGED", "BatteryManager.EXTRA_STATUS");		
+		super("BatteryContext", c, "Intent.ACTION_BATTERY_CHANGED", "BatteryManager.EXTRA_STATUS");	
+		if (D) Log.d(LOG_TAG, "constructor");
 //		this.addRange(0, 30, "LOW");
 //		this.addRange(31, 80, "MEDIUM");
 //		this.addRange(81, 200, "HIGH"); 
@@ -40,6 +43,7 @@ public class BatteryContext extends MonitorComponent{
 	}	
 	
 	protected String obtainContextInformation(){
+		if (D) Log.d(LOG_TAG, "obtainContextInformation");
      /*   
 		BatteryManager bm = new BatteryManager();
 		
@@ -56,6 +60,7 @@ public class BatteryContext extends MonitorComponent{
 	}
 	
 	protected void checkContext(Bundle data) {
+		if (D) Log.d(LOG_TAG, "checkContext");
 		int rawlevel = data.getInt(BatteryManager.EXTRA_LEVEL, -1);
         int scale = data.getInt(BatteryManager.EXTRA_SCALE, -1);
         

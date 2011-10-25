@@ -16,19 +16,26 @@
 
 package uk.ac.tvu.mdse.contextengine.highLevelContext;
 
+import android.util.Log;
+
 public class ContextRange {
+	
+	public static final String LOG_TAG = "ContextRange";
+	public static final boolean D = true;
 
 	public int minValue;
 	public int maxValue;
 	public String contextHighValue;
 	
 	public ContextRange(int mv, int mxv, String value){
+		if (D) Log.d(LOG_TAG, "constructor");
 		this.minValue = mv;
 		this.maxValue = mxv;
 		this.contextHighValue = value;
 	}
 	
 	public String getContextHighValue(int currentValue){
+		if (D) Log.d(LOG_TAG, "getContextHighValue");
 		return ((currentValue<maxValue)&&(currentValue>=minValue)) ? contextHighValue : null;
 	}
 }
