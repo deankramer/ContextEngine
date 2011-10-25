@@ -177,13 +177,23 @@ public class ContextEngine extends Service {
 
 	public final IContextsDefinition.Stub contextsBinder = new IContextsDefinition.Stub() {
 		
-		public void registerApplicationKey(String key){
-			newAppKey = new ApplicationKey(key);
-			applicationKeys.add(newAppKey);
+		public boolean registerApplicationKey(String key){
+			if(newAppKey==null)
+				newAppKey = new ApplicationKey(key);
+			for(ApplicationKey k: applicationKeys){
+				if(! (k.key.equalsIgnoreCase(key))){
+					applicationKeys.add(newAppKey);
+					newAppKey.key=key;
+					return true;
+				}	
+			}
+			newAppKey.key = key;
+		    return false;
 		}
 		
-		public void registerComponent(String componentName)
+		public boolean registerComponent(String componentName)
 				throws RemoteException {
+			
 			//FOR LOCATION:
 			if (componentName.equals("LocationContext")){
 				if (locationServices == null)
@@ -191,34 +201,45 @@ public class ContextEngine extends Service {
 			}
 			
 			if(activeContexts.isEmpty())
-				loadClass(componentName);
+				return loadClass(componentName);
 			else{
 				for (Component ac: activeContexts){
-					if (! ac.contextName.equals(componentName))
-						loadClass(componentName);	
+					if (ac.contextName.equals(componentName)){
+						Log.e(LOG_TAG, "Component already running!");
+						return false;
+					}			
 				}
+				return loadClass(componentName);
 			}
-			
 		}
 		
 		//***add context values to a component***
-		public  void addContextValues(String componentName, String[] contextValues){			
+		public  boolean addContextValues(String componentName, String[] contextValues){	
 			
 			for (Component ac: activeContexts){
-				if (ac.contextName.equals(componentName))
-					ac.setupNewValuesSet(newAppKey, contextValues);	
+				if (ac.contextName.equals(componentName)){
+					ac.setupNewValuesSet(newAppKey, contextValues);
+					return true;
+				}
 			}
+			Log.e(LOG_TAG, "Context not running!");
+			return false;
 		 }
 		  
 		  //***add a context value***
-		public void addContextValue(String componentName, String contextValue){
+		public boolean addContextValue(String componentName, String contextValue){
 			try{
 				for (Component ac: activeContexts){
-					if (ac.contextName.equals(componentName))
-						ac.addContextValue(newAppKey, contextValue);	
-				}		
+					if (ac.contextName.equals(componentName)){
+						ac.addContextValue(newAppKey, contextValue);
+						return true;
+					}
+				}
+				Log.e(LOG_TAG, "Context not running!");
+				return false;
 			}catch(Exception e){
 				Log.e(LOG_TAG, e.getLocalizedMessage());
+				return false;
 			}
 		}
 		  
@@ -254,24 +275,35 @@ public class ContextEngine extends Service {
 		}
 		
 
-		public void newComposite(String compositeName) throws RemoteException {				
+		public boolean newComposite(String compositeName) throws RemoteException {				
 			try{
-				RuledCompositeComponent ruledComponent = new RuledCompositeComponent(compositeName, c);				
-				activeContexts.add(ruledComponent);
-				//db.addContext(ruledCC);			
-				}
-				catch(Exception e){
-					Log.d(LOG_TAG, e.getLocalizedMessage());
-				}
-				if (D)
-					Log.d(LOG_TAG, "Ruled comnponent added: " + compositeName);
+				RuledCompositeComponent ruledComponent=null;
+				if(activeContexts.isEmpty()){
+					ruledComponent = new RuledCompositeComponent(compositeName, c);				
+					activeContexts.add(ruledComponent);
+					return true;
+				}else{
+					for (Component ac: activeContexts){
+						if (ac.contextName.equals(compositeName)){
+							Log.e(LOG_TAG, "Component already running!");
+							return false;
+						}			
+					}
+					
+					ruledComponent = new RuledCompositeComponent(compositeName, c);				
+					activeContexts.add(ruledComponent);
+					return true;
+				}			
+			}
+			catch(Exception e){
+				Log.d(LOG_TAG, e.getLocalizedMessage());
+				return false;
+			}
 		}
 
-		public void addToComposite(String componentName, String compositeName)
+		public boolean addToComposite(String componentName, String compositeName)
 				throws RemoteException {
-			
-			loadClass(componentName);
-			
+				
 			RuledCompositeComponent ruledComponent = null;
 			Component component = null;
 			
@@ -280,16 +312,21 @@ public class ContextEngine extends Service {
 				if (ac.contextName.equals(compositeName))
 					ruledComponent = (RuledCompositeComponent) ac;
 				if (ac.contextName.equals(componentName))
-					component = ac;			
-			}		
+					component = ac;	
+			}
 			
-			if ((ruledComponent!=null)&&(component!=null)){
-				ruledComponent.registerComponent(component);	
-				Log.d(LOG_TAG, component.contextName);
-			}			
-			
+			if(component==null){
+				if( ! (loadClass(componentName)) )
+						return false;
+			}
+			if(ruledComponent==null){
+				ruledComponent = new RuledCompositeComponent(compositeName, c);				
+				activeContexts.add(ruledComponent);
+			}
+			ruledComponent.registerComponent(component);		
 			if (D)
-				Log.d(LOG_TAG, "registerComponent");
+				Log.d(LOG_TAG, "Added" + componentName + " to " + compositeName);
+			return true;
 		}
 		
 
@@ -308,7 +345,7 @@ public class ContextEngine extends Service {
 				
 		}
 		
-		public void startComposite(String compositeName) throws RemoteException {
+		public boolean startComposite(String compositeName) throws RemoteException {
 			RuledCompositeComponent ruledComponent = null;
 			
 			//look up for the composite if created
@@ -317,8 +354,11 @@ public class ContextEngine extends Service {
 					ruledComponent = (RuledCompositeComponent) ac;
 					setupContextMonitor();
 					ruledComponent.componentDefined();
+					return true;
 				}
 			}
+			Log.e(LOG_TAG, "Composite not active!");
+			return false;
 		}
 
 		public void registerCallback(IRemoteServiceCallback cb) {
@@ -402,7 +442,7 @@ public class ContextEngine extends Service {
 		  }
 	}
 
-	protected void loadClass(String componentName) {
+	protected boolean loadClass(String componentName) {
 		final File optimizedDexOutputPath = getDir("outdex", Context.MODE_PRIVATE);
 		File dexInternalStoragePath = new File(getDir("dex", Context.MODE_PRIVATE),
           "classes.dex");
@@ -421,10 +461,15 @@ public class ContextEngine extends Service {
 			      
 			      Component context = (Component) contextConstructor.newInstance(c);
 			      activeContexts.add(context);
-			
-			  } catch (Exception e) {
+			      return true;
+			  } catch(ClassNotFoundException cnfe){
+				  Log.e(LOG_TAG, "Component does not exist!");
+				  return false;
+			  }
+			  catch (Exception e) {
 				  //Log.e("Error", e.getStackTrace().toString());
 				  e.printStackTrace();
+				  return false;
 			  } 
 		
 	}

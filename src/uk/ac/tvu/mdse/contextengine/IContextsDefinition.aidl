@@ -26,16 +26,16 @@ interface IContextsDefinition {
   void registerCallback(IRemoteServiceCallback cb);
   
   //***application registers its unique key***
-  void registerApplicationKey(String key);
+  boolean registerApplicationKey(String key);
   
   //***add an atomic component***
-  void registerComponent(in String componentName);
+  boolean registerComponent(in String componentName);
   
   //***add context values to a component***
-  void addContextValues(in String componentName, in String[] contextValues);
+  boolean addContextValues(in String componentName, in String[] contextValues);
   
   //***add a context value***
-  void addContextValue(in String componentName, in String contextValue);
+  boolean addContextValue(in String componentName, in String contextValue);
   
   //***add a specific context value described by two numeric coordinates (e.g.location)***
   //TO DO: void addSpecificContextValues(in String componentName, in String contextValue, sets of values);
@@ -47,16 +47,16 @@ interface IContextsDefinition {
   void addRange(in String componentName, in String minValue, in String maxValue, in String contextValue);  
     
   //***create a composite component***
-  void newComposite(in String compositeName);
+  boolean newComposite(in String compositeName);
   
   //***add context to a composite context component
-  void addToComposite(in String componentName, in String compositeName);  
+  boolean addToComposite(in String componentName, in String compositeName);  
  
   //***specify context value of the composite context based on values of context it is composed of***
   void addRule(in String componentName, in String[] condition, in String result);
   
    //***notify that the composite context has been fully identified***
-  void startComposite(in String compositeName);   
+  boolean startComposite(in String compositeName);   
   
   void unregisterCallback(IRemoteServiceCallback cb);
   
