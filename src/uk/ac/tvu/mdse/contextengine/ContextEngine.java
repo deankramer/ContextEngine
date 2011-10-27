@@ -178,189 +178,49 @@ public class ContextEngine extends Service {
 	public final IContextsDefinition.Stub contextsBinder = new IContextsDefinition.Stub() {
 		
 		public boolean registerApplicationKey(String key){
-			if(newAppKey==null){
-				newAppKey = new ApplicationKey(key);
-				newAppKey.key = key;
-				return true;
-			}
-				for(ApplicationKey k: applicationKeys){
-				if(! (k.key.equalsIgnoreCase(key))){
-					applicationKeys.add(newAppKey);
-					newAppKey.key=key;
-					return true;
-				}	
-			}
-		    return false;
+			return registerAppKey(key);
 		}
 		
 		public boolean registerComponent(String componentName)
 				throws RemoteException {
-			
-			//FOR LOCATION:
-			if (componentName.equals("LocationContext")){
-				if (locationServices == null)
-					locationServices = new LocationServices(c);
-			}
-			
-			if(activeContexts.isEmpty())
-				return loadClass(componentName);
-			else{
-				for (Component ac: activeContexts){
-					if (ac.contextName.equals(componentName)){
-						Log.e(LOG_TAG, "Component already running!");						
-						return false;
-					}			
-				}
-				return loadClass(componentName);
-			}
+			return newComponent(componentName);
 		}
 		
 		//***add context values to a component***
 		public  boolean addContextValues(String componentName, String[] contextValues){	
-			
-			for (Component ac: activeContexts){
-				if (ac.contextName.equals(componentName)){
-					ac.setupNewValuesSet(newAppKey, contextValues);
-					return true;
-				}
-			}
-			Log.e(LOG_TAG, "Context not running!");
-			return false;
+			return newContextValues(componentName, contextValues);
 		 }
 		  
 		  //***add a context value***
 		public boolean addContextValue(String componentName, String contextValue){
-			try{
-				for (Component ac: activeContexts){
-					if (ac.contextName.equals(componentName)){
-						ac.addContextValue(newAppKey, contextValue);
-						return true;
-					}
-				}
-				Log.e(LOG_TAG, "Context not running!");
-				return false;
-			}catch(Exception e){
-				Log.e(LOG_TAG, e.getLocalizedMessage());
-				return false;
-			}
+			return newContextValue(componentName, contextValue);
 		}
 		  
 		  //***add a specific context value described by two numeric coordinates (e.g.location)***
 		public void addSpecificContextValue(String componentName, String contextValue, String numericData1, String numericData2){
-			if (D)
-				Log.d(LOG_TAG, "addSpecificContextValue");
-			try{
-				for (Component ac: activeContexts){
-					if (ac.contextName.equals(componentName))
-						ac.addSpecificContextValue(newAppKey, contextValue, Double.valueOf(numericData1), Double.valueOf(numericData2));	
-				}		
-			}catch(Exception e){
-				Log.e(LOG_TAG, e.getLocalizedMessage());
-			}
+			newSpecificContextValue(componentName, contextValue, numericData1, numericData2);
 		}
 		
 		//***define higher context value - in case of numeric values specify range of values***  
 		public void addRange(String componentName, String minValue, String maxValue, String contextValue){
-			
-			//look up for the component
-			Component component = null;
-			
-			//look up for the composite if created
-			for (Component ac: activeContexts){
-				if (ac.contextName.equals(componentName))
-					component = (Component) ac;				
-			}		
-			Log.d(LOG_TAG, "addRange" +  componentName);
-			if (component!=null)
-				component.addRange(newAppKey, Integer.valueOf(minValue), Integer.valueOf(maxValue), contextValue);
-			
+			newRange(componentName, minValue, maxValue, contextValue);
 		}
 		
-
 		public boolean newComposite(String compositeName) throws RemoteException {				
-			try{
-				RuledCompositeComponent ruledComponent=null;
-				if(activeContexts.isEmpty()){
-					ruledComponent = new RuledCompositeComponent(compositeName, c);				
-					activeContexts.add(ruledComponent);
-					return true;
-				}else{
-					for (Component ac: activeContexts){
-						if (ac.contextName.equals(compositeName)){
-							Log.e(LOG_TAG, "Component already running!");
-							return false;
-						}			
-					}
-					
-					ruledComponent = new RuledCompositeComponent(compositeName, c);				
-					activeContexts.add(ruledComponent);
-					return true;
-				}			
-			}
-			catch(Exception e){
-				Log.d(LOG_TAG, e.getLocalizedMessage());
-				return false;
-			}
+			return addComposite(compositeName);
 		}
 
 		public boolean addToComposite(String componentName, String compositeName)
 				throws RemoteException {
-				
-			RuledCompositeComponent ruledComponent = null;
-			Component component = null;
-			
-			//look up for the composite if created
-			for (Component ac: activeContexts){
-				if (ac.contextName.equals(compositeName))
-					ruledComponent = (RuledCompositeComponent) ac;
-				if (ac.contextName.equals(componentName))
-					component = ac;	
-			}
-			
-			if(component==null){
-				if( ! (loadClass(componentName)) )
-						return false;
-			}
-			if(ruledComponent==null){
-				ruledComponent = new RuledCompositeComponent(compositeName, c);				
-				activeContexts.add(ruledComponent);
-			}
-			ruledComponent.registerComponent(component);		
-			if (D)
-				Log.d(LOG_TAG, "Added" + componentName + " to " + compositeName);
-			return true;
+			return addToCompositeM(componentName, compositeName);
 		}
 		
-
 		public void addRule(String componentName, String[] condition, String result){
-			
-			RuledCompositeComponent ruledComponent = null;
-			
-			//look up for the composite if created
-			for (Component ac: activeContexts){
-				if (ac.contextName.equals(componentName))
-					ruledComponent = (RuledCompositeComponent) ac;		
-			}	
-			
-				ruledComponent.addRule(condition, result);
-				Log.d(LOG_TAG, "addRule" );
-				
+			newRule(componentName, condition, result);
 		}
 		
 		public boolean startComposite(String compositeName) throws RemoteException {
-			RuledCompositeComponent ruledComponent = null;
-			
-			//look up for the composite if created
-			for (Component ac: activeContexts){
-				if (ac.contextName.equals(compositeName)){
-					ruledComponent = (RuledCompositeComponent) ac;
-					setupContextMonitor();
-					ruledComponent.componentDefined();
-					return true;
-				}
-			}
-			Log.e(LOG_TAG, "Composite not active!");
-			return false;
+			return compositeReady(compositeName);
 		}
 
 		public void registerCallback(IRemoteServiceCallback cb) {
@@ -534,6 +394,178 @@ public class ContextEngine extends Service {
 		} catch (Exception e) {
 			Log.e("ContextEngine", "broadcasting to apps not working");
 		}
+	}
+	
+	public boolean registerAppKey(String key){
+		if(newAppKey==null){
+			newAppKey = new ApplicationKey(key);
+			newAppKey.key = key;
+			return true;
+		}
+			for(ApplicationKey k: applicationKeys){
+			if(! (k.key.equalsIgnoreCase(key))){
+				applicationKeys.add(newAppKey);
+				newAppKey.key=key;
+				return true;
+			}	
+		}
+	    return false;
+	}
+	
+	public boolean newComponent(String componentName){
+		//FOR LOCATION:
+		if (componentName.equals("LocationContext")){
+			if (locationServices == null)
+				locationServices = new LocationServices(c);
+		}
+		
+		if(activeContexts.isEmpty())
+			return loadClass(componentName);
+		else{
+			for (Component ac: activeContexts){
+				if (ac.contextName.equals(componentName)){
+					Log.e(LOG_TAG, "Component already running!");						
+					return false;
+				}			
+			}
+			return loadClass(componentName);
+		}
+	}
+	
+	public boolean newContextValues(String componentName, String[] contextValues){
+		for (Component ac: activeContexts){
+			if (ac.contextName.equals(componentName)){
+				ac.setupNewValuesSet(newAppKey, contextValues);
+				return true;
+			}
+		}
+		Log.e(LOG_TAG, "Context not running!");
+		return false;
+	}
+	
+	public boolean newContextValue(String componentName, String contextValue){
+		try{
+			for (Component ac: activeContexts){
+				if (ac.contextName.equals(componentName)){
+					ac.addContextValue(newAppKey, contextValue);
+					return true;
+				}
+			}
+			Log.e(LOG_TAG, "Context not running!");
+			return false;
+		}catch(Exception e){
+			Log.e(LOG_TAG, e.getLocalizedMessage());
+			return false;
+		}
+	}
+	
+	public void newSpecificContextValue(String componentName, String contextValue, String numericData1, String numericData2){
+		if (D)
+			Log.d(LOG_TAG, "addSpecificContextValue");
+		try{
+			for (Component ac: activeContexts){
+				if (ac.contextName.equals(componentName))
+					ac.addSpecificContextValue(newAppKey, contextValue, Double.valueOf(numericData1), Double.valueOf(numericData2));	
+			}		
+		}catch(Exception e){
+			Log.e(LOG_TAG, e.getLocalizedMessage());
+		}
+	}
+	
+	public void newRange(String componentName, String minValue, String maxValue, String contextValue){
+		//look up for the component
+		Component component = null;
+		
+		//look up for the composite if created
+		for (Component ac: activeContexts){
+			if (ac.contextName.equals(componentName))
+				component = (Component) ac;				
+		}		
+		Log.d(LOG_TAG, "addRange" +  componentName);
+		if (component!=null)
+			component.addRange(newAppKey, Integer.valueOf(minValue), Integer.valueOf(maxValue), contextValue);
+	}
+	
+	public boolean addComposite(String compositeName){
+		try{
+			RuledCompositeComponent ruledComponent=null;
+			if(activeContexts.isEmpty()){
+				ruledComponent = new RuledCompositeComponent(compositeName, c);				
+				activeContexts.add(ruledComponent);
+				return true;
+			}else{
+				for (Component ac: activeContexts){
+					if (ac.contextName.equals(compositeName)){
+						Log.e(LOG_TAG, "Component already running!");
+						return false;
+					}			
+				}
+				
+				ruledComponent = new RuledCompositeComponent(compositeName, c);				
+				activeContexts.add(ruledComponent);
+				return true;
+			}			
+		}
+		catch(Exception e){
+			Log.d(LOG_TAG, e.getLocalizedMessage());
+			return false;
+		}
+	}
+	
+	public boolean addToCompositeM(String componentName, String compositeName){
+		RuledCompositeComponent ruledComponent = null;
+		Component component = null;
+		
+		//look up for the composite if created
+		for (Component ac: activeContexts){
+			if (ac.contextName.equals(compositeName))
+				ruledComponent = (RuledCompositeComponent) ac;
+			if (ac.contextName.equals(componentName))
+				component = ac;	
+		}
+		
+		if(component==null){
+			if( ! (loadClass(componentName)) )
+					return false;
+		}
+		if(ruledComponent==null){
+			ruledComponent = new RuledCompositeComponent(compositeName, c);				
+			activeContexts.add(ruledComponent);
+		}
+		ruledComponent.registerComponent(component);		
+		if (D)
+			Log.d(LOG_TAG, "Added" + componentName + " to " + compositeName);
+		return true;
+	}
+	
+	public void newRule(String componentName, String[] condition, String result){
+		
+		RuledCompositeComponent ruledComponent = null;
+		
+		//look up for the composite if created
+		for (Component ac: activeContexts){
+			if (ac.contextName.equals(componentName))
+				ruledComponent = (RuledCompositeComponent) ac;		
+		}	
+		
+		ruledComponent.addRule(condition, result);
+		Log.d(LOG_TAG, "addRule" );
+	}
+	
+	public boolean compositeReady(String compositeName){
+		RuledCompositeComponent ruledComponent = null;
+		
+		//look up for the composite if created
+		for (Component ac: activeContexts){
+			if (ac.contextName.equals(compositeName)){
+				ruledComponent = (RuledCompositeComponent) ac;
+				setupContextMonitor();
+				ruledComponent.componentDefined();
+				return true;
+			}
+		}
+		Log.e(LOG_TAG, "Composite not active!");
+		return false;
 	}
 
 
