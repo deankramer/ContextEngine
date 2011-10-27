@@ -178,16 +178,18 @@ public class ContextEngine extends Service {
 	public final IContextsDefinition.Stub contextsBinder = new IContextsDefinition.Stub() {
 		
 		public boolean registerApplicationKey(String key){
-			if(newAppKey==null)
+			if(newAppKey==null){
 				newAppKey = new ApplicationKey(key);
-			for(ApplicationKey k: applicationKeys){
+				newAppKey.key = key;
+				return true;
+			}
+				for(ApplicationKey k: applicationKeys){
 				if(! (k.key.equalsIgnoreCase(key))){
 					applicationKeys.add(newAppKey);
 					newAppKey.key=key;
 					return true;
 				}	
 			}
-			newAppKey.key = key;
 		    return false;
 		}
 		
@@ -205,7 +207,7 @@ public class ContextEngine extends Service {
 			else{
 				for (Component ac: activeContexts){
 					if (ac.contextName.equals(componentName)){
-						Log.e(LOG_TAG, "Component already running!");
+						Log.e(LOG_TAG, "Component already running!");						
 						return false;
 					}			
 				}
@@ -403,14 +405,20 @@ public class ContextEngine extends Service {
 					Bundle bundle = intent.getExtras();
 					
 					//send broadcast to apps
-					sendBroadcastToApps(bundle);
+					//sendBroadcastToApps(bundle);
 					
 					//show notification - just for testing
-					String changeName = bundle
+					String contextName = bundle
 							.getString(Component.CONTEXT_NAME);
-					String contextvalue = bundle
+					String contextValue = bundle
 							.getString(Component.CONTEXT_INFORMATION);
-						showNotification(changeName+ " "+contextvalue);
+					ArrayList<String> appKey = bundle
+							.getStringArrayList(Component.CONTEXT_APPLICATION_KEY);
+						//showNotification(contextName+ " "+contextvalue);
+					if (appKey.size()>0)
+						Log.v(LOG_TAG, "onReceive:" + contextName + " " + contextValue + " " + appKey.get(0));
+					else
+						Log.v(LOG_TAG, "onReceive:" + contextName + " " + contextValue);
 				}
 			}
 
@@ -461,6 +469,12 @@ public class ContextEngine extends Service {
 			      
 			      Component context = (Component) contextConstructor.newInstance(c);
 			      activeContexts.add(context);
+			      
+			    //only to test - add key when default context values set = ON&OFF
+//					if (context.valuesSets.size()==1)
+//						context.valuesSets.get(0).keys.add(newAppKey);
+						
+					
 			      return true;
 			  } catch(ClassNotFoundException cnfe){
 				  Log.e(LOG_TAG, "Component does not exist!");

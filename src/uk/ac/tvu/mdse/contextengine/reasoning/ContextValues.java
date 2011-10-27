@@ -30,7 +30,7 @@ public class ContextValues {
 	public static final boolean D = true;
 	
 	//current contextInformation of this context value set
-	public String contextInformation;
+	public String contextInformation = "";
 
 	//a set of applications listening to the context values
 	public ArrayList<ApplicationKey> keys = new ArrayList<ApplicationKey>();
@@ -58,7 +58,7 @@ public class ContextValues {
 	}
 
 	public boolean setNewContextInformation(String newContextInformation){
-		if (D) Log.d(LOG_TAG, "setNewContextInformation");
+		if (D) Log.d(LOG_TAG, "setNewContextInformation" + newContextInformation);
 		//only inform&change it if different from previous context value		
 		if (!(contextInformation.equals(newContextInformation))) {				
 			contextInformation = newContextInformation;
