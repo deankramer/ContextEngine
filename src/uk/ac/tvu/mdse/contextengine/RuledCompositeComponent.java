@@ -48,6 +48,9 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	//a set of valid context values
 	public ArrayList<String> valuesSet = new ArrayList<String>();
 	
+	//a set of applications listening to the context values
+	public ArrayList<ApplicationKey> keys = new ArrayList<ApplicationKey>();
+	
 	//to make easier if AND or OR can be applied
 	public enum Expression {ALL, ANY}; 
 	
@@ -74,7 +77,7 @@ public class RuledCompositeComponent extends Component implements Serializable {
 				// TODO Auto-generated method stub
 //				String context = in.getExtras().getString(CONTEXT_NAME);
 //				boolean value = in.getExtras().getBoolean(CONTEXT_VALUE);
-				in.getExtras().getStringArrayList(CONTEXT_APPLICATION_KEY);
+//				in.getExtras().getStringArrayList(CONTEXT_APPLICATION_KEY);
 				checkContext();				
 			}
 		};
@@ -88,7 +91,7 @@ public class RuledCompositeComponent extends Component implements Serializable {
 		if (!compositeContextValue.equals(this.contextInformation))	{		//((compositeContextValue.equals(null)||compositeContextValue.equals(this.contextInformation)))){
 			this.contextInformation = compositeContextValue;
 			Log.d("checkContext", contextInformation);
-			sendNotification();
+			sendNotification(this.contextName,this.contextInformation,getKeysList());
 		}			
 	}
 	
@@ -127,26 +130,32 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	
 	public String fireRules(){
 		if (D) Log.d(LOG_TAG, "fireRules");
+		if (D) Log.v(LOG_TAG, "fireRules keys size"+keys.size());
 		String[] componentContexts = new String[components.size()];
 		Log.d("fireRules", String.valueOf(componentContexts.length));
-		int i =0;
-		for (Component c: components){
-			componentContexts[i] = c.getContextInformation();			
-			Log.d(LOG_TAG, "fireRules" +  componentContexts[i]);
-			i++;
+		//for each application key check value
+		for(ApplicationKey appKey: keys){
+			int i =0;
+			for (Component c: components){
+				componentContexts[i] = c.getContextInformation(appKey);			
+				Log.d(LOG_TAG, "fireRules" +  componentContexts[i]);
+				i++;
+			}
 		}
+		
 		String thenStatement = "OFF";
 		if (!componentContexts.equals(null)){			
 			for(Rule r: rules){
 				if(r.fireRule(componentContexts))
 					thenStatement = r.thenStatement;
-					Log.d(LOG_TAG, "fireRules" +  r.thenStatement);
+					Log.d(LOG_TAG, "fireRules" +  thenStatement);
 			}
 		}
 		
 //		if(thenStatement.equals(null)||thenStatement.trim().equals(""))
 //			return "default";
 //		else
+		Log.d(LOG_TAG, "fireRules" +  thenStatement);
 			return thenStatement;
 	}
 	
@@ -190,5 +199,20 @@ public class RuledCompositeComponent extends Component implements Serializable {
 	public int getComponentsNo(){
 		if (D) Log.d(LOG_TAG, "getComponentsNo");
 		return this.components.size();
+	}
+	
+	public void addAppKey(ApplicationKey appKey){
+		keys.add(appKey);
+	}
+	
+	public String[] getKeysList(){
+		if (D) Log.d(LOG_TAG, "getKeysList");
+		String[] keysList = new String[keys.size()];
+		int i=0;
+		for (ApplicationKey appKey: keys){
+			keysList[i] = appKey.key;
+			i++;
+		}
+		return keysList;
 	}
 }

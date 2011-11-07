@@ -39,6 +39,13 @@ public class BatteryContext extends MonitorComponent{
 //		this.addRange(0, 30, "LOW");
 //		this.addRange(31, 80, "MEDIUM");
 //		this.addRange(81, 200, "HIGH"); 
+		try{
+			this.valuesSets.remove(0);
+			this.valuesSets.add(new ContextValues());
+		}
+		catch (Exception e){
+			if (D) Log.e(LOG_TAG, "constructor - values sets problem");
+		}
 		this.contextInformation = obtainContextInformation();
 	}	
 	
@@ -56,7 +63,7 @@ public class BatteryContext extends MonitorComponent{
 		
 		//set as default
 		int v=50;
-        return this.getContextInformation(v);
+        return this.valuesSets.get(0).contextInformation;
 	}
 	
 	protected void checkContext(Bundle data) {

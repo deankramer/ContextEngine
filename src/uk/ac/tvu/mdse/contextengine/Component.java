@@ -78,8 +78,9 @@ public class Component implements Serializable {
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
 		intent.putExtra(CONTEXT_VALUE, contextValue);
 		intent.putExtra(CONTEXT_INFORMATION, contextValues.contextInformation);
-		
+		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues).contextInformation:" +contextValues.contextInformation);
 		intent.putExtra(CONTEXT_APPLICATION_KEY, contextValues.getKeysList());
+		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist0:"+contextValues.getKeysList());
 		try {
 			context.sendBroadcast(intent);
 		} catch (Exception e) {
@@ -109,6 +110,44 @@ public class Component implements Serializable {
 		} catch (Exception e) {
 			Log.e(contextName, "not working");
 		}
+	}	
+	
+	public void sendNotification(String name, String contextInformation, String[] keys) {
+		if (D) Log.d(LOG_TAG, "sendNotification(name,contextInformation)");
+		Intent intent = new Intent();
+
+		intent.setAction(CONTEXT_INTENT);
+		intent.putExtra(CONTEXT_NAME, name);
+		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+		intent.putExtra(CONTEXT_VALUE, contextValue);
+		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
+		intent.putExtra(CONTEXT_APPLICATION_KEY, keys);
+		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist0:"+keys);
+		
+		try {
+			context.sendBroadcast(intent);
+		} catch (Exception e) {
+			Log.e(contextName, "not working");
+		}
+	}
+	
+	public void sendNotification(String[] contextInformation, String[] keys) {
+		if (D) Log.d(LOG_TAG, "sendNotification(name,contextInformation)");
+		Intent intent = new Intent();
+
+		intent.setAction(CONTEXT_INTENT);
+		intent.putExtra(CONTEXT_NAME, contextName);
+		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+		intent.putExtra(CONTEXT_VALUE, contextValue);
+		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
+		intent.putExtra(CONTEXT_APPLICATION_KEY, keys);
+		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist0:"+keys);
+		
+		try {
+			context.sendBroadcast(intent);
+		} catch (Exception e) {
+			Log.e(contextName, "not working");
+		}
 	}
 	
 	public void sendNotification(String name, String contextInformation) {
@@ -120,7 +159,8 @@ public class Component implements Serializable {
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
 		intent.putExtra(CONTEXT_VALUE, contextValue);
 		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
-
+		//intent.putExtra(CONTEXT_APPLICATION_KEY, contextInformation);
+		
 		try {
 			context.sendBroadcast(intent);
 		} catch (Exception e) {
@@ -135,7 +175,30 @@ public class Component implements Serializable {
 	
 	public String getContextInformation(){
 		if (D) Log.d(LOG_TAG, "getContextInformation");
+		
+		if (contextInformation.trim().equals("") || contextInformation == null){
+			for (ContextValues cv: valuesSets){
+				if (valuesSets.size()==1)
+					contextInformation = valuesSets.get(0).contextInformation;
+			}
+		}
 		return contextInformation;
+	}
+	
+	//if a call from composite context
+	public String getContextInformation(ApplicationKey appKey){
+		if (D) Log.d(LOG_TAG, "getContextInformation");
+		String contextInfo="";
+		//if (contextInformation.trim().equals("") || contextInformation == null){
+			for (ContextValues cv: valuesSets){
+				if (cv.keys.contains(appKey)){
+					contextInfo = cv.contextInformation;
+					if (D) Log.v(LOG_TAG, "contextname:"+contextName);
+					if (D) Log.v(LOG_TAG, "getContextInformation:"+contextInfo);
+				}
+			}
+		//}
+		return contextInfo;
 	}
 	
 
@@ -232,11 +295,27 @@ public class Component implements Serializable {
 	public void addRange(ApplicationKey appKey, Integer minValue,
 			Integer maxValue, String newContextValue) {
 		if (D) Log.d(LOG_TAG, "addRange");
-		for (ContextValues cv: valuesSets){
-			if (cv.keys.contains(appKey))
-				cv.addRange(minValue, maxValue, newContextValue);	
+		try{
+			if (valuesSets.size()==1 && valuesSets.get(0).keys.isEmpty()){
+				valuesSets.get(0).keys.add(appKey);
+				if (D) Log.d(LOG_TAG, "addRange+valueset size" + String.valueOf(valuesSets.size()));
+				if (D) Log.d(LOG_TAG, "addRange keys size"+valuesSets.get(0).keys.size());
+			}
+		}
+		catch (Exception ex){
+			if (D) Log.e(LOG_TAG, "problem adding range");			
 		}
 		
+		for (ContextValues cv: valuesSets){
+			if (cv.keys.contains(appKey))
+				cv.addRange(minValue, maxValue, newContextValue);
+				if (D) Log.d(LOG_TAG, "addRange+context info:" + cv.contextInformation + " " + cv.keys.get(0).key);
+		}
+		
+	}
+	
+	public void addAppKey(ApplicationKey appKey){
+		valuesSets.get(0).keys.add(appKey);
 	}
 	
 	public void stop() {	

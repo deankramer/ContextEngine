@@ -56,6 +56,15 @@ public class ContextValues {
 			addValue(newValue);
 		keys.add(key);
 	}
+	
+	public ContextValues(ApplicationKey key){
+		if (D) Log.d(LOG_TAG, "constructor3");
+		keys.add(key);
+	}
+	
+	public ContextValues(){
+		if (D) Log.d(LOG_TAG, "constructor4");
+	}
 
 	public boolean setNewContextInformation(String newContextInformation){
 		if (D) Log.d(LOG_TAG, "setNewContextInformation" + newContextInformation);
@@ -87,6 +96,17 @@ public class ContextValues {
 		Log.v("ContextValues", "havent crashed yet");
 		contextRangeSet.add(new ContextRange(minValue,maxValue,contextValue));		
 		valuesSet.add(contextValue);
+		
+		//set the new value as context information
+		//this needs to be changed and obtain default value
+		//it would require a method to define the whole range of values
+		this.contextInformation = contextValue;
+		
+		//check values set so far
+		for(int i=0; i<valuesSet.size();i++){
+			if (D) Log.v(LOG_TAG, "addRange values" + valuesSet.get(i));
+		}
+		
 		return true;
 		}	
 	}
@@ -146,11 +166,14 @@ public class ContextValues {
 		return (valuesSet.contains(value));
 	}
 	
-	public ArrayList<String> getKeysList(){
+	public String[] getKeysList(){
 		if (D) Log.d(LOG_TAG, "getKeysList");
-		ArrayList<String> keysList = new ArrayList<String>();
-		for (ApplicationKey appKey: keys)
-			keysList.add(appKey.key);
+		String[] keysList = new String[keys.size()];
+		int i=0;
+		for (ApplicationKey appKey: keys){
+			keysList[i] = appKey.key;
+			i++;
+		}
 		return keysList;
 	}
 }

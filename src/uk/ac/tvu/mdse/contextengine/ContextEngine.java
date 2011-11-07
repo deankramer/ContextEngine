@@ -57,7 +57,7 @@ public class ContextEngine extends Service {
 	public static final String CONTEXT_NAME = "context_name";
 	public static final String CONTEXT_DATE = "context_date";
 	public static final String CONTEXT_VALUE = "context_value";
-	public static final String CONTEXT_APPLICATION_KEY = "context_location_key";	
+	public static final String CONTEXT_APPLICATION_KEY = "context_application_key";	
 	
 	private NotificationManager mNM;
 	private BroadcastReceiver contextMonitor;
@@ -126,6 +126,7 @@ public class ContextEngine extends Service {
 		//copyDexFile();
 		//setupContextMonitor();
 
+		setupContextMonitor();
 		
 		c = getApplicationContext();
 		try{
@@ -268,17 +269,18 @@ public class ContextEngine extends Service {
 					//sendBroadcastToApps(bundle);
 					
 					//show notification - just for testing
-					String contextName = bundle
-							.getString(Component.CONTEXT_NAME);
-					String contextValue = bundle
-							.getString(Component.CONTEXT_INFORMATION);
-					ArrayList<String> appKey = bundle
-							.getStringArrayList(Component.CONTEXT_APPLICATION_KEY);
-						//showNotification(contextName+ " "+contextvalue);
-					if (appKey.size()>0)
-						Log.v(LOG_TAG, "onReceive:" + contextName + " " + contextValue + " " + appKey.get(0));
-					else
-						Log.v(LOG_TAG, "onReceive:" + contextName + " " + contextValue);
+//					String contextName = bundle
+//							.getString(Component.CONTEXT_NAME);
+//					String contextValue = bundle
+//							.getString(Component.CONTEXT_INFORMATION);
+//					ArrayList<String> appKey = bundle
+//							.getStringArrayList(Component.CONTEXT_APPLICATION_KEY);
+//						//showNotification(contextName+ " "+contextvalue);
+//					if (appKey.size()>0)
+//						Log.v(LOG_TAG, "onReceive:" + contextName + " " + contextValue + " " + appKey.get(0));
+//					else
+//						Log.v(LOG_TAG, "onReceive:" + contextName + " " + contextValue);
+					sendBroadcastToApps(bundle);
 				}
 			}
 
@@ -378,18 +380,23 @@ public class ContextEngine extends Service {
 	}
 	
 	public void sendBroadcastToApps(Bundle bundle){
+		
+		Log.d(LOG_TAG, "broadcasting to apps");
+		
 		Intent intent = new Intent();
-
+		try {
 		intent.setAction(CONTEXT_INTENT);
 		intent.putExtra(CONTEXT_NAME,bundle.getString(CONTEXT_NAME));
-		if (!bundle.getString(CONTEXT_APPLICATION_KEY).equals(null))
-			intent.putExtra(CONTEXT_APPLICATION_KEY, bundle.getString(CONTEXT_APPLICATION_KEY));
+		Log.d(LOG_TAG, "CONTEXT_NAME:" + bundle.getString(CONTEXT_NAME));
+		if (!bundle.getStringArray(CONTEXT_APPLICATION_KEY).equals(null)){
+			Log.d(LOG_TAG, "broadcasting to apps-getting app key");
+			intent.putExtra(CONTEXT_APPLICATION_KEY, bundle.getStringArray(CONTEXT_APPLICATION_KEY));}
 		intent.putExtra(CONTEXT_DATE, bundle.getString(CONTEXT_DATE));
-		if (!bundle.getString(CONTEXT_VALUE).equals(null))
-			intent.putExtra(CONTEXT_VALUE, bundle.getBoolean(CONTEXT_VALUE));
+//		if (!bundle.getBoolean(CONTEXT_VALUE).equals(null))
+//			intent.putExtra(CONTEXT_VALUE, bundle.getBoolean(CONTEXT_VALUE));
 		if (!bundle.getString(CONTEXT_INFORMATION).equals(null))
 			intent.putExtra(CONTEXT_INFORMATION, bundle.getString(CONTEXT_INFORMATION));
-		try {
+		Log.d(LOG_TAG, "CONTEXT_INFORMATION:" + bundle.getString(CONTEXT_INFORMATION));
 			c.sendBroadcast(intent);
 		} catch (Exception e) {
 			Log.e("ContextEngine", "broadcasting to apps not working");
@@ -419,15 +426,16 @@ public class ContextEngine extends Service {
 				locationServices = new LocationServices(c);
 		}
 		
-		if(activeContexts.isEmpty())
+		if(activeContexts.isEmpty()){
 			return loadClass(componentName);
+		}
 		else{
 			for (Component ac: activeContexts){
 				if (ac.contextName.equals(componentName)){
 					Log.e(LOG_TAG, "Component already running!");						
 					return false;
 				}			
-			}
+			}			
 			return loadClass(componentName);
 		}
 	}
@@ -497,6 +505,7 @@ public class ContextEngine extends Service {
 				for (Component ac: activeContexts){
 					if (ac.contextName.equals(compositeName)){
 						Log.e(LOG_TAG, "Component already running!");
+						//create new content values set
 						return false;
 					}			
 				}
@@ -559,6 +568,17 @@ public class ContextEngine extends Service {
 		for (Component ac: activeContexts){
 			if (ac.contextName.equals(compositeName)){
 				ruledComponent = (RuledCompositeComponent) ac;
+				ruledComponent.addAppKey(newAppKey);
+				
+				//check all contexts  whether app key added:
+				for (Component c: ruledComponent.components)
+				{					
+					if (c.valuesSets.size()==1){
+						c.addAppKey(newAppKey);
+					}
+						
+				}
+					
 				setupContextMonitor();
 				ruledComponent.componentDefined();
 				return true;

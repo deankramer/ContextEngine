@@ -42,8 +42,10 @@ public class MonitorComponent extends Component{
 	public MonitorComponent(String name, Context c){		
 		super(name, c);	
 		if (D) Log.d(LOG_TAG, "constructor1");
-		//default set of context values is ON&OFF			
+		//default set of context values is ON&OFF		
+		//ContextValues cv = new ContextValues(values);
 		valuesSets.add(new ContextValues(values));
+		//cv.contextInformation = "OFF";
 		setupMonitor();
 	}
 	
@@ -71,9 +73,11 @@ public class MonitorComponent extends Component{
 		contextMonitor = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context c, Intent in) {	
+				if (in.getAction().equals(filterAction)){
 				if (D) Log.d(LOG_TAG, "onReceive");
                 Bundle data =  in.getExtras();
                 checkContext(data);
+			}
             }			
 		};
 		context.registerReceiver(contextMonitor, new IntentFilter(filterAction));
