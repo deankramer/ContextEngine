@@ -25,6 +25,9 @@ interface IContextsDefinition {
 
   void registerCallback(IRemoteServiceCallback cb);
   
+  //***setup contexts using xml***
+  void setupContexts(String path);
+  
   //***application registers its unique key***
   boolean registerApplicationKey(String key);
   

@@ -19,14 +19,27 @@ package uk.ac.tvu.mdse.contextengine;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 import uk.ac.tvu.mdse.contextengine.contexts.LocationContext;
 import uk.ac.tvu.mdse.contextengine.db.ContextDB;
 import uk.ac.tvu.mdse.contextengine.db.ContextDBSQLite;
+import uk.ac.tvu.mdse.contextengine.parser.ParserHandler;
 import uk.ac.tvu.mdse.contextengine.reasoning.ApplicationKey;
 import uk.ac.tvu.mdse.contextengine.test.TestActivity;
 import android.app.Notification;
@@ -39,6 +52,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Binder;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
@@ -233,6 +247,10 @@ public class ContextEngine extends Service {
 			if (cb != null)
 				mCallbacks.unregister(cb);
 		}
+
+		public void setupContexts(String path) throws RemoteException {
+			runXML(path);
+		}
 	};
 	
 	public final ISynchronousCommunication.Stub synchronousBinder = new ISynchronousCommunication.Stub() {
@@ -288,6 +306,31 @@ public class ContextEngine extends Service {
 		registerReceiver(contextMonitor, filter);
 	}
 	
+	protected void runXML(String path) {
+		try{
+			File file = new File(Environment.getExternalStorageDirectory() + path);
+			SAXParserFactory spf = SAXParserFactory.newInstance();
+			SAXParser sp = spf.newSAXParser();
+			XMLReader xr = sp.getXMLReader();
+			
+			ParserHandler ph = new ParserHandler();
+			ph.setContextEngine(this);
+			xr.setContentHandler(ph);
+			
+			xr.parse(new InputSource(new InputStreamReader(new FileInputStream(file))));
+		} catch(MalformedURLException e){
+			e.printStackTrace();
+		} catch(ParserConfigurationException e){
+			e.printStackTrace();
+		} catch(SAXException e){
+			e.printStackTrace();
+		} catch(IOException e){
+			e.printStackTrace();
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
 	public void copyDexFile(){
 		File dexInternalStoragePath = new File(getDir("dex", Context.MODE_PRIVATE),
 		          "classes.dex");
@@ -620,73 +663,3 @@ public class ContextEngine extends Service {
 
 	}
 }
-
-//REMOVED FROM CONTEXT DEFINITION:
-//public void addLocationComponent(String key) throws RemoteException {
-//	
-//	if (locationServices == null)
-//		locationServices = new LocationServices(c);
-//	
-//	locationContext = new LocationContext(c, key, locationServices);
-//	locationContexts.add(locationContext);
-//	activeContexts.add(locationContext);
-//	if (D)
-//		Log.d(LOG_TAG, "onaddLocationComponent -success");
-//	
-//}
-//
-//public void addLocation(String locationKey, String identifier, String latitude,
-//		String longitude) throws RemoteException {
-//	if (D)
-//		Log.d(LOG_TAG, "addLocation -success");
-//	try{
-//	for (LocationContext lc: locationContexts){
-//		if (lc.key.equals(locationKey)){
-//			lc.addLocation(identifier, Double.valueOf(latitude), Double.valueOf(longitude));
-//		}
-//	}			
-//	}catch(Exception e){
-//		Log.e(LOG_TAG, e.getLocalizedMessage());
-//	}
-//}
-
-//USED TO TEST CONNECTION TO APP:
-//private static final int REPORT_MSG = 1;
-//
-///**
-// * Our Handler used to execute operations on the main thread. This is used
-// * to schedule increments of our value.
-// */
-//private final Handler mHandler = new Handler() {
-//	@Override
-//	public void handleMessage(Message msg) {
-//		switch (msg.what) {
-//
-//		// It is time to bump the value!
-//		case REPORT_MSG: {
-//			// Up it goes.
-////			int value = ++value;
-//			Bundle bundle = msg.getData();
-//			String contextInfo = bundle
-//			.getString(Component.CONTEXT_NAME);
-//			// Broadcast to all clients the new value.
-//			final int N = mCallbacks.beginBroadcast();
-//			for (int i = 0; i < N; i++) {
-//				try {
-//					mCallbacks.getBroadcastItem(i).valueChanged(contextInfo);
-//				} catch (RemoteException e) {
-//					// The RemoteCallbackList will take care of removing
-//					// the dead object for us.
-//				}
-//			}
-//			mCallbacks.finishBroadcast();
-//
-//			// Repeat every 1 second.
-////			sendMessageDelayed(obtainMessage(REPORT_MSG), 1 * 1000);
-//		}
-//			break;
-//		default:
-//			super.handleMessage(msg);
-//		}
-//	}
-//};
