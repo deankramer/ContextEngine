@@ -647,9 +647,10 @@ public class ContextEngine extends Service {
 
 		unregisterReceiver(contextMonitor);
 		
-		locationServices.stop();
-		locationServices = null;
-		
+		if (locationServices!=null){		
+			locationServices.stop();
+			locationServices = null;
+		}
 		// Unregister all callbacks.
 		mCallbacks.kill();
 

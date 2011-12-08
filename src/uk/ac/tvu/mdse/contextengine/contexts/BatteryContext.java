@@ -51,7 +51,7 @@ public class BatteryContext extends MonitorComponent{
 	
 	protected String obtainContextInformation(){
 		if (D) Log.d(LOG_TAG, "obtainContextInformation");
-     /*   
+        /*
 		BatteryManager bm = new BatteryManager();
 		
 		int rawlevel = Integer.parseInt(BatteryManager.EXTRA_LEVEL);
@@ -63,6 +63,7 @@ public class BatteryContext extends MonitorComponent{
 		
 		//set as default
 		int v=50;
+		
         return this.valuesSets.get(0).contextInformation;
 	}
 	

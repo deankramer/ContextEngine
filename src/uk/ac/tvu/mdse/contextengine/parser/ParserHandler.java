@@ -54,6 +54,12 @@ public class ParserHandler extends DefaultHandler{
 	private static final String RANGE_MIN_VALUE = "Min";
 	//Maximum value in Context Range
 	private static final String RANGE_MAX_VALUE = "Max";
+	//Specific Context Value
+	private static final String SPECIFIC_CONTEXT_VALUE = "SpeicificContextValue";
+	//Numeric value 1 to describe Specific Context Value
+	private static final String NUMERIC_VALUE_1 = "NumericValue1";
+	//Numeric value 2 to describe Specific Context Value
+	private static final String NUMERIC_VALUE_2 = "NumericValue2";
 	//Composite Context container
 	private static final String COMPOSITE_CONTEXT = "CompositeContext";
 	//Context needed for the composite composition
