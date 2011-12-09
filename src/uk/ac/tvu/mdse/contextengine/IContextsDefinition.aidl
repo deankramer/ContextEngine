@@ -16,15 +16,11 @@
 
 package uk.ac.tvu.mdse.contextengine;
 
-import uk.ac.tvu.mdse.contextengine.IRemoteServiceCallback;
-
 //Interface 1 for context engine 
 // Deals with registering of contexts
 
 interface IContextsDefinition {
 
-  void registerCallback(IRemoteServiceCallback cb);
-  
   //***setup contexts using xml***
   void setupContexts(String path);
   
@@ -60,8 +56,6 @@ interface IContextsDefinition {
   
    //***notify that the composite context has been fully identified***
   boolean startComposite(in String compositeName);   
-  
-  void unregisterCallback(IRemoteServiceCallback cb);
   
   //***taken out and replaced - REMOVE once tested!***
   //void addLocationComponent(in String key);

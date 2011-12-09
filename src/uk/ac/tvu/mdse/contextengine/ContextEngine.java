@@ -97,17 +97,13 @@ public class ContextEngine extends Service {
 	private ArrayList<LocationContext> locationContexts = new ArrayList<LocationContext>();
 	LocationContext locationContext;
 	
-	//there are 2 approaches to deal with contexts, this variable serves
-	//as a controller to switch between hashtable and rules approach
-	//value = true - hashtable
-	//value = false - rules
 
 	/**
 	 * This is a list of callbacks that have been registered with the service.
 	 * Note that this is package scoped (instead of private) so that it can be
 	 * accessed more efficiently from inner classes.
 	 */
-	final RemoteCallbackList<IRemoteServiceCallback> mCallbacks = new RemoteCallbackList<IRemoteServiceCallback>();
+	//final RemoteCallbackList<IRemoteServiceCallback> mCallbacks = new RemoteCallbackList<IRemoteServiceCallback>();
 
 	int mValue = 0;
 
@@ -137,8 +133,6 @@ public class ContextEngine extends Service {
 		mNM = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 		filter = new IntentFilter(
 				"uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED");
-		//copyDexFile();
-		//setupContextMonitor();
 
 		setupContextMonitor();
 		
@@ -149,10 +143,6 @@ public class ContextEngine extends Service {
 			if (D)
 				Log.e(LOG_TAG, e.getLocalizedMessage());
 		}
-		// While this service is running, it will continually increment a
-		// number. Send the first message that is used to perform the
-		// increment.
-		//mHandler.sendEmptyMessage(REPORT_MSG);
 		
 		// Manage list of all contexts registered with the engine and store the list in the database
 		db = new ContextDBSQLite(c);
@@ -238,15 +228,15 @@ public class ContextEngine extends Service {
 			return compositeReady(compositeName);
 		}
 
-		public void registerCallback(IRemoteServiceCallback cb) {
-			if (cb != null)
-				mCallbacks.register(cb);
-		}
-
-		public void unregisterCallback(IRemoteServiceCallback cb) {
-			if (cb != null)
-				mCallbacks.unregister(cb);
-		}
+//		public void registerCallback(IRemoteServiceCallback cb) {
+//			if (cb != null)
+//				mCallbacks.register(cb);
+//		}
+//
+//		public void unregisterCallback(IRemoteServiceCallback cb) {
+//			if (cb != null)
+//				mCallbacks.unregister(cb);
+//		}
 
 		public void setupContexts(String path) throws RemoteException {
 			runXML(path);
@@ -255,19 +245,22 @@ public class ContextEngine extends Service {
 	
 	public final ISynchronousCommunication.Stub synchronousBinder = new ISynchronousCommunication.Stub() {
 
+		//to obtain list of active contexts if needed
 		public ArrayList<String> getContextList() throws RemoteException {
-			ArrayList<String> contextList = new ArrayList<String>();
-			ArrayList<Component> contexts = new ArrayList<Component>();
-			contexts = db.getAllContexts();
-			for(Component c: contexts)
+			ArrayList<String> contextList = new ArrayList<String>();			
+			for(Component c: activeContexts)
 				contextList.add(c.contextName);
 			return contextList;
 		}
 
-		public boolean getContextValue(String componentName)
-				throws RemoteException {
-			//firstly find if context exist in db!
-			return db.getContextValue(componentName);			
+		//query a particular context value
+		public String getContextValue(String componentName)
+				throws RemoteException {			
+			String contextValue = "unknown";
+			for(Component c: activeContexts)
+				if (c.contextName.equals(componentName))
+					contextValue = c.contextInformation;
+			return contextValue;			
 		}
 		
 	};
@@ -283,21 +276,16 @@ public class ContextEngine extends Service {
 						Log.d(LOG_TAG, "onReceive");
 					Bundle bundle = intent.getExtras();
 					
-					//send broadcast to apps
-					//sendBroadcastToApps(bundle);
-					
-					//show notification - just for testing
-//					String contextName = bundle
-//							.getString(Component.CONTEXT_NAME);
-//					String contextValue = bundle
-//							.getString(Component.CONTEXT_INFORMATION);
-//					ArrayList<String> appKey = bundle
-//							.getStringArrayList(Component.CONTEXT_APPLICATION_KEY);
-//						//showNotification(contextName+ " "+contextvalue);
-//					if (appKey.size()>0)
-//						Log.v(LOG_TAG, "onReceive:" + contextName + " " + contextValue + " " + appKey.get(0));
-//					else
-//						Log.v(LOG_TAG, "onReceive:" + contextName + " " + contextValue);
+					/*
+					show notification - just for testing
+					String contextName = bundle
+							.getString(Component.CONTEXT_NAME);
+					String contextValue = bundle
+							.getString(Component.CONTEXT_INFORMATION);
+					ArrayList<String> appKey = bundle
+							.getStringArrayList(Component.CONTEXT_APPLICATION_KEY);
+					showNotification(contextName+ " "+contextvalue);
+ */
 					sendBroadcastToApps(bundle);
 				}
 			}
@@ -393,6 +381,8 @@ public class ContextEngine extends Service {
 		
 	}
 
+	//used originally to test broadcasting
+	//instead of sending message to app, the message is displayed as notification
 	private void showNotification(String contextChange) {
 		// In this sample, we'll use the same text for the ticker and the
 		// expanded notification
@@ -539,9 +529,9 @@ public class ContextEngine extends Service {
 	
 	public boolean addComposite(String compositeName){
 		try{
-			RuledCompositeComponent ruledComponent=null;
+			CompositeComponent ruledComponent=null;
 			if(activeContexts.isEmpty()){
-				ruledComponent = new RuledCompositeComponent(compositeName, c);				
+				ruledComponent = new CompositeComponent(compositeName, c);				
 				activeContexts.add(ruledComponent);
 				return true;
 			}else{
@@ -553,7 +543,7 @@ public class ContextEngine extends Service {
 					}			
 				}
 				
-				ruledComponent = new RuledCompositeComponent(compositeName, c);				
+				ruledComponent = new CompositeComponent(compositeName, c);				
 				activeContexts.add(ruledComponent);
 				return true;
 			}			
@@ -565,13 +555,13 @@ public class ContextEngine extends Service {
 	}
 	
 	public boolean addToCompositeM(String componentName, String compositeName){
-		RuledCompositeComponent ruledComponent = null;
+		CompositeComponent ruledComponent = null;
 		Component component = null;
 		
 		//look up for the composite if created
 		for (Component ac: activeContexts){
 			if (ac.contextName.equals(compositeName))
-				ruledComponent = (RuledCompositeComponent) ac;
+				ruledComponent = (CompositeComponent) ac;
 			if (ac.contextName.equals(componentName))
 				component = ac;	
 		}
@@ -581,7 +571,7 @@ public class ContextEngine extends Service {
 					return false;
 		}
 		if(ruledComponent==null){
-			ruledComponent = new RuledCompositeComponent(compositeName, c);				
+			ruledComponent = new CompositeComponent(compositeName, c);				
 			activeContexts.add(ruledComponent);
 		}
 		ruledComponent.registerComponent(component);		
@@ -592,12 +582,12 @@ public class ContextEngine extends Service {
 	
 	public void newRule(String componentName, String[] condition, String result){
 		
-		RuledCompositeComponent ruledComponent = null;
+		CompositeComponent ruledComponent = null;
 		
 		//look up for the composite if created
 		for (Component ac: activeContexts){
 			if (ac.contextName.equals(componentName))
-				ruledComponent = (RuledCompositeComponent) ac;		
+				ruledComponent = (CompositeComponent) ac;		
 		}	
 		
 		ruledComponent.addRule(condition, result);
@@ -605,12 +595,12 @@ public class ContextEngine extends Service {
 	}
 	
 	public boolean compositeReady(String compositeName){
-		RuledCompositeComponent ruledComponent = null;
+		CompositeComponent ruledComponent = null;
 		
 		//look up for the composite if created
 		for (Component ac: activeContexts){
 			if (ac.contextName.equals(compositeName)){
-				ruledComponent = (RuledCompositeComponent) ac;
+				ruledComponent = (CompositeComponent) ac;
 				ruledComponent.addAppKey(newAppKey);
 				
 				//check all contexts  whether app key added:
@@ -637,6 +627,7 @@ public class ContextEngine extends Service {
 	public void onDestroy() {
 		super.onDestroy();
 		Log.d(LOG_TAG, "onDestroy");
+		
 		// Cancel the persistent notification.
 		mNM.cancel(R.string.local_service_started);
 
@@ -652,11 +643,7 @@ public class ContextEngine extends Service {
 			locationServices = null;
 		}
 		// Unregister all callbacks.
-		mCallbacks.kill();
-
-		// Remove the next pending message to increment the counter, stopping
-		// the increment loop.
-		//mHandler.removeMessages(REPORT_MSG);
+		//mCallbacks.kill();
 
 		// Tell the user we stopped.
 		Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT)

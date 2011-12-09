@@ -21,5 +21,5 @@ package uk.ac.tvu.mdse.contextengine;
 
 interface ISynchronousCommunication {
   List<String> getContextList();
-  boolean getContextValue(in String componentName);
+  String getContextValue(in String componentName);
 }

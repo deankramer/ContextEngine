@@ -27,13 +27,8 @@ public class ApplicationKey {
 	//that uses the context engine
 	public String key;
 	
-	//keeps information whether the application is currently running
-	//and needs to be informed about context
-	public boolean running;
-	
 	public ApplicationKey(String appKey){
 		if (D) Log.d(LOG_TAG, "constructor");
 		this.key = appKey;
-		running = true;
 	}
 }

@@ -32,7 +32,8 @@ public class ContextValues {
 	//current contextInformation of this context value set
 	public String contextInformation = "";
 
-	//a set of applications listening to the context values
+	//list of app keys to know which applications are interested in 
+	//this particular contextValues set
 	public ArrayList<ApplicationKey> keys = new ArrayList<ApplicationKey>();
 
 	//a set of valid context values

@@ -18,46 +18,53 @@ package uk.ac.tvu.mdse.contextengine;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Hashtable;
 
+import uk.ac.tvu.mdse.contextengine.highLevelContext.Rule;
+import uk.ac.tvu.mdse.contextengine.reasoning.ApplicationKey;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+
+/**
+ * @project ContextEngine
+ * @date 28 Jul 2011
+ * @author Dean Kramer & Anna Kocurova
+ */
 
 public class CompositeComponent extends Component implements Serializable {
-
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -493221379660180723L;
-	public static final String LOG_TAG = "Composite_Component";
+	private static final long serialVersionUID = 5268211078370074986L;
+	public static final String LOG_TAG = "CompositeComponent";
 	public static final boolean D = true;
+
+	public ArrayList<Component> components = new ArrayList<Component>();
 	
-	// Attributes
-	public Hashtable<String, Boolean> positivecontexts;
-	public Hashtable<String, Boolean> negativecontexts;
-	public Hashtable<String, Boolean> eithercontexts;
-	public Boolean eithercontextvalue;
+	public ArrayList<Rule> rules = new ArrayList<Rule>();
+	
+	//a set of valid context values
+	public ArrayList<String> valuesSet = new ArrayList<String>();
+	
+	//a set of applications listening to the context values
+	public ArrayList<ApplicationKey> keys = new ArrayList<ApplicationKey>();
+	
+	//to make easier if AND or OR can be applied
+	public enum Expression {ALL, ANY}; 
+	
+	public Expression simplerRule;
 
 	public CompositeComponent(String name, Context c) {
 		super(name, c);
-		positivecontexts = new Hashtable<String, Boolean>();
-		negativecontexts = new Hashtable<String, Boolean>();
-		eithercontexts = new Hashtable<String, Boolean>();
-		eithercontextvalue = false;
-		setupMonitor();
-
+		if (D) Log.d(LOG_TAG, "constructor");
+		this.contextInformation = "default";		
 	}
-
-	public CompositeComponent(String name, Context c, ArrayList<String> pc,
-			ArrayList<String> nc) {
-		super(name, c);
-		positivecontexts = new Hashtable<String, Boolean>();
+	
+	public void componentDefined(){
+		if (D) Log.d(LOG_TAG, "componentDefined");
 		setupMonitor();
-		for (String cn : pc)
-			registerComponent(cn, false);
-		for (String cn : nc)
-			registerComponent(cn, true);
 	}
 
 	private void setupMonitor() {
@@ -66,120 +73,146 @@ public class CompositeComponent extends Component implements Serializable {
 
 			@Override
 			public void onReceive(Context c, Intent in) {
+				if (D) Log.d(LOG_TAG, "onReceive");
 				// TODO Auto-generated method stub
-				String context = in.getExtras().getString(CONTEXT_NAME);
-				boolean value = in.getExtras().getBoolean(CONTEXT_VALUE);
-				if (positivecontexts.containsKey(context)) {
-					positivecontexts.put(context, value);
-					checkContext();
-				}
-
-				if (negativecontexts.containsKey(context)) {
-					negativecontexts.put(context, value);
-					checkContext();
-				}
-
-				if (eithercontexts.containsKey(context)) {
-					eithercontexts.put(context, value);
-					checkContext();
-				}
+//				String context = in.getExtras().getString(CONTEXT_NAME);
+//				boolean value = in.getExtras().getBoolean(CONTEXT_VALUE);
+//				in.getExtras().getStringArrayList(CONTEXT_APPLICATION_KEY);
+				checkContext();				
 			}
 		};
 		context.registerReceiver(contextMonitor, filter);
 
 	}
 
-	public boolean registerComponent(String c, Boolean v) {
-		if (v) {
-			if (!positivecontexts.containsKey(c)) {
-				positivecontexts.put(c, !v);
-				return true;
-			} else
-				return false;
-		} else {
-			if (!negativecontexts.containsKey(c)) {
-				negativecontexts.put(c, !v);
-				return true;
-			} else
-				return false;
+	public void checkContext(){
+		if (D) Log.d(LOG_TAG, "checkContext");
+		String compositeContextValue  = fireRules(); //"ON";//
+		if (!compositeContextValue.equals(this.contextInformation))	{		//((compositeContextValue.equals(null)||compositeContextValue.equals(this.contextInformation)))){
+			this.contextInformation = compositeContextValue;
+			Log.d("checkContext", contextInformation);
+			sendNotification(this.contextName,this.contextInformation,getKeysList());
+		}			
+	}
+	
+	//ALL or ANY
+	public boolean addSimplerRule(String s){
+		if (D) Log.d(LOG_TAG, "addSimplerRule");
+		try{
+			this.simplerRule = Expression.valueOf(s);
+			return true;
+		}
+		catch(Exception e){
+			return false;
 		}
 	}
-
-	public boolean registerComponent(ArrayList<String> contextList,
-			Boolean value) {
-
-		if (contextList.size() > 0) {
-			eithercontextvalue = value;
-			for (String c : contextList) {
-				eithercontexts.put(c, !value);
+	
+	public void addRule(String[] conditions, String statement){
+		if (D) Log.d(LOG_TAG, "addRule");
+		//if (!checkRule(conditions, statement))
+		Rule r = new Rule(conditions, statement);
+			rules.add(r);
+			Log.d("Rule", r.toString());
+	}
+	
+	public boolean checkRule(String[] conditions, String statement){
+		if (D) Log.d(LOG_TAG, "checkRule");
+		//this is not good
+		Rule rule = new Rule(conditions, statement);
+		return rules.contains(rule);
+	}
+	
+	public void addRules(ArrayList<Rule> newRules){
+		if (D) Log.d(LOG_TAG, "addRules");
+		for(Rule r: newRules)
+			addRule(r.ifCondition,r.thenStatement);
+	}
+	
+	public String fireRules(){
+		if (D) Log.d(LOG_TAG, "fireRules");
+		if (D) Log.v(LOG_TAG, "fireRules keys size"+keys.size());
+		String[] componentContexts = new String[components.size()];
+		Log.d("fireRules", String.valueOf(componentContexts.length));
+		//for each application key check value
+		for(ApplicationKey appKey: keys){
+			int i =0;
+			for (Component c: components){
+				componentContexts[i] = c.getContextInformation(appKey);			
+				Log.d(LOG_TAG, "fireRules" +  componentContexts[i]);
+				i++;
 			}
-			return true;
 		}
-		return false;
+		
+		String thenStatement = "OFF";
+		if (!componentContexts.equals(null)){			
+			for(Rule r: rules){
+				if(r.fireRule(componentContexts))
+					thenStatement = r.thenStatement;
+					Log.d(LOG_TAG, "fireRules" +  thenStatement);
+			}
+		}
+		
+//		if(thenStatement.equals(null)||thenStatement.trim().equals(""))
+//			return "default";
+//		else
+		Log.d(LOG_TAG, "fireRules" +  thenStatement);
+			return thenStatement;
+	}
+	
+	//add a new component to composite
+	public void registerComponent(Component c) {
+		if (D) Log.d(LOG_TAG, "registerComponent");
+		//if (!checkComponent(c))
+			components.add(c);
+	}
+	
+	//check whether the component has been already added
+	public boolean checkComponent(Component c){
+		if (D) Log.d(LOG_TAG, "checkComponent");
+		return components.contains(c);
 	}
 
-	public boolean unregisterComponent(String c) {
+	public void registerComponents(ArrayList<Component> componentList) {
+		if (D) Log.d(LOG_TAG, "registerComponents");
+		for (Component c: componentList)
+			if (!checkComponent(c))
+				components.add(c);
+				
+	}
 
-		if (positivecontexts.containsKey(c)) {
-			positivecontexts.remove(c);
-			return true;
-		} else if (negativecontexts.containsKey(c)) {
-			negativecontexts.remove(c);
-			return true;
-		} else if (eithercontexts.containsKey(c)) {
-			eithercontexts.remove(c);
-			return true;
-		} else
+	public boolean unregisterComponent(Component c) {
+		if (D) Log.d(LOG_TAG, "unregisterComponent");
+		if (checkComponent(c))
+			return components.remove(c);
+		else
 			return false;
 	}
 
 	public boolean isComposite() {
-		if (positivecontexts.size() > 1)
+		if (D) Log.d(LOG_TAG, "isComposite");
+		if (components.size() > 1)
 			return true;
 		else
 			return false;
 	}
-
-	public void checkContext() {
-		if (checkPositives() && checkNegatives() && checkEithers()) {
-			if (!contextValue) {
-				sendNotification(true);
-				contextValue = true;
-			}
-		} else if ((!checkPositives()) || (!checkNegatives())
-				|| (!checkEithers())) {
-			if (contextValue) {
-				sendNotification(false);
-				contextValue = false;
-			}
+	
+	public int getComponentsNo(){
+		if (D) Log.d(LOG_TAG, "getComponentsNo");
+		return this.components.size();
+	}
+	
+	public void addAppKey(ApplicationKey appKey){
+		keys.add(appKey);
+	}
+	
+	public String[] getKeysList(){
+		if (D) Log.d(LOG_TAG, "getKeysList");
+		String[] keysList = new String[keys.size()];
+		int i=0;
+		for (ApplicationKey appKey: keys){
+			keysList[i] = appKey.key;
+			i++;
 		}
+		return keysList;
 	}
-
-	/*
-	 * Because not all hashtables may contain a context, its important we don't
-	 * get null exceptions, so we check if they have anything. If they don't,
-	 * then just say its true so it gets ignored in the context checking, though
-	 * it does have a context, check it and return if it suits or not.
-	 */
-	private Boolean checkPositives() {
-		if (positivecontexts.size() > 0)
-			return !positivecontexts.containsValue(false);
-		else
-			return true;
-	}
-
-	private Boolean checkNegatives() {
-		if (negativecontexts.size() > 0)
-			return !negativecontexts.containsValue(true);
-		else
-			return true;
-	}
-
-	private Boolean checkEithers() {
-		if (eithercontexts.size() > 0)
-			return eithercontexts.containsValue(eithercontextvalue);
-		else
-			return true;
-	}
-
 }

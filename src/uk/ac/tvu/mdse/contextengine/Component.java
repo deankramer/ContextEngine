@@ -36,6 +36,9 @@ public class Component implements Serializable {
 	public static final String LOG_TAG = "Component";
 	public static final boolean D = true;
 	
+	//current state of the application/object (Android specific)
+	public Context context;
+	
 	// Each application listens only to particular location context determined by its key
 	public static final String CONTEXT_APPLICATION_KEY = "context_application_key";
 
@@ -45,16 +48,18 @@ public class Component implements Serializable {
 	public static final String CONTEXT_VALUE = "context_value";
 	public static final String CONTEXT_INFORMATION = "context_information";
 	
-	//a set of valid context values
+	//a number of context values sets can be specified for each context
 	public ArrayList<ContextValues> valuesSets = new ArrayList<ContextValues>();
 	
-	// BroadcastReceiver
+	// BroadcastReceiver - (listening to messages broadcasted by other components)
 	public BroadcastReceiver contextMonitor = null;
 
 	public static final String CONTEXT_INTENT = "uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED";
 	public IntentFilter filter = new IntentFilter(CONTEXT_INTENT);
+	
+	//for database use
 	public int contextId;
-	public Context context;
+	
 	public String contextName;
 	public boolean contextValue;
 	public Calendar contextDate;
@@ -159,7 +164,6 @@ public class Component implements Serializable {
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
 		intent.putExtra(CONTEXT_VALUE, contextValue);
 		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
-		//intent.putExtra(CONTEXT_APPLICATION_KEY, contextInformation);
 		
 		try {
 			context.sendBroadcast(intent);
@@ -323,76 +327,4 @@ public class Component implements Serializable {
 	}
 }
 	
-	//REMOVE THE FOLLOWING CODE IF TESTING OK!
-	
-//	//a set of valid context values
-//	public ArrayList<String> valuesSet = new ArrayList<String>();
-//
-//	//to hold high level contexts with its range of values
-//	public ArrayList<ContextRange> contextRangeSet = new ArrayList<ContextRange>();
-	
-	
-	
-//	protected boolean checkContextValue(String value){
-//		return (valuesSet.contains(value));
-//	}
-	
-//	public String getContextInformation(double contextInput){
-//		for (ContextRange cr: contextRangeSet){
-//			if ((cr.maxValue>contextInput)&&(cr.minValue<contextInput))
-//				contextInformation = cr.contextHighValue;
-//		}
-//		return contextInformation;
-//	}
-//	
-//	public String getContextInformation(int contextInput){
-//		for (ContextRange cr: contextRangeSet){
-//			if ((cr.maxValue>contextInput)&&(cr.minValue<contextInput))
-//				contextInformation = cr.contextHighValue;
-//		}
-//		return contextInformation;
-//	}
-	
-//	public boolean addValue(String contextValue){
-//	
-//	//check if the value already exists in the set
-//	if (valuesSet.contains(contextValue))
-//		return false;
-//	else {
-//		valuesSet.add(contextValue);
-//		return true;
-//	}		
-//}
-	
-//	public void addValues(String[] values){		
-//		for (String newValue: values)
-//			addValue(newValue);
-//	}
-//	
-//	public void setupValues(String[] values){
-//		valuesSet.removeAll(valuesSet.subList(0, valuesSet.size()-1));
-//		addValues(values);
-//	}	
-	
-	
-//	public boolean addRange(int minValue, int maxValue, String contextValue){		
-//		
-//		if (checkRange(contextValue))
-//			return false;
-//		else{
-//		Log.v("test", "havent crashed yet");
-//			contextRangeSet.add(new ContextRange(minValue,maxValue,contextValue));		
-//			valuesSet.add(contextValue);
-//			return true;
-//		}		
-//	}
-	
-//	public boolean checkRange(String contextValue){
-//		boolean exist = false;
-//		for (ContextRange cr: contextRangeSet){
-//			if (cr.contextHighValue.equals(contextValue))
-//				exist = true;
-//		}	
-//		return exist;		
-//	}
 	

@@ -80,19 +80,7 @@ public class BatteryContext extends MonitorComponent{
         	for (ContextValues cv: this.valuesSets){
     			if (cv.setNewContextValue(v))
     				sendNotification(cv);
-    		}
-        	
-//            String highContext = this.getContextInformation(v);
-//    		if ((highContext.equals("HIGH")) && (!contextInformation.equals("HIGH"))) {				
-//    			contextInformation = "HIGH";
-//    			sendNotification();
-//    		} else if ((highContext.equals("MEDIUM")) && (!contextInformation.equals("MEDIUM"))) {
-//    			contextInformation = "MEDIUM";
-//    			sendNotification();
-//    		} else if ((highContext.equals("LOW")) && (!contextInformation.equals("LOW"))) {				
-//    			contextInformation = "LOW";
-//    			sendNotification();
-//    		}
+    		}        	
         }
 	}	
 }
