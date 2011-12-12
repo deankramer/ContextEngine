@@ -25,6 +25,7 @@
         <service android:name="ContextEngine">
             <intent-filter>
                 <action android:name="uk.ac.tvu.mdse.contextengine.IContextsDefinition"></action>
+                <action android:name="uk.ac.tvu.mdse.contextengine.ISynchronousCommunication"></action>
                 <action android:name="uk.ac.tvu.mdse.contextengine.CONTEXT_CHANGED"></action>
                 <action android:name="uk.ac.tvu.mdse.contextengine.REMOTE_SERVICE"></action>
             </intent-filter>
