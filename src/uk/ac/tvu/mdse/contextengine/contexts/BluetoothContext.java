@@ -46,7 +46,17 @@ public class BluetoothContext extends MonitorComponent {
 	protected String obtainContextInformation(){
 		if (D) Log.d(LOG_TAG, "obtainContextInformation");
 		int bluetoothValue = bluetoothAdapter.getState();
-		return (bluetoothValue == BluetoothAdapter.STATE_ON) ? "ON" : "OFF";
+		
+		
+		//For some reason the statement below does not work, so using if statement for now
+		//return (bluetoothValue == BluetoothAdapter.STATE_ON) ? "ON" : "OFF";
+		if (bluetoothValue == BluetoothAdapter.STATE_ON)
+			return "ON";
+		else if (bluetoothValue == BluetoothAdapter.STATE_OFF)
+			return "OFF";
+		else
+			return "NOBODY KNOWS";
+		//return String.valueOf(bluetoothValue);
 	}
 	
 	protected void checkContext(Bundle data) {
