@@ -259,7 +259,8 @@ public class ContextEngine extends Service {
 			String contextValue = "unknown";
 			for(Component c: activeContexts)
 				if (c.contextName.equals(componentName))
-					contextValue = c.contextInformation;
+					if (c.contextInformation!=null)
+						contextValue = c.contextInformation;
 			return contextValue;			
 		}
 		
