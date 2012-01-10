@@ -24,6 +24,9 @@ interface IContextsDefinition {
   //***setup contexts using xml***
   void setupContexts(String path);
   
+  //***register the path to the application context components***
+  boolean registerContextPath(String path);
+  
   //***application registers its unique key***
   boolean registerApplicationKey(String key);
   

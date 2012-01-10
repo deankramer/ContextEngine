@@ -71,6 +71,8 @@ public class ContextEngine extends Service {
 	public static final String CONTEXT_DATE = "context_date";
 	public static final String CONTEXT_VALUE = "context_value";
 	public static final String CONTEXT_APPLICATION_KEY = "context_application_key";	
+	public static final String DEFAULT_CLASSPATH = "uk.ac.tvu.mdse.contextengine.contexts.";
+	public String USER_CLASSPATH = null;
 	
 	private NotificationManager mNM;
 	private BroadcastReceiver contextMonitor;
@@ -180,6 +182,10 @@ public class ContextEngine extends Service {
 	}
 
 	public final IContextsDefinition.Stub contextsBinder = new IContextsDefinition.Stub() {
+		
+		public boolean registerContextPath(String path) {
+			return registerContextPath(path);
+		}
 		
 		public boolean registerApplicationKey(String key){
 			return registerAppKey(key);
@@ -353,7 +359,14 @@ public class ContextEngine extends Service {
 		                                         getClassLoader());
 		  Class<?> contextClass = null;
 		  Class<?>[] parameterTypes = {Context.class};
-			String classpath = "uk.ac.tvu.mdse.contextengine.contexts.";
+		  
+		  String classpath;
+		  if (USER_CLASSPATH==null)
+			  classpath = DEFAULT_CLASSPATH;
+		  else
+			  classpath = USER_CLASSPATH;
+		  
+		  
 			  try {
 			      // Load the Class
 			      contextClass =
@@ -434,6 +447,11 @@ public class ContextEngine extends Service {
 		} catch (Exception e) {
 			Log.e("ContextEngine", "broadcasting to apps not working");
 		}
+	}
+	
+	public boolean registerContextPath(String path) {
+		this.USER_CLASSPATH = path;
+		return true;
 	}
 	
 	public boolean registerAppKey(String key){
