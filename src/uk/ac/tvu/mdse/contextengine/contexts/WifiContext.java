@@ -21,6 +21,7 @@ import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.util.Log;
 
 public class WifiContext extends MonitorComponent {
@@ -29,48 +30,37 @@ public class WifiContext extends MonitorComponent {
 	public static final String LOG_TAG = "WifiContext";
 	public static final boolean D = true;
 	private WifiManager wm;
+	Context c;
 
 	public WifiContext(Context c) {
 		super("WifiContext", c, "android.net.wifi.WIFI_STATE_CHANGED");
 		if (D) Log.d(LOG_TAG, "constructor");
+		this.c=c;
 		this.wm = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);					
 		this.contextInformation = obtainContextInformation();
-		this.valuesSets.get(0).contextInformation = this.contextInformation;
-		//this.contextInformation = "ON";
-		Log.d("WifiContext", this.contextInformation);
+		this.valuesSets.get(0).contextInformation = this.contextInformation;		
+		Log.d("WifiContext", this.contextInformation);		
 	}
 	
 	protected String obtainContextInformation(){
 		if (D) Log.d(LOG_TAG, "obtainContextInformation");
-		Boolean wifiEnabled = wm.isWifiEnabled();
+		Boolean wifiEnabled = wm.isWifiEnabled();		
 		return (wifiEnabled) ? "ON" : "OFF";
 	}
 
-	protected void checkContext() {
+	public void checkContext(Bundle data) {
 		if (D) Log.d(LOG_TAG, "checkContext");
-		String wifiEnabled = wm.isWifiEnabled() ? "ON" : "OFF" ;		
-		
+		wm = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);		
+		Boolean wifiEnabled = wm.isWifiEnabled();		
+		String wifiStatus = "";		
+		if (wifiEnabled)
+			wifiStatus = "ON" ;
+		else
+			wifiStatus = "OFF" ;				
 		for (ContextValues cv: this.valuesSets){
-			if (cv.setNewContextInformation(wifiEnabled))
+			if (cv.setNewContextInformation(wifiStatus))
 				sendNotification(cv);
 		}
-
-//		Boolean wifiEnabled = wm.isWifiEnabled() ;	
-//		//send context value - 2nd approach
-//		if (wifiEnabled & (!contextInformation.equals("ON"))) {			
-//			contextInformation = "ON";
-//		} else if ((!wifiEnabled) & (!contextInformation.equals("OFF"))) {			
-//			contextInformation = "OFF";
-//		}
-//		sendNotification();
-		
-//		if (wifiEnabled & (!contextValue)) {
-//		sendNotification("wifiON", true);
-//		contextValue = true;
-//	} else if ((!wifiEnabled) & (contextValue)) {
-//		sendNotification("wifiON", false);
-//		contextValue = false;
-//	}
 
 	}
 }

@@ -44,7 +44,7 @@ public class MonitorComponent extends Component{
 		if (D) Log.d(LOG_TAG, "constructor1");
 		//default set of context values is ON&OFF		
 		//ContextValues cv = new ContextValues(values);
-		valuesSets.add(new ContextValues(values));
+		//valuesSets.add(new ContextValues(values));
 		//cv.contextInformation = "OFF";
 		setupMonitor();
 	}
@@ -53,7 +53,7 @@ public class MonitorComponent extends Component{
 		super(name, c);	
 		if (D) Log.d(LOG_TAG, "constructor2");
 		this.filterAction = action;	
-		valuesSets.add(new ContextValues(values));
+		//valuesSets.add(new ContextValues(values));
 		setupMonitor();
 	}
 	
@@ -63,7 +63,7 @@ public class MonitorComponent extends Component{
 		if (D) Log.d(LOG_TAG, "constructor3");
 		this.filterAction = action;		
 		this.monitoringKey = key;
-		valuesSets.add(new ContextValues(values));
+		//valuesSets.add(new ContextValues(values));
 		setupMonitor();
 	}
 	
@@ -92,7 +92,7 @@ public class MonitorComponent extends Component{
 		//sendNotification
 //		if (data != null)
 //			contextValue = data.getString(monitoringKey);
-		sendNotification();		
+		//sendNotification();		
 	}
 	
 //	public String getContextValue(){

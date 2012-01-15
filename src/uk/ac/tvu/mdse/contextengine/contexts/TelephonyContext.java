@@ -42,22 +42,22 @@ public class TelephonyContext extends MonitorComponent {
 	private void checkConnectionState() {
 		int v = tm.getDataState();
 		if (v != connection){
-			if(v == 2)
-				sendNotification("telephonyConnectedON", true);
-			else
-				sendNotification("telephonyConnectedON", false);
+//			if(v == 2)
+				//sendNotification("telephonyConnectedON", true);
+//			else
+				//sendNotification("telephonyConnectedON", false);
 			connection = v;
 		}		
 	}
 
 	private void checkRoaming() {
 		boolean r = tm.isNetworkRoaming();
-		if (r && (!roaming)) {
-			sendNotification("roamingON", true);
-			roaming = true;
-		} else if ((!r) && (roaming)) {
-			sendNotification("roamingON", false);
-			roaming = false;
-		}
+//		if (r && (!roaming)) {
+//			sendNotification("roamingON", true);
+//			roaming = true;
+//		} else if ((!r) && (roaming)) {
+//			sendNotification("roamingON", false);
+//			roaming = false;
+//		}
 	}
 }

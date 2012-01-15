@@ -37,7 +37,7 @@ public class UserPreferenceContext extends PreferenceChangeComponent{
 
 	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
 		if (D) Log.d(LOG_TAG, "onSharedPreferenceChanged");
-		if (preference.equals(arg1))
-			sendNotification(arg1, true);
+//		if (preference.equals(arg1))
+//			sendNotification(arg1, true);
 	}
 }

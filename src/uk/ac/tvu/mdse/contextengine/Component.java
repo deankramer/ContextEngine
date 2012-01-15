@@ -65,12 +65,16 @@ public class Component implements Serializable {
 	public Calendar contextDate;
 	public String contextInformation;
 	
+	String[] values = new String[]{"ON","OFF"};
+	
 	// Constructors
 	public Component(String name, Context c) {
 		if (D) Log.d(LOG_TAG, "constructor");
 		context = c;
 		contextName = name;
-		contextValue = false;				
+		contextValue = false;	
+		valuesSets.add(new ContextValues(values));
+		valuesSets.get(0).contextInformation = "OFF";
 	}
 	
 	//send notification for particular context values and application keys set
@@ -93,124 +97,63 @@ public class Component implements Serializable {
 		}
 	}
 
-	public void sendNotification(){
-		sendNotification(contextName, contextValue);
-	}
-
-	public void sendNotification(boolean value) {
-		sendNotification(contextName, value);
-	}
-	
-	public void sendNotification(String name, boolean value) {
-		if (D) Log.d(LOG_TAG, "sendNotification(name,value)");
-		Intent intent = new Intent();
-
-		intent.setAction(CONTEXT_INTENT);
-		intent.putExtra(CONTEXT_NAME, name);
-		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_VALUE, value);
-		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
-		try {
-			context.sendBroadcast(intent);
-		} catch (Exception e) {
-			Log.e(contextName, "not working");
-		}
-	}	
-	
-	public void sendNotification(String name, String contextInformation, String[] keys) {
-		if (D) Log.d(LOG_TAG, "sendNotification(name,contextInformation)");
-		Intent intent = new Intent();
-
-		intent.setAction(CONTEXT_INTENT);
-		intent.putExtra(CONTEXT_NAME, name);
-		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_VALUE, contextValue);
-		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
-		intent.putExtra(CONTEXT_APPLICATION_KEY, keys);
-		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist0:"+keys);
-		
-		try {
-			context.sendBroadcast(intent);
-		} catch (Exception e) {
-			Log.e(contextName, "not working");
-		}
-	}
-	
-	public void sendNotification(String[] contextInformation, String[] keys) {
-		if (D) Log.d(LOG_TAG, "sendNotification(name,contextInformation)");
-		Intent intent = new Intent();
-
-		intent.setAction(CONTEXT_INTENT);
-		intent.putExtra(CONTEXT_NAME, contextName);
-		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_VALUE, contextValue);
-		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
-		intent.putExtra(CONTEXT_APPLICATION_KEY, keys);
-		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist0:"+keys);
-		
-		try {
-			context.sendBroadcast(intent);
-		} catch (Exception e) {
-			Log.e(contextName, "not working");
-		}
-	}
-	
-	public void sendNotification(String name, String contextInformation) {
-		if (D) Log.d(LOG_TAG, "sendNotification(name,contextInformation)");
-		Intent intent = new Intent();
-
-		intent.setAction(CONTEXT_INTENT);
-		intent.putExtra(CONTEXT_NAME, name);
-		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_VALUE, contextValue);
-		intent.putExtra(CONTEXT_INFORMATION, contextInformation);
-		
-		try {
-			context.sendBroadcast(intent);
-		} catch (Exception e) {
-			Log.e(contextName, "not working");
-		}
-	}
-
 	public boolean getContextValue(){
 		if (D) Log.d(LOG_TAG, "getContextValue");
 		return contextValue;
 	}
 	
-	public String getContextInformation(){
-		if (D) Log.d(LOG_TAG, "getContextInformation");
-		
-		if (contextInformation.trim().equals("") || contextInformation == null){
-			for (ContextValues cv: valuesSets){
-				if (valuesSets.size()==1)
-					contextInformation = valuesSets.get(0).contextInformation;
-			}
-		}
-		return contextInformation;
-	}
+//	public String getContextInformation(){
+//		if (D) Log.d(LOG_TAG, "getContextInformation");
+//		
+//		if (contextInformation.trim().equals("") || contextInformation == null){
+//			for (ContextValues cv: valuesSets){
+//				if (valuesSets.size()==1)
+//					contextInformation = valuesSets.get(0).contextInformation;
+//			}
+//		}
+//		return contextInformation;
+//	}
 	
 	//if a call from composite context
-	public String getContextInformation(ApplicationKey appKey){
-		if (D) Log.d(LOG_TAG, "getContextInformation");
-		String contextInfo="";
-		//if (contextInformation.trim().equals("") || contextInformation == null){
-			for (ContextValues cv: valuesSets){
-				if (cv.keys.contains(appKey)){
-					contextInfo = cv.contextInformation;
-					if (D) Log.v(LOG_TAG, "contextname:"+contextName);
-					if (D) Log.v(LOG_TAG, "getContextInformation:"+contextInfo);
+//	public String getContextInformation(ApplicationKey appKey){
+//		if (D) Log.d(LOG_TAG, "getContextInformation");
+//		String contextInfo="";
+//		//if (contextInformation.trim().equals("") || contextInformation == null){
+//			for (ContextValues cv: valuesSets){
+//				if (cv.keys.contains(appKey)){
+//					contextInfo = cv.contextInformation;
+//					if (D) Log.v(LOG_TAG, "contextname:"+contextName);
+//					if (D) Log.v(LOG_TAG, "getContextInformation:"+contextInfo);
+//				}
+//			}
+//		//}
+//		return contextInfo;
+//	}
+	
+	//if a call from composite context
+		public String getContextInformation(String appKey){
+			if (D) Log.d(LOG_TAG, "getContextInformation");
+			String contextInfo="";
+			//if (contextInformation.trim().equals("") || contextInformation == null){
+				for (ContextValues cv: valuesSets){
+					for (ApplicationKey ak: cv.keys){
+					if (ak.key.equals(appKey)){
+						contextInfo = cv.contextInformation;
+						if (D) Log.v(LOG_TAG, "contextname:"+contextName);
+						if (D) Log.v(LOG_TAG, "getContextInformation:"+contextInfo);
+					}
+					}
 				}
-			}
-		//}
-		return contextInfo;
-	}
+			//}
+			return contextInfo;
+		}
 	
 
-	public String getContextInformation(double v) {
-		if (D) Log.d(LOG_TAG, "getContextInformation(v)");
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	public String getContextInformation(double v) {
+//		if (D) Log.d(LOG_TAG, "getContextInformation(v)");
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 	
 	//re-implement if context value depends on some values
 	protected void checkContext(Bundle data) {
@@ -281,45 +224,99 @@ public class Component implements Serializable {
 
 	public void addContextValue(ApplicationKey appKey, String newContextValue) {
 		if (D) Log.d(LOG_TAG, "addContextValue");
+		boolean keyExists = false;
 		for (ContextValues cv: valuesSets){
-			if (cv.keys.contains(appKey))
-				cv.addValue(newContextValue);	
+			if (cv.keys.contains(appKey)){
+				cv.addValue(newContextValue);
+				keyExists = true;
+				if (D) Log.d(LOG_TAG, "addSpecificContextValue true key exist");
+			}
 		}		
+		if (!keyExists){
+			ContextValues newSet = new ContextValues();			
+			newSet.keys.add(appKey);
+			newSet.valuesSet.add(newContextValue);
+			valuesSets.add(newSet);
+			if (D) Log.d(LOG_TAG, "addSpecificContextValue false key exist");
+		}
 	}
 	
 	public void addSpecificContextValue(ApplicationKey appKey,
 			String newContextValue, Double value1, Double value2) {	
 		if (D) Log.d(LOG_TAG, "addSpecificContextValue");
+		boolean keyExists = false;
 		for (ContextValues cv: valuesSets){
-			if (cv.keys.contains(appKey))
-				cv.addLocation(newContextValue, value1, value2);	
+			if (cv.keys.contains(appKey)){
+				cv.addLocation(newContextValue, value1, value2);
+				keyExists = true;
+				if (D) Log.d(LOG_TAG, "addSpecificContextValue true key exist");
+			}
+		}
+		if (!keyExists){
+			ContextValues newSet = new ContextValues();			
+			newSet.keys.add(appKey);
+			newSet.addLocation(newContextValue, value1, value2);
+			valuesSets.add(newSet);
+			if (D) Log.d(LOG_TAG, "addSpecificContextValue false key exist");
 		}
 	}	
 	
 	public void addRange(ApplicationKey appKey, Integer minValue,
 			Integer maxValue, String newContextValue) {
 		if (D) Log.d(LOG_TAG, "addRange");
-		try{
-			if (valuesSets.size()==1 && valuesSets.get(0).keys.isEmpty()){
-				valuesSets.get(0).keys.add(appKey);
-				if (D) Log.d(LOG_TAG, "addRange+valueset size" + String.valueOf(valuesSets.size()));
-				if (D) Log.d(LOG_TAG, "addRange keys size"+valuesSets.get(0).keys.size());
-			}
-		}
-		catch (Exception ex){
-			if (D) Log.e(LOG_TAG, "problem adding range");			
-		}
-		
+//		try{
+//			if (valuesSets.size()==1 && valuesSets.get(0).keys.isEmpty()){
+//				valuesSets.get(0).keys.add(appKey);
+//				if (D) Log.d(LOG_TAG, "addRange+valueset size" + String.valueOf(valuesSets.size()));
+//				if (D) Log.d(LOG_TAG, "addRange keys size"+valuesSets.get(0).keys.size());
+//			}
+//		}
+//		catch (Exception ex){
+//			if (D) Log.e(LOG_TAG, "problem adding range");			
+//		}
+		boolean keyExists = false;
+		if (D) Log.d(LOG_TAG, "values sets size:"+valuesSets.size());
+		if (D) Log.d(LOG_TAG, "values set 0 keys size:"+valuesSets.get(0).keys.size());
+		if (D) Log.d(LOG_TAG, "values set 0 values size:"+valuesSets.get(0).valuesSet.size());
 		for (ContextValues cv: valuesSets){
-			if (cv.keys.contains(appKey))
+			if (cv.keys.contains(appKey)){
 				cv.addRange(minValue, maxValue, newContextValue);
-				if (D) Log.d(LOG_TAG, "addRange+context info:" + cv.contextInformation + " " + cv.keys.get(0).key);
+				keyExists = true;
+				if (D) Log.d(LOG_TAG, "addSpecificContextValue true key exist");
+			}
+				//if (D) Log.d(LOG_TAG, "addRange+context info:" + cv.contextInformation + " " + cv.keys.get(0).key);
 		}
-		
+		if (!keyExists){
+			ContextValues newSet = new ContextValues();			
+			newSet.keys.add(appKey);
+			newSet.addRange(minValue, maxValue, newContextValue);
+			valuesSets.add(newSet);
+			if (D) Log.d(LOG_TAG, "addSpecificContextValue false key exist");
+		}
 	}
 	
 	public void addAppKey(ApplicationKey appKey){
-		valuesSets.get(0).keys.add(appKey);
+		boolean keyExists = false;
+		for (ContextValues cv: valuesSets){
+			if (cv.keys.contains(appKey)){
+				keyExists = true;
+			}
+		}
+		if (!keyExists)			
+			valuesSets.get(0).keys.add(appKey);
+		if (D) Log.d(LOG_TAG, "addAppKey:" + String.valueOf(keyExists));
+	}
+	
+	public boolean existKey(ApplicationKey appKey){
+		for (ContextValues cv: valuesSets){
+			if (cv.keys.contains(appKey)){				
+				return true;
+			}
+		}
+		return false;				
+	}
+		
+	public void componentDefined(){
 	}
 	
 	public void stop() {	
@@ -327,4 +324,81 @@ public class Component implements Serializable {
 	}
 }
 	
-	
+//public void sendNotification(){
+//sendNotification(contextName, contextValue);
+//}
+//
+//public void sendNotification(boolean value) {
+//sendNotification(contextName, value);
+//}
+//
+//public void sendNotification(String name, boolean value) {
+//if (D) Log.d(LOG_TAG, "sendNotification(name,value)");
+//Intent intent = new Intent();
+//
+//intent.setAction(CONTEXT_INTENT);
+//intent.putExtra(CONTEXT_NAME, name);
+//intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+//intent.putExtra(CONTEXT_VALUE, value);
+//intent.putExtra(CONTEXT_INFORMATION, contextInformation);
+//try {
+//	context.sendBroadcast(intent);
+//} catch (Exception e) {
+//	Log.e(contextName, "not working");
+//}
+//}	
+//
+//public void sendNotification(String name, String contextInformation, String[] keys) {
+//if (D) Log.d(LOG_TAG, "sendNotification(name,contextInformation,keys)");
+//Intent intent = new Intent();
+//
+//intent.setAction(CONTEXT_INTENT);
+//intent.putExtra(CONTEXT_NAME, name);
+//intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+//intent.putExtra(CONTEXT_VALUE, contextValue);
+//intent.putExtra(CONTEXT_INFORMATION, contextInformation);
+//intent.putExtra(CONTEXT_APPLICATION_KEY, keys);
+//if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist0:"+keys);
+//
+//try {
+//	context.sendBroadcast(intent);
+//} catch (Exception e) {
+//	Log.e(contextName, "not working");
+//}
+//}
+//
+//public void sendNotification(String[] contextInformation, String[] keys) {
+//if (D) Log.d(LOG_TAG, "sendNotification(contextInformation,keys)");
+//Intent intent = new Intent();
+//
+//intent.setAction(CONTEXT_INTENT);
+//intent.putExtra(CONTEXT_NAME, contextName);
+//intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+//intent.putExtra(CONTEXT_VALUE, contextValue);
+//intent.putExtra(CONTEXT_INFORMATION, contextInformation);
+//intent.putExtra(CONTEXT_APPLICATION_KEY, keys);
+//if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist0:"+keys);
+//
+//try {
+//	context.sendBroadcast(intent);
+//} catch (Exception e) {
+//	Log.e(contextName, "not working");
+//}
+//}
+//
+//public void sendNotification(String name, String contextInformation) {
+//if (D) Log.d(LOG_TAG, "sendNotification(name,contextInformation)");
+//Intent intent = new Intent();
+//
+//intent.setAction(CONTEXT_INTENT);
+//intent.putExtra(CONTEXT_NAME, name);
+//intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
+//intent.putExtra(CONTEXT_VALUE, contextValue);
+//intent.putExtra(CONTEXT_INFORMATION, contextInformation);
+//
+//try {
+//	context.sendBroadcast(intent);
+//} catch (Exception e) {
+//	Log.e(contextName, "not working");
+//}
+//}

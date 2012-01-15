@@ -167,14 +167,24 @@ public class ContextValues {
 		return (valuesSet.contains(value));
 	}
 	
-	public String[] getKeysList(){
+	public ArrayList<String> getKeysList(){
 		if (D) Log.d(LOG_TAG, "getKeysList");
-		String[] keysList = new String[keys.size()];
-		int i=0;
-		for (ApplicationKey appKey: keys){
-			keysList[i] = appKey.key;
-			i++;
-		}
+		ArrayList<String> keysList = new ArrayList<String>();		
+//		for (ApplicationKey appKey: keys){
+//			keysList.add(appKey.key);			
+//		}
+		keysList.add("1111");
 		return keysList;
 	}
+	
+//	public String[] getKeysList(){
+//		if (D) Log.d(LOG_TAG, "getKeysList");
+//		String[] keysList = new String[keys.size()];
+//		int i=0;
+//		for (ApplicationKey appKey: keys){
+//			keysList[i] = appKey.key;
+//			i++;
+//		}
+//		return keysList;
+//	}
 }

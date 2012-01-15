@@ -74,7 +74,7 @@ public class ListenerComponent extends Component implements SensorEventListener{
 		//check data		
 		//fire off the rules
 		//set contextValue	
-		sendNotification();		
+		//sendNotification();		
 	}
 
 	public void stop() {

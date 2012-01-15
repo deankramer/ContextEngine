@@ -41,6 +41,7 @@ import uk.ac.tvu.mdse.contextengine.db.ContextDB;
 import uk.ac.tvu.mdse.contextengine.db.ContextDBSQLite;
 import uk.ac.tvu.mdse.contextengine.parser.ParserHandler;
 import uk.ac.tvu.mdse.contextengine.reasoning.ApplicationKey;
+import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import uk.ac.tvu.mdse.contextengine.test.TestActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -94,6 +95,10 @@ public class ContextEngine extends Service {
 	//it is assumed that only one app define context
 	//composition at the time - it needs to gets synchronised later on!
 	ApplicationKey newAppKey;
+	
+	//added because multiple messages received from one broadcast
+	String lastContextName = "";
+	String lastContextValue = "";
 	
 	private ArrayList<LocationContext> locationContexts = new ArrayList<LocationContext>();
 	LocationContext locationContext;
@@ -184,7 +189,7 @@ public class ContextEngine extends Service {
 	public final IContextsDefinition.Stub contextsBinder = new IContextsDefinition.Stub() {
 		
 		public boolean registerContextPath(String path) {
-			return registerContextPath(path);
+			return registerContextPathI(path);
 		}
 		
 		public boolean registerApplicationKey(String key){
@@ -282,17 +287,19 @@ public class ContextEngine extends Service {
 						Log.d(LOG_TAG, "onReceive");
 					Bundle bundle = intent.getExtras();
 					
-					/*
-					show notification - just for testing
+					
+					//show notification - just for testing
 					String contextName = bundle
 							.getString(Component.CONTEXT_NAME);
 					String contextValue = bundle
 							.getString(Component.CONTEXT_INFORMATION);
-					ArrayList<String> appKey = bundle
-							.getStringArrayList(Component.CONTEXT_APPLICATION_KEY);
-					showNotification(contextName+ " "+contextvalue);
- */
-					sendBroadcastToApps(bundle);
+//					ArrayList<String> appKey = bundle
+//							.getStringArrayList(Component.CONTEXT_APPLICATION_KEY);
+					if (lastContextName.equals(contextName) && lastContextValue.equals(contextValue))
+						Log.v("value", "again the same msg");
+					else
+						showNotification(contextName+ " "+contextValue); 
+						//sendBroadcastToApps(bundle);
 				}
 			}
 
@@ -449,7 +456,7 @@ public class ContextEngine extends Service {
 		}
 	}
 	
-	public boolean registerContextPath(String path) {
+	public boolean registerContextPathI(String path) {
 		this.USER_CLASSPATH = path;
 		return true;
 	}
@@ -620,15 +627,26 @@ public class ContextEngine extends Service {
 			if (ac.contextName.equals(compositeName)){
 				ruledComponent = (CompositeComponent) ac;
 				ruledComponent.addAppKey(newAppKey);
-				
+				Log.d(LOG_TAG, "newAppKey" + newAppKey +" to "+ruledComponent.contextName );
 				//check all contexts  whether app key added:
-				for (Component c: ruledComponent.components)
-				{					
-					if (c.valuesSets.size()==1){
+				for (Component c: ruledComponent.components){
+					if (!c.existKey(newAppKey)){
 						c.addAppKey(newAppKey);
+						Log.d(LOG_TAG, "newAppKey" + newAppKey +" to "+c.contextName );
 					}
-						
+					if (c.contextName.equals("BatteryContext")){
+						c.componentDefined();
+						Log.d(LOG_TAG, "componentDefined BatteryContext");
+					}
 				}
+//				for (Component c: ruledComponent.components)
+//				{					
+//					if (c.valuesSets.size()==1){
+//						c.addAppKey(newAppKey);
+//						Log.d(LOG_TAG, "newAppKey" + newAppKey +" to "+c.contextName );
+//					}
+//						
+//				}
 					
 				setupContextMonitor();
 				ruledComponent.componentDefined();
@@ -660,8 +678,6 @@ public class ContextEngine extends Service {
 			locationServices.stop();
 			locationServices = null;
 		}
-		// Unregister all callbacks.
-		//mCallbacks.kill();
 
 		// Tell the user we stopped.
 		Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT)

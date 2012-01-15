@@ -39,15 +39,26 @@ public class BatteryContext extends MonitorComponent{
 //		this.addRange(0, 30, "LOW");
 //		this.addRange(31, 80, "MEDIUM");
 //		this.addRange(81, 200, "HIGH"); 
-		try{
-			this.valuesSets.remove(0);
-			this.valuesSets.add(new ContextValues());
-		}
-		catch (Exception e){
-			if (D) Log.e(LOG_TAG, "constructor - values sets problem");
-		}
-		this.contextInformation = obtainContextInformation();
+//		try{
+//			this.valuesSets.remove(0);
+//			this.valuesSets.add(new ContextValues());
+//		}
+//		catch (Exception e){
+//			if (D) Log.e(LOG_TAG, "constructor - values sets problem");
+//		}
+		//this.contextInformation = obtainContextInformation();
 	}	
+	
+	public void componentDefined(){
+		if (D) Log.d(LOG_TAG, "componentDefined " + contextName);
+		this.contextInformation = obtainContextInformation();
+//		if (valuesSets.size() == 2){			
+//			valuesSets.remove(0);
+//		}
+		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.size());
+		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.get(0).keys.size());
+		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.get(0).contextInformation);
+	}
 	
 	protected String obtainContextInformation(){
 		if (D) Log.d(LOG_TAG, "obtainContextInformation");
@@ -64,7 +75,7 @@ public class BatteryContext extends MonitorComponent{
 		//set as default
 		int v=50;
 		
-        return this.valuesSets.get(0).contextInformation;
+        return this.valuesSets.get(1).contextInformation;
 	}
 	
 	protected void checkContext(Bundle data) {

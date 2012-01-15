@@ -71,23 +71,5 @@ public class BluetoothContext extends MonitorComponent {
 				sendNotification(cv);
 		}
 		
-//		int bluetoothValue = bluetoothAdapter.getState();
-//		//send context information - 2nd approach
-//		if ((bluetoothValue == BluetoothAdapter.STATE_ON)&&(!contextInformation.equals("ON"))) {
-//			contextInformation = "ON";
-//			sendNotification();
-//		} 
-//		if ((bluetoothValue == BluetoothAdapter.STATE_OFF)&&(!contextInformation.equals("OFF"))) {
-//			contextInformation = "OFF";
-//			sendNotification();
-//		}	
-		
-//		if (bluetoothValue == BluetoothAdapter.STATE_ON) {
-//		sendNotification("bluetoothON", true);
-//		sendNotification("bluetoothOFF", false);
-//	} else {
-//		sendNotification("bluetoothON", false);
-//		sendNotification("bluetoothOFF", true);
-//	}
 	}
 }
