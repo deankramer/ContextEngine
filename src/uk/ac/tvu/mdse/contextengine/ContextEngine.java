@@ -86,6 +86,10 @@ public class ContextEngine extends Service {
 	
 	int defined = 0;
 	
+	//to test location only
+	boolean locationTested = true;
+	int j=0;
+	
 	//hold the info about running components
 	private ArrayList<Component> activeContexts = new ArrayList<Component>();
 	
@@ -103,14 +107,6 @@ public class ContextEngine extends Service {
 	private ArrayList<LocationContext> locationContexts = new ArrayList<LocationContext>();
 	LocationContext locationContext;
 	
-
-	/**
-	 * This is a list of callbacks that have been registered with the service.
-	 * Note that this is package scoped (instead of private) so that it can be
-	 * accessed more efficiently from inner classes.
-	 */
-	//final RemoteCallbackList<IRemoteServiceCallback> mCallbacks = new RemoteCallbackList<IRemoteServiceCallback>();
-
 	int mValue = 0;
 
 	// for notifications
@@ -237,16 +233,6 @@ public class ContextEngine extends Service {
 		public boolean startComposite(String compositeName) throws RemoteException {
 			return compositeReady(compositeName);
 		}
-
-//		public void registerCallback(IRemoteServiceCallback cb) {
-//			if (cb != null)
-//				mCallbacks.register(cb);
-//		}
-//
-//		public void unregisterCallback(IRemoteServiceCallback cb) {
-//			if (cb != null)
-//				mCallbacks.unregister(cb);
-//		}
 
 		public void setupContexts(String path) throws RemoteException {
 			runXML(path);
@@ -532,7 +518,19 @@ public class ContextEngine extends Service {
 			for (Component ac: activeContexts){
 				if (ac.contextName.equals(componentName))
 					ac.addSpecificContextValue(newAppKey, contextValue, Double.valueOf(numericData1), Double.valueOf(numericData2));	
-			}		
+			}	
+			
+			if (locationTested){
+				j++;
+				if (j==4){
+					for (Component ac: activeContexts){
+						if (ac.contextName.equals("LocationContextTest"))
+							ac.onLocationChangedManually(11.00, 11.00);
+						Log.d(LOG_TAG, "onLocationChangedManually");
+					}
+				}
+			}
+				
 		}catch(Exception e){
 			Log.e(LOG_TAG, e.getLocalizedMessage());
 		}

@@ -101,35 +101,7 @@ public class Component implements Serializable {
 		if (D) Log.d(LOG_TAG, "getContextValue");
 		return contextValue;
 	}
-	
-//	public String getContextInformation(){
-//		if (D) Log.d(LOG_TAG, "getContextInformation");
-//		
-//		if (contextInformation.trim().equals("") || contextInformation == null){
-//			for (ContextValues cv: valuesSets){
-//				if (valuesSets.size()==1)
-//					contextInformation = valuesSets.get(0).contextInformation;
-//			}
-//		}
-//		return contextInformation;
-//	}
-	
-	//if a call from composite context
-//	public String getContextInformation(ApplicationKey appKey){
-//		if (D) Log.d(LOG_TAG, "getContextInformation");
-//		String contextInfo="";
-//		//if (contextInformation.trim().equals("") || contextInformation == null){
-//			for (ContextValues cv: valuesSets){
-//				if (cv.keys.contains(appKey)){
-//					contextInfo = cv.contextInformation;
-//					if (D) Log.v(LOG_TAG, "contextname:"+contextName);
-//					if (D) Log.v(LOG_TAG, "getContextInformation:"+contextInfo);
-//				}
-//			}
-//		//}
-//		return contextInfo;
-//	}
-	
+		
 	//if a call from composite context
 		public String getContextInformation(String appKey){
 			if (D) Log.d(LOG_TAG, "getContextInformation");
@@ -264,16 +236,6 @@ public class Component implements Serializable {
 	public void addRange(ApplicationKey appKey, Integer minValue,
 			Integer maxValue, String newContextValue) {
 		if (D) Log.d(LOG_TAG, "addRange");
-//		try{
-//			if (valuesSets.size()==1 && valuesSets.get(0).keys.isEmpty()){
-//				valuesSets.get(0).keys.add(appKey);
-//				if (D) Log.d(LOG_TAG, "addRange+valueset size" + String.valueOf(valuesSets.size()));
-//				if (D) Log.d(LOG_TAG, "addRange keys size"+valuesSets.get(0).keys.size());
-//			}
-//		}
-//		catch (Exception ex){
-//			if (D) Log.e(LOG_TAG, "problem adding range");			
-//		}
 		boolean keyExists = false;
 		if (D) Log.d(LOG_TAG, "values sets size:"+valuesSets.size());
 		if (D) Log.d(LOG_TAG, "values set 0 keys size:"+valuesSets.get(0).keys.size());
@@ -284,7 +246,6 @@ public class Component implements Serializable {
 				keyExists = true;
 				if (D) Log.d(LOG_TAG, "addSpecificContextValue true key exist");
 			}
-				//if (D) Log.d(LOG_TAG, "addRange+context info:" + cv.contextInformation + " " + cv.keys.get(0).key);
 		}
 		if (!keyExists){
 			ContextValues newSet = new ContextValues();			
@@ -322,7 +283,39 @@ public class Component implements Serializable {
 	public void stop() {	
 		if (D) Log.d(LOG_TAG, "stop");
 	}
+	
+	public void onLocationChangedManually(Double latitude, Double longitude) {
+	
+	}
 }
+
+//public String getContextInformation(){
+//if (D) Log.d(LOG_TAG, "getContextInformation");
+//
+//if (contextInformation.trim().equals("") || contextInformation == null){
+//	for (ContextValues cv: valuesSets){
+//		if (valuesSets.size()==1)
+//			contextInformation = valuesSets.get(0).contextInformation;
+//	}
+//}
+//return contextInformation;
+//}
+
+//if a call from composite context
+//public String getContextInformation(ApplicationKey appKey){
+//if (D) Log.d(LOG_TAG, "getContextInformation");
+//String contextInfo="";
+////if (contextInformation.trim().equals("") || contextInformation == null){
+//	for (ContextValues cv: valuesSets){
+//		if (cv.keys.contains(appKey)){
+//			contextInfo = cv.contextInformation;
+//			if (D) Log.v(LOG_TAG, "contextname:"+contextName);
+//			if (D) Log.v(LOG_TAG, "getContextInformation:"+contextInfo);
+//		}
+//	}
+////}
+//return contextInfo;
+//}
 	
 //public void sendNotification(){
 //sendNotification(contextName, contextValue);

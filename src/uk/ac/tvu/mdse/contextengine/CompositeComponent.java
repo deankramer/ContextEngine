@@ -64,11 +64,10 @@ public class CompositeComponent extends Component implements Serializable {
 	
 	public void componentDefined(){
 		if (D) Log.d(LOG_TAG, "componentDefined " + contextName);
-		if (valuesSets.size() == 2){
-			ContextValues contextValues = new ContextValues();
-			contextValues = valuesSets.get(1);
-			valuesSets.add(0, contextValues);
-			valuesSets.add(1, null);
+		//in case that a new set of values has been defined
+		//remove the default values set:ON,OFF
+		if (valuesSets.size() == 2){			
+			valuesSets.remove(0);
 		}
 		if (D) Log.d(LOG_TAG, "componentDefined cv " + contextName);
 		setupMonitor();
@@ -105,12 +104,17 @@ public class CompositeComponent extends Component implements Serializable {
 		if (!compositeContextValue.equals(this.contextInformation))	{		//((compositeContextValue.equals(null)||compositeContextValue.equals(this.contextInformation)))){
 			if (D) Log.d(LOG_TAG, "compositeContextValue  this.contextInformation diff"+contextName);
 			this.contextInformation = compositeContextValue;
+			if (D) Log.d(LOG_TAG, "cv size"+valuesSets.size());
+			if (D) Log.d(LOG_TAG, "cv"+valuesSets.get(0).valuesSet.get(0));
 			for (ContextValues cv: this.valuesSets){
-    			if (cv.setNewContextInformation(compositeContextValue))
-    				sendNotification(cv);
+				for (ApplicationKey ak: cv.keys){
+					if (ak.key.equals(broadcastedKeys.get(0))){
+						if (cv.setNewContextInformation(compositeContextValue))
+								sendNotification(cv);
+					}
+				}
     		}
-			Log.d(LOG_TAG,"checkContext: "+ contextName + " i: "+ contextInformation);
-			//sendNotification(this.contextName,this.contextInformation,getKeysList());
+			
 			if (D) Log.d(LOG_TAG, "sendNotification command "+contextName);
 		}			
 	}
@@ -152,16 +156,7 @@ public class CompositeComponent extends Component implements Serializable {
 		if (D) Log.d(LOG_TAG, "fireRules "+contextName);		
 		String[] componentContexts = new String[components.size()];
 		Log.d("fireRules", String.valueOf(componentContexts.length));
-		//for each application key check value
-//		for(ApplicationKey appKey: keys){
-//			int i =0;
-//			for (Component c: components){
-//				componentContexts[i] = c.getContextInformation(appKey);			
-//				Log.d(LOG_TAG, "fireRules" +  componentContexts[i]);
-//				i++;
-//			}
-//		}
-		//ApplicationKey appKey = new ApplicationKey(broadcastedKeys.get(0));			
+			
 		int i =0;
 		for (Component c: components){
 			componentContexts[i] = c.getContextInformation(broadcastedKeys.get(0));			
@@ -178,10 +173,7 @@ public class CompositeComponent extends Component implements Serializable {
 					Log.d(LOG_TAG, "fireRules" +  thenStatement);
 			}
 		}
-		
-//		if(thenStatement.equals(null)||thenStatement.trim().equals(""))
-//			return "default";
-//		else
+
 		Log.d(LOG_TAG, "fireRules" +  thenStatement);
 			return thenStatement;
 	}
@@ -226,10 +218,6 @@ public class CompositeComponent extends Component implements Serializable {
 		if (D) Log.d(LOG_TAG, "getComponentsNo");
 		return this.components.size();
 	}
-	
-//	public void addAppKey(ApplicationKey appKey){
-//		keys.add(appKey);
-//	}
 	
 	public String[] getKeysList(){
 		if (D) Log.d(LOG_TAG, "getKeysList");
