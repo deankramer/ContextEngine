@@ -19,7 +19,7 @@ package uk.ac.tvu.mdse.contextengine;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import uk.ac.tvu.mdse.contextengine.highLevelContext.ContextRange;
+
 import uk.ac.tvu.mdse.contextengine.reasoning.ApplicationKey;
 import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import android.content.BroadcastReceiver;
@@ -233,8 +233,8 @@ public class Component implements Serializable {
 		}
 	}	
 	
-	public void addRange(ApplicationKey appKey, Integer minValue,
-			Integer maxValue, String newContextValue) {
+	public void addRange(ApplicationKey appKey, long minValue,
+			long maxValue, String newContextValue) {
 		if (D) Log.d(LOG_TAG, "addRange");
 		boolean keyExists = false;
 		if (D) Log.d(LOG_TAG, "values sets size:"+valuesSets.size());

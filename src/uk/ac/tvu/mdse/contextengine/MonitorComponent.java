@@ -16,7 +16,6 @@
 
 package uk.ac.tvu.mdse.contextengine;
 
-import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

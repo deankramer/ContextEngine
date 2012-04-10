@@ -18,7 +18,6 @@ package uk.ac.tvu.mdse.contextengine.reasoning;
 
 import java.util.ArrayList;
 
-import android.location.Location;
 import android.util.Log;
 
 import uk.ac.tvu.mdse.contextengine.highLevelContext.ContextRange;
@@ -78,7 +77,7 @@ public class ContextValues {
 			return false;
 	}
 	
-	public boolean setNewContextValue(int newContextValue){
+	public boolean setNewContextValue(long newContextValue){
 		if (D) Log.d(LOG_TAG, "setNewContextValue");
 		boolean newInformation = false;
 		
@@ -89,7 +88,7 @@ public class ContextValues {
 		return newInformation;					
 	}
 
-	public boolean addRange(int minValue, int maxValue, String contextValue){		
+	public boolean addRange(long minValue, long maxValue, String contextValue){		
 		if (D) Log.d(LOG_TAG, "addRange");
 		if (checkRange(contextValue))
 			return false;

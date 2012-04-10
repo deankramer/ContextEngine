@@ -41,7 +41,6 @@ import uk.ac.tvu.mdse.contextengine.db.ContextDB;
 import uk.ac.tvu.mdse.contextengine.db.ContextDBSQLite;
 import uk.ac.tvu.mdse.contextengine.parser.ParserHandler;
 import uk.ac.tvu.mdse.contextengine.reasoning.ApplicationKey;
-import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
 import uk.ac.tvu.mdse.contextengine.test.TestActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -547,7 +546,7 @@ public class ContextEngine extends Service {
 		}		
 		Log.d(LOG_TAG, "addRange" +  componentName);
 		if (component!=null)
-			component.addRange(newAppKey, Integer.valueOf(minValue), Integer.valueOf(maxValue), contextValue);
+			component.addRange(newAppKey, Long.parseLong(minValue), Long.parseLong(maxValue), contextValue);
 	}
 	
 	public boolean addComposite(String compositeName){
