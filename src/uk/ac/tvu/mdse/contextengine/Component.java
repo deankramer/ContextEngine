@@ -45,7 +45,6 @@ public class Component implements Serializable {
 	// Key names for context change
 	public static final String CONTEXT_NAME = "context_name";
 	public static final String CONTEXT_DATE = "context_date";
-	public static final String CONTEXT_VALUE = "context_value";
 	public static final String CONTEXT_INFORMATION = "context_information";
 	
 	//a number of context values sets can be specified for each context
@@ -61,7 +60,6 @@ public class Component implements Serializable {
 	public int contextId;
 	
 	public String contextName;
-	public boolean contextValue;
 	public Calendar contextDate;
 	public String contextInformation;
 	
@@ -72,7 +70,6 @@ public class Component implements Serializable {
 		if (D) Log.d(LOG_TAG, "constructor");
 		context = c;
 		contextName = name;
-		contextValue = false;	
 		valuesSets.add(new ContextValues(values));
 		valuesSets.get(0).contextInformation = "OFF";
 	}
@@ -85,7 +82,6 @@ public class Component implements Serializable {
 		intent.setAction(CONTEXT_INTENT);
 		intent.putExtra(CONTEXT_NAME, contextName);
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_VALUE, contextValue);
 		intent.putExtra(CONTEXT_INFORMATION, contextValues.contextInformation);
 		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues).contextInformation:" +contextValues.contextInformation);
 		intent.putExtra(CONTEXT_APPLICATION_KEY, contextValues.getKeysList());
@@ -95,11 +91,6 @@ public class Component implements Serializable {
 		} catch (Exception e) {
 			Log.e(contextName, "not working");
 		}
-	}
-
-	public boolean getContextValue(){
-		if (D) Log.d(LOG_TAG, "getContextValue");
-		return contextValue;
 	}
 		
 	//if a call from composite context
@@ -119,14 +110,7 @@ public class Component implements Serializable {
 			//}
 			return contextInfo;
 		}
-	
-
-//	public String getContextInformation(double v) {
-//		if (D) Log.d(LOG_TAG, "getContextInformation(v)");
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-	
+		
 	//re-implement if context value depends on some values
 	protected void checkContext(Bundle data) {
 		if (D) Log.d(LOG_TAG, "checkContext");
@@ -288,110 +272,3 @@ public class Component implements Serializable {
 	
 	}
 }
-
-//public String getContextInformation(){
-//if (D) Log.d(LOG_TAG, "getContextInformation");
-//
-//if (contextInformation.trim().equals("") || contextInformation == null){
-//	for (ContextValues cv: valuesSets){
-//		if (valuesSets.size()==1)
-//			contextInformation = valuesSets.get(0).contextInformation;
-//	}
-//}
-//return contextInformation;
-//}
-
-//if a call from composite context
-//public String getContextInformation(ApplicationKey appKey){
-//if (D) Log.d(LOG_TAG, "getContextInformation");
-//String contextInfo="";
-////if (contextInformation.trim().equals("") || contextInformation == null){
-//	for (ContextValues cv: valuesSets){
-//		if (cv.keys.contains(appKey)){
-//			contextInfo = cv.contextInformation;
-//			if (D) Log.v(LOG_TAG, "contextname:"+contextName);
-//			if (D) Log.v(LOG_TAG, "getContextInformation:"+contextInfo);
-//		}
-//	}
-////}
-//return contextInfo;
-//}
-	
-//public void sendNotification(){
-//sendNotification(contextName, contextValue);
-//}
-//
-//public void sendNotification(boolean value) {
-//sendNotification(contextName, value);
-//}
-//
-//public void sendNotification(String name, boolean value) {
-//if (D) Log.d(LOG_TAG, "sendNotification(name,value)");
-//Intent intent = new Intent();
-//
-//intent.setAction(CONTEXT_INTENT);
-//intent.putExtra(CONTEXT_NAME, name);
-//intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-//intent.putExtra(CONTEXT_VALUE, value);
-//intent.putExtra(CONTEXT_INFORMATION, contextInformation);
-//try {
-//	context.sendBroadcast(intent);
-//} catch (Exception e) {
-//	Log.e(contextName, "not working");
-//}
-//}	
-//
-//public void sendNotification(String name, String contextInformation, String[] keys) {
-//if (D) Log.d(LOG_TAG, "sendNotification(name,contextInformation,keys)");
-//Intent intent = new Intent();
-//
-//intent.setAction(CONTEXT_INTENT);
-//intent.putExtra(CONTEXT_NAME, name);
-//intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-//intent.putExtra(CONTEXT_VALUE, contextValue);
-//intent.putExtra(CONTEXT_INFORMATION, contextInformation);
-//intent.putExtra(CONTEXT_APPLICATION_KEY, keys);
-//if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist0:"+keys);
-//
-//try {
-//	context.sendBroadcast(intent);
-//} catch (Exception e) {
-//	Log.e(contextName, "not working");
-//}
-//}
-//
-//public void sendNotification(String[] contextInformation, String[] keys) {
-//if (D) Log.d(LOG_TAG, "sendNotification(contextInformation,keys)");
-//Intent intent = new Intent();
-//
-//intent.setAction(CONTEXT_INTENT);
-//intent.putExtra(CONTEXT_NAME, contextName);
-//intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-//intent.putExtra(CONTEXT_VALUE, contextValue);
-//intent.putExtra(CONTEXT_INFORMATION, contextInformation);
-//intent.putExtra(CONTEXT_APPLICATION_KEY, keys);
-//if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist0:"+keys);
-//
-//try {
-//	context.sendBroadcast(intent);
-//} catch (Exception e) {
-//	Log.e(contextName, "not working");
-//}
-//}
-//
-//public void sendNotification(String name, String contextInformation) {
-//if (D) Log.d(LOG_TAG, "sendNotification(name,contextInformation)");
-//Intent intent = new Intent();
-//
-//intent.setAction(CONTEXT_INTENT);
-//intent.putExtra(CONTEXT_NAME, name);
-//intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-//intent.putExtra(CONTEXT_VALUE, contextValue);
-//intent.putExtra(CONTEXT_INFORMATION, contextInformation);
-//
-//try {
-//	context.sendBroadcast(intent);
-//} catch (Exception e) {
-//	Log.e(contextName, "not working");
-//}
-//}

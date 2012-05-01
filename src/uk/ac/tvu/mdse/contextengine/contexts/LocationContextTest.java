@@ -53,8 +53,7 @@ public class LocationContextTest extends Component implements LocationListener{
 
 	public LocationContextTest(Context c) {		
 		super("LocationContextTest", c);		
-		valuesSets.remove(0);
-//		this.contextValue = false;				
+		valuesSets.remove(0);			
 //		
 //		locationManager = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
 //	    
@@ -152,7 +151,6 @@ public class LocationContextTest extends Component implements LocationListener{
 		intent.setAction(CONTEXT_INTENT);
 		intent.putExtra(CONTEXT_NAME, contextName);
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_VALUE, contextValue);
 		intent.putExtra(CONTEXT_INFORMATION, nearbys.get(0));
 		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues).contextInformation:" +nearbys.get(0));
 		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues).contextInformation:" +nearbys.get(1));

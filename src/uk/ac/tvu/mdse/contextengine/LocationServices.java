@@ -18,7 +18,7 @@ package uk.ac.tvu.mdse.contextengine;
 
 import java.util.ArrayList;
 
-import uk.ac.tvu.mdse.contextengine.contexts.LocationContext;
+import uk.ac.tvu.mdse.contextengine.contexts.LocationContextTest;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -45,7 +45,7 @@ public class LocationServices implements LocationListener{
 		private int minTime = 3000; //in milliseconds
 		private int minDistance = 1000; //in meters	
 		
-		private ArrayList<LocationContext> locationContexts = new ArrayList<LocationContext>();
+		private ArrayList<LocationContextTest> locationContexts = new ArrayList<LocationContextTest>();
 
 		public LocationServices(Context c) {
 			if (D) Log.d(LOG_TAG, "constructor");
@@ -87,7 +87,7 @@ public class LocationServices implements LocationListener{
 			}
 		}
 		
-		public void addLocationContext(LocationContext locationContext){
+		public void addLocationContext(LocationContextTest locationContext){
 			if (D) Log.d(LOG_TAG, "addLocationContext");
 			locationContexts.add(locationContext);
 		}
@@ -99,7 +99,7 @@ public class LocationServices implements LocationListener{
 		
 		public void onLocationChanged(Location locale) {
 			if (D) Log.d(LOG_TAG, "onLocationChanged");
-			for (LocationContext locationContext:locationContexts){
+			for (LocationContextTest locationContext:locationContexts){
 				locationContext.onLocationChanged(locale);
 			}			
 			this.location = locale;

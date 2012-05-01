@@ -47,7 +47,7 @@ public class ContextDBSQLite implements ContextDB {
 			initialValues.put("name", c.contextName);
 			initialValues.put("lastDateTime", c.getDateTimeString());
 			// initialValues.put("count", c.count);
-			initialValues.put("value", Boolean.toString(c.contextValue));
+			//initialValues.put("value", Boolean.toString(c.contextValue));
 
 			sqlite.insert("contexts", null, initialValues);
 			sqlite.close();
@@ -76,7 +76,7 @@ public class ContextDBSQLite implements ContextDB {
 				cdate.setTime(dateFormat.parse(crsr.getString(2)));
 				component.contextDate = cdate;
 				// context.count = crsr.getInt(3);
-				component.contextValue = Boolean.getBoolean(crsr.getString(4));
+				//component.contextValue = Boolean.getBoolean(crsr.getString(4));
 				crsr.moveToNext();
 			}
 			crsr.close();
@@ -126,7 +126,7 @@ public class ContextDBSQLite implements ContextDB {
 			initialValues.put("name", c.contextName);
 			initialValues.put("lastDateTime", c.getDateTimeString());
 			// initialValues.put("count", c.count);
-			initialValues.put("value", Boolean.toString(c.contextValue));
+			//initialValues.put("value", Boolean.toString(c.contextValue));
 
 			sqlite.update("contexts", initialValues, "_id=?",
 					new String[] { Integer.toString(c.contextId) });
@@ -154,7 +154,7 @@ public class ContextDBSQLite implements ContextDB {
 	        	Calendar cdate = Calendar.getInstance();
 	        	cdate.setTime(dateFormat.parse(crsr.getString(2)));
 	        	contextComponent.contextDate=cdate;
-	        	contextComponent.contextValue=Boolean.valueOf(crsr.getString(3));
+	        	//contextComponent.contextValue=Boolean.valueOf(crsr.getString(3));
 	        	contexts.add(contextComponent);
 	        	crsr.moveToNext();
 			}

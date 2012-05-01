@@ -36,7 +36,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import uk.ac.tvu.mdse.contextengine.contexts.LocationContext;
+import uk.ac.tvu.mdse.contextengine.contexts.LocationContextTest;
 import uk.ac.tvu.mdse.contextengine.db.ContextDB;
 import uk.ac.tvu.mdse.contextengine.db.ContextDBSQLite;
 import uk.ac.tvu.mdse.contextengine.parser.ParserHandler;
@@ -103,8 +103,8 @@ public class ContextEngine extends Service {
 	String lastContextName = "";
 	String lastContextValue = "";
 	
-	private ArrayList<LocationContext> locationContexts = new ArrayList<LocationContext>();
-	LocationContext locationContext;
+	private ArrayList<LocationContextTest> locationContexts = new ArrayList<LocationContextTest>();
+	LocationContextTest locationContext;
 	
 	int mValue = 0;
 

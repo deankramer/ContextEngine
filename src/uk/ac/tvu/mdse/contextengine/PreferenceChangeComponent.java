@@ -99,7 +99,7 @@ public class PreferenceChangeComponent extends Component implements
 		intent.setAction(CONTEXT_INTENT);
 		intent.putExtra(CONTEXT_NAME, contextName);
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_VALUE, preferenceValue);
+		intent.putExtra(CONTEXT_INFORMATION, preferenceValue);
 		try {
 			context.sendBroadcast(intent);
 		} catch (Exception e) {
