@@ -69,7 +69,6 @@ public class ContextEngine extends Service {
 	public static final String CONTEXT_INFORMATION = "context_information";
 	public static final String CONTEXT_NAME = "context_name";
 	public static final String CONTEXT_DATE = "context_date";
-	public static final String CONTEXT_VALUE = "context_value";
 	public static final String CONTEXT_APPLICATION_KEY = "context_application_key";	
 	public static final String DEFAULT_CLASSPATH = "uk.ac.tvu.mdse.contextengine.contexts.";
 	public String USER_CLASSPATH = null;
