@@ -38,9 +38,9 @@ public class BluetoothContext extends MonitorComponent {
 		super("BluetoothContext", c, "android.bluetooth.adapter.action.STATE_CHANGED", "bluetoothAdapter.getState()" );
 		if (D) Log.d(LOG_TAG, "constructor");
 		this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		this.contextInformation = obtainContextInformation();
+//		this.contextInformation = obtainContextInformation();
 		//this.contextInformation = "ON";
-		Log.d("BluetoothContext", this.contextInformation);
+//		Log.d("BluetoothContext", this.contextInformation);
 	}
 	
 	protected String obtainContextInformation(){

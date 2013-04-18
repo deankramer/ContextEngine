@@ -23,6 +23,7 @@ public class Rule {
 	public static final String LOG_TAG = "Rule";
 	public static final boolean D = true;
 
+	
 	public String[] ifCondition;
 	public String thenStatement;
 	

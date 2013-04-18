@@ -55,6 +55,7 @@ public class ContextValues {
 		for (String newValue: values)
 			addValue(newValue);
 		keys.add(key);
+		this.contextInformation = values[0];
 	}
 	
 	public ContextValues(ApplicationKey key){
@@ -145,6 +146,8 @@ public class ContextValues {
 			return false;
 		else {
 			valuesSet.add(contextValue);
+			this.contextInformation = contextValue;
+			if (D) Log.d(LOG_TAG, "addValue added" + contextValue);
 			return true;
 		}		
 	}
@@ -169,21 +172,9 @@ public class ContextValues {
 	public ArrayList<String> getKeysList(){
 		if (D) Log.d(LOG_TAG, "getKeysList");
 		ArrayList<String> keysList = new ArrayList<String>();		
-//		for (ApplicationKey appKey: keys){
-//			keysList.add(appKey.key);			
-//		}
-		keysList.add("1111");
+		for (ApplicationKey appKey: keys){
+			keysList.add(appKey.key);			
+		}
 		return keysList;
 	}
-	
-//	public String[] getKeysList(){
-//		if (D) Log.d(LOG_TAG, "getKeysList");
-//		String[] keysList = new String[keys.size()];
-//		int i=0;
-//		for (ApplicationKey appKey: keys){
-//			keysList[i] = appKey.key;
-//			i++;
-//		}
-//		return keysList;
-//	}
 }

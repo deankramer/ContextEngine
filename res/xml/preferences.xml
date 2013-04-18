@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory android:title="Test">
+    <ListPreference android:entryValues="@array/reviewsNo" android:key="NoOfReviewsUP" android:title="NoOfReviewsUP" android:entries="@array/reviewsNo"/>
+    <ListPreference android:entryValues="@array/ratings" android:key="RatingUP" android:title="RatingUP" android:entries="@array/ratings"/>
+    <ListPreference android:entryValues="@array/atwork" android:key="AtWork" android:title="AtWork" android:entries="@array/atwork"/>
+    <ListPreference android:entryValues="@array/status" android:key="Status" android:title="Status" android:entries="@array/status"/>
+    <ListPreference android:entryValues="@array/locations" android:key="Location" android:title="Location" android:entries="@array/locations"/>
+    <ListPreference android:entryValues="@array/values" android:key="BluetoothContext" android:title="BluetoothContext" android:entries="@array/values"/>
+    <ListPreference android:entryValues="@array/values" android:key="WifiContext" android:title="WifiContext" android:entries="@array/values"/>
+    <ListPreference android:entryValues="@array/batteryvalues" android:key="BatteryContext" android:title="BatteryContext" android:entries="@array/batteryvalues"/>
+</PreferenceCategory>
+
 <PreferenceCategory android:title="Password Preferences">
 <EditTextPreference android:summary="Please maintain your password" android:key="password" android:title="Password"></EditTextPreference>
 <CheckBoxPreference android:title="Remember password" android:key="remember_pwd" android:summary="Please indicate if password is remembered" android:defaultValue="false"></CheckBoxPreference>

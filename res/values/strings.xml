@@ -35,4 +35,37 @@
 		<item>SMS</item>
 		<item>Network</item>
 	</string-array>
+	<string-array name="reviewsNo">
+		<item >1</item>
+		<item >2</item>
+		<item >3</item>
+	</string-array>
+	<string-array name="ratings">
+		<item >1</item>
+		<item >2</item>
+		<item >3</item>
+		<item >4</item>
+	</string-array>
+	<string-array name="atwork">
+		<item >YES</item>
+		<item >NO</item>
+	</string-array>
+	<string-array name="status">
+		<item >AVAILABLE</item>
+		<item >BUSY</item>
+	</string-array>
+	<string-array name="locations">
+		<item >Building1</item>
+		<item >Building2</item>
+		<item >Building3</item>
+	</string-array>
+	<string-array name="values">
+		<item >ON</item>
+		<item >OFF</item>
+	</string-array>
+	<string-array name="batteryvalues">
+		<item >LOW</item>
+		<item >MEDIUM</item>
+		<item >HIGH</item>
+	</string-array>
 </resources>

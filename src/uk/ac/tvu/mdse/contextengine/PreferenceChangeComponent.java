@@ -18,6 +18,8 @@ package uk.ac.tvu.mdse.contextengine;
 
 import java.util.Calendar;
 
+import uk.ac.tvu.mdse.contextengine.reasoning.ContextValues;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,6 +50,21 @@ public class PreferenceChangeComponent extends Component implements
 		sharedPreferences = sp;
 		prefType = prefT;
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+		contextInformation = "unknown";
+	}
+
+	public PreferenceChangeComponent(SharedPreferences sp, String pref, String prefT, Context c) {
+		super(pref, c);
+		if (D) Log.d(LOG_TAG, "constructor2");
+		// might be option to work just with one preference a time, or register
+		// a number of preferences
+		preference = pref;
+		sharedPreferences = sp;	
+		prefType = PreferenceType.valueOf(prefT);
+		if (D) Log.d(LOG_TAG, "constructor2 prefType:"+prefType.toString());
+		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+		if (D) Log.d(LOG_TAG, "constructor2 ok");
+		contextInformation = "unknown";
 	}
 
 	public PreferenceChangeComponent(SharedPreferences pm, Context c) {
@@ -55,14 +72,8 @@ public class PreferenceChangeComponent extends Component implements
 		if (D) Log.d(LOG_TAG, "constructor2");
 		sharedPreferences = pm;
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+		contextInformation = "unknown";
 	}
-
-//	public boolean onPreferenceChange(Preference preference, Object newValue) {
-//		if (D) Log.v(LOG_TAG, "onPreferenceChange");
-//		preferenceValue = newValue.toString();
-//		sendNotification();
-//		return true;
-//	}
 
 	public void stop() {
 		sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
@@ -73,37 +84,32 @@ public class PreferenceChangeComponent extends Component implements
 		if (D) Log.v(LOG_TAG, "onSharedPreferenceChanged");
 		if (preference.equals(arg1)){
 			switch (prefType){
-			case BOOLEAN:
+			case BOOLEAN:				
 				preferenceValue = String.valueOf(arg0.getBoolean(arg1, true));
-				sendNotification(preferenceValue);
+				if (D) Log.v(LOG_TAG, "preferencetype BOOLEAN" + preferenceValue);
+				checkContext(preferenceValue);
 				break;
-			case STRING:
+			case STRING:				
 				preferenceValue = arg0.getString(arg1, "none");
-				sendNotification(preferenceValue);
+				if (D) Log.v(LOG_TAG, "preferencetype STRING" + preferenceValue);
+				checkContext(preferenceValue);
 				break;
-			case INT:
+			case INT:				
 				preferenceValue = String.valueOf(arg0.getInt(arg1, 0));
-				sendNotification(preferenceValue);
+				if (D) Log.v(LOG_TAG, "preferencetype INT" + preferenceValue);
+				checkContext(preferenceValue);
 				break;
 			default:
 				preferenceValue = "none";
-				sendNotification(preferenceValue);
+				checkContext(preferenceValue);
 			}			
 		}			
 	}
 	
-	public void sendNotification(String preferenceValue) {
-		if (D) Log.v(LOG_TAG, "sendNotification");
-		Intent intent = new Intent();
-
-		intent.setAction(CONTEXT_INTENT);
-		intent.putExtra(CONTEXT_NAME, contextName);
-		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_INFORMATION, preferenceValue);
-		try {
-			context.sendBroadcast(intent);
-		} catch (Exception e) {
-			Log.e(contextName, "not working");
+	public void checkContext(String preferenceValue){
+		for (ContextValues cv: this.valuesSets){
+			if (cv.setNewContextInformation(preferenceValue))
+				sendNotification(cv);
 		}
 	}
 }

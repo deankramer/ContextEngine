@@ -36,29 +36,18 @@ public class BatteryContext extends MonitorComponent{
 	public BatteryContext(Context c) {
 		super("BatteryContext", c, "Intent.ACTION_BATTERY_CHANGED", "BatteryManager.EXTRA_STATUS");	
 		if (D) Log.d(LOG_TAG, "constructor");
-//		this.addRange(0, 30, "LOW");
-//		this.addRange(31, 80, "MEDIUM");
-//		this.addRange(81, 200, "HIGH"); 
-//		try{
-//			this.valuesSets.remove(0);
-//			this.valuesSets.add(new ContextValues());
-//		}
-//		catch (Exception e){
-//			if (D) Log.e(LOG_TAG, "constructor - values sets problem");
-//		}
-		//this.contextInformation = obtainContextInformation();
 	}	
 	
-	public void componentDefined(){
-		if (D) Log.d(LOG_TAG, "componentDefined " + contextName);
-		this.contextInformation = obtainContextInformation();
-//		if (valuesSets.size() == 2){			
-//			valuesSets.remove(0);
-//		}
-		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.size());
-		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.get(0).keys.size());
-		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.get(0).contextInformation);
-	}
+//	public void componentDefined(){
+//		if (D) Log.d(LOG_TAG, "componentDefined " + contextName);
+//		this.contextInformation = obtainContextInformation();
+////		if (valuesSets.size() == 2){			
+////			valuesSets.remove(0);
+////		}
+//		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.size());
+//		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.get(0).keys.size());
+//		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.get(0).contextInformation);
+//	}
 	
 	protected String obtainContextInformation(){
 		if (D) Log.d(LOG_TAG, "obtainContextInformation");

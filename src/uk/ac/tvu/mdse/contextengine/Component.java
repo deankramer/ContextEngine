@@ -70,8 +70,8 @@ public class Component implements Serializable {
 		if (D) Log.d(LOG_TAG, "constructor");
 		context = c;
 		contextName = name;
-		valuesSets.add(new ContextValues(values));
-		valuesSets.get(0).contextInformation = "OFF";
+//		valuesSets.add(new ContextValues(values));
+//		valuesSets.get(0).contextInformation = "OFF";
 	}
 	
 	//send notification for particular context values and application keys set
@@ -82,10 +82,18 @@ public class Component implements Serializable {
 		intent.setAction(CONTEXT_INTENT);
 		intent.putExtra(CONTEXT_NAME, contextName);
 		intent.putExtra(CONTEXT_DATE, Calendar.getInstance().toString());
-		intent.putExtra(CONTEXT_INFORMATION, contextValues.contextInformation);
+		intent.putExtra(CONTEXT_INFORMATION, contextValues.contextInformation);		
 		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues).contextInformation:" +contextValues.contextInformation);
-		intent.putExtra(CONTEXT_APPLICATION_KEY, contextValues.getKeysList());
-		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist0:"+contextValues.getKeysList());
+		
+		//build a list of app keys
+		String appKeys = "";
+		for (String key: contextValues.getKeysList()){
+			if (!appKeys.equals(""))
+				appKeys.concat(",");
+			appKeys = appKeys + key;			
+		}
+		intent.putExtra(CONTEXT_APPLICATION_KEY, appKeys);
+		if (D) Log.d(LOG_TAG, "sendNotification(ContextValues)-keylist:"+contextValues.getKeysList().size() + " "+appKeys);
 		try {
 			context.sendBroadcast(intent);
 		} catch (Exception e) {
@@ -189,8 +197,7 @@ public class Component implements Serializable {
 			}
 		}		
 		if (!keyExists){
-			ContextValues newSet = new ContextValues();			
-			newSet.keys.add(appKey);
+			ContextValues newSet = new ContextValues(appKey);				
 			newSet.valuesSet.add(newContextValue);
 			valuesSets.add(newSet);
 			if (D) Log.d(LOG_TAG, "addSpecificContextValue false key exist");
@@ -261,7 +268,12 @@ public class Component implements Serializable {
 		return false;				
 	}
 		
-	public void componentDefined(){
+	public void componentDefined(ApplicationKey appKey){
+		for (ContextValues cv: valuesSets){
+			if (cv.keys.contains(appKey)){				
+				cv.contextInformation = cv.valuesSet.get(0);
+			}
+		}
 	}
 	
 	public void stop() {	

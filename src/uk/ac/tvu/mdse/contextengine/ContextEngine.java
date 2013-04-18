@@ -39,6 +39,7 @@ import org.xml.sax.XMLReader;
 import uk.ac.tvu.mdse.contextengine.contexts.LocationContextTest;
 import uk.ac.tvu.mdse.contextengine.db.ContextDB;
 import uk.ac.tvu.mdse.contextengine.db.ContextDBSQLite;
+import uk.ac.tvu.mdse.contextengine.parser.ContextsParser;
 import uk.ac.tvu.mdse.contextengine.parser.ParserHandler;
 import uk.ac.tvu.mdse.contextengine.reasoning.ApplicationKey;
 import uk.ac.tvu.mdse.contextengine.test.TestActivity;
@@ -50,11 +51,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 import dalvik.system.DexClassLoader;
@@ -77,16 +80,15 @@ public class ContextEngine extends Service {
 	private BroadcastReceiver contextMonitor;
 	private IntentFilter filter;
 	
-	private LocationServices locationServices = null;
+	private SharedPreferences sp;
 	
 	private Context c;
 	private ContextDB db;
 	
 	int defined = 0;
 	
-	//to test location only
-	boolean locationTested = true;
-	int j=0;
+	//monitor setup?
+	boolean set = false;
 	
 	//hold the info about running components
 	private ArrayList<Component> activeContexts = new ArrayList<Component>();
@@ -137,12 +139,7 @@ public class ContextEngine extends Service {
 		setupContextMonitor();
 		
 		c = getApplicationContext();
-		try{
-		locationServices = new LocationServices(c);
-		}catch(Exception e){
-			if (D)
-				Log.e(LOG_TAG, e.getLocalizedMessage());
-		}
+		sp = PreferenceManager.getDefaultSharedPreferences(c);
 		
 		// Manage list of all contexts registered with the engine and store the list in the database
 		db = new ContextDBSQLite(c);
@@ -233,7 +230,8 @@ public class ContextEngine extends Service {
 		}
 
 		public void setupContexts(String path) throws RemoteException {
-			runXML(path);
+//			runXML(path);
+			runXMLParser(path);
 		}
 	};
 	
@@ -282,8 +280,8 @@ public class ContextEngine extends Service {
 					if (lastContextName.equals(contextName) && lastContextValue.equals(contextValue))
 						Log.v("value", "again the same msg");
 					else
-						showNotification(contextName+ " "+contextValue); 
-						//sendBroadcastToApps(bundle);
+//						showNotification(contextName+ " "+contextValue); 
+						sendBroadcastToApps(bundle);
 				}
 			}
 
@@ -311,6 +309,16 @@ public class ContextEngine extends Service {
 			e.printStackTrace();
 		} catch(IOException e){
 			e.printStackTrace();
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	protected void runXMLParser(String path) {
+		try{
+			Log.d(LOG_TAG, "runWorkflowXML");
+			ContextsParser wcp = new ContextsParser();
+			wcp.readXMLfile(c, path, this);
 		} catch(Exception e){
 			e.printStackTrace();
 		}
@@ -365,13 +373,7 @@ public class ContextEngine extends Service {
 			      Constructor<?> contextConstructor = contextClass.getConstructor(parameterTypes);
 			      
 			      Component context = (Component) contextConstructor.newInstance(c);
-			      activeContexts.add(context);
-			      
-			    //only to test - add key when default context values set = ON&OFF
-//					if (context.valuesSets.size()==1)
-//						context.valuesSets.get(0).keys.add(newAppKey);
-						
-					
+			      activeContexts.add(context);					
 			      return true;
 			  } catch(ClassNotFoundException cnfe){
 				  Log.e(LOG_TAG, "Component does not exist!");
@@ -418,23 +420,26 @@ public class ContextEngine extends Service {
 	
 	public void sendBroadcastToApps(Bundle bundle){
 		
-		Log.d(LOG_TAG, "broadcasting to apps");
+		//to display all context values in log file
+		for (Component c: activeContexts){
+			if ((c.contextName.equals("NoOfReviewsUP"))||(c.contextName.equals("RatingUP")))
+				Log.d(LOG_TAG, c.contextName + ": 2");
+			else
+				Log.d(LOG_TAG, c.contextName + ": "+ c.valuesSets.get(0).contextInformation);
+		}
+		
+		Log.d(LOG_TAG, "broadcasting to apps"+ bundle.getString(CONTEXT_NAME)+ bundle.getString(CONTEXT_INFORMATION));
 		
 		Intent intent = new Intent();
 		try {
 		intent.setAction(CONTEXT_INTENT);
 		intent.putExtra(CONTEXT_NAME,bundle.getString(CONTEXT_NAME));
-		Log.d(LOG_TAG, "CONTEXT_NAME:" + bundle.getString(CONTEXT_NAME));
-		if (!bundle.getStringArray(CONTEXT_APPLICATION_KEY).equals(null)){
-			Log.d(LOG_TAG, "broadcasting to apps-getting app key");
-			intent.putExtra(CONTEXT_APPLICATION_KEY, bundle.getStringArray(CONTEXT_APPLICATION_KEY));}
+		intent.putExtra(CONTEXT_APPLICATION_KEY,bundle.getString(CONTEXT_APPLICATION_KEY));
 		intent.putExtra(CONTEXT_DATE, bundle.getString(CONTEXT_DATE));
-//		if (!bundle.getBoolean(CONTEXT_VALUE).equals(null))
-//			intent.putExtra(CONTEXT_VALUE, bundle.getBoolean(CONTEXT_VALUE));
 		if (!bundle.getString(CONTEXT_INFORMATION).equals(null))
 			intent.putExtra(CONTEXT_INFORMATION, bundle.getString(CONTEXT_INFORMATION));
-		Log.d(LOG_TAG, "CONTEXT_INFORMATION:" + bundle.getString(CONTEXT_INFORMATION));
-			c.sendBroadcast(intent);
+		
+		// c.sendBroadcast(intent);
 		} catch (Exception e) {
 			Log.e("ContextEngine", "broadcasting to apps not working");
 		}
@@ -446,27 +451,31 @@ public class ContextEngine extends Service {
 	}
 	
 	public boolean registerAppKey(String key){
-		if(newAppKey==null){
-			newAppKey = new ApplicationKey(key);
-			newAppKey.key = key;
-			return true;
-		}
-			for(ApplicationKey k: applicationKeys){
-			if(! (k.key.equalsIgnoreCase(key))){
-				applicationKeys.add(newAppKey);
-				newAppKey.key=key;
-				return true;
-			}	
-		}
-	    return false;
+//		if(newAppKey==null){
+//			newAppKey = new ApplicationKey(key);
+//			newAppKey.key = key;
+//			return true;
+//		}
+//			for(ApplicationKey k: applicationKeys){
+//			if(! (k.key.equalsIgnoreCase(key))){
+//				applicationKeys.add(newAppKey);
+//				newAppKey.key=key;
+//				return true;
+//			}	
+//		}
+//	    return false;
+		newAppKey = new ApplicationKey(key);
+		applicationKeys.add(newAppKey);
+		Log.d(LOG_TAG, "registerAppKey "+ newAppKey.key);
+		return true;
 	}
 	
 	public boolean newComponent(String componentName){
 		//FOR LOCATION:
-		if (componentName.equals("LocationContext")){
-			if (locationServices == null)
-				locationServices = new LocationServices(c);
-		}
+//		if (componentName.equals("LocationContext")){
+//			if (locationServices == null)
+//				locationServices = new LocationServices(c);
+//		}
 		
 		if(activeContexts.isEmpty()){
 			return loadClass(componentName);
@@ -480,6 +489,13 @@ public class ContextEngine extends Service {
 			}			
 			return loadClass(componentName);
 		}
+	}
+	
+	public boolean newPreferenceComponent(String preferenceName, String preferenceType){	
+		PreferenceChangeComponent preferenceContext = new PreferenceChangeComponent(sp, preferenceName, preferenceType, c);
+	      activeContexts.add(preferenceContext);
+	      Log.e(LOG_TAG, "newPreferenceComponent added");		
+		return true;
 	}
 	
 	public boolean newContextValues(String componentName, String[] contextValues){
@@ -516,18 +532,7 @@ public class ContextEngine extends Service {
 			for (Component ac: activeContexts){
 				if (ac.contextName.equals(componentName))
 					ac.addSpecificContextValue(newAppKey, contextValue, Double.valueOf(numericData1), Double.valueOf(numericData2));	
-			}	
-			
-			if (locationTested){
-				j++;
-				if (j==4){
-					for (Component ac: activeContexts){
-						if (ac.contextName.equals("LocationContextTest"))
-							ac.onLocationChangedManually(11.00, 11.00);
-						Log.d(LOG_TAG, "onLocationChangedManually");
-					}
-				}
-			}
+		}
 				
 		}catch(Exception e){
 			Log.e(LOG_TAG, e.getLocalizedMessage());
@@ -615,45 +620,34 @@ public class ContextEngine extends Service {
 		Log.d(LOG_TAG, "addRule" );
 	}
 	
+	public void componentDefined(String name){
+		for (Component ac: activeContexts){
+			if (ac.contextName.equals(name)){
+				ac.componentDefined(newAppKey);
+			}
+		}
+	}
+	
 	public boolean compositeReady(String compositeName){
+		
 		CompositeComponent ruledComponent = null;
 		
 		//look up for the composite if created
 		for (Component ac: activeContexts){
 			if (ac.contextName.equals(compositeName)){
 				ruledComponent = (CompositeComponent) ac;
-				ruledComponent.addAppKey(newAppKey);
-				Log.d(LOG_TAG, "newAppKey" + newAppKey +" to "+ruledComponent.contextName );
-				//check all contexts  whether app key added:
-				for (Component c: ruledComponent.components){
-					if (!c.existKey(newAppKey)){
-						c.addAppKey(newAppKey);
-						Log.d(LOG_TAG, "newAppKey" + newAppKey +" to "+c.contextName );
-					}
-					if (c.contextName.equals("BatteryContext")){
-						c.componentDefined();
-						Log.d(LOG_TAG, "componentDefined BatteryContext");
-					}
+				
+				if (set = false){
+				  setupContextMonitor();
+				  set=true;
 				}
-//				for (Component c: ruledComponent.components)
-//				{					
-//					if (c.valuesSets.size()==1){
-//						c.addAppKey(newAppKey);
-//						Log.d(LOG_TAG, "newAppKey" + newAppKey +" to "+c.contextName );
-//					}
-//						
-//				}
-					
-				setupContextMonitor();
-				ruledComponent.componentDefined();
+				ruledComponent.componentDefined(newAppKey);
 				return true;
 			}
 		}
 		Log.e(LOG_TAG, "Composite not active!");
 		return false;
 	}
-
-
 
 	@Override
 	public void onDestroy() {
@@ -668,12 +662,7 @@ public class ContextEngine extends Service {
 			ac = null;
 		}
 
-		unregisterReceiver(contextMonitor);
-		
-		if (locationServices!=null){		
-			locationServices.stop();
-			locationServices = null;
-		}
+		unregisterReceiver(contextMonitor);		
 
 		// Tell the user we stopped.
 		Toast.makeText(this, R.string.local_service_stopped, Toast.LENGTH_SHORT)

@@ -37,9 +37,9 @@ public class WifiContext extends MonitorComponent {
 		if (D) Log.d(LOG_TAG, "constructor");
 		this.c=c;
 		this.wm = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);					
-		this.contextInformation = obtainContextInformation();
-		this.valuesSets.get(0).contextInformation = this.contextInformation;		
-		Log.d("WifiContext", this.contextInformation);		
+//		this.contextInformation = obtainContextInformation();
+//		this.valuesSets.get(0).contextInformation = this.contextInformation;		
+//		Log.d("WifiContext", this.contextInformation);		
 	}
 	
 	protected String obtainContextInformation(){

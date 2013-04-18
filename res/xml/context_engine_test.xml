@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ContextDefinition xsi:noNamespaceSchemaLocation="C:\Users\Anna\Dropbox\PhD Work\XMLs\ContextDefinition-Engine\contextDefinition2.xsd" AppKey="test1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Context ContextName="AtWork" ContextType="UserPreference">
+		<ContextValue>YES</ContextValue>
+		<ContextValue>NO</ContextValue>
+	</Context>
+	<Context ContextName="Status" ContextType="UserPreference">
+		<ContextValue>AVAILABLE</ContextValue>
+		<ContextValue>BUSY</ContextValue>
+	</Context>
+	
+	<Context ContextName="BluetoothContext" ContextType="Default">
+		<ContextValue>ON</ContextValue>
+		<ContextValue>OFF</ContextValue>
+	</Context>
+	<Context ContextName="WifiContext" ContextType="Default">
+		<ContextValue>ON</ContextValue>
+		<ContextValue>OFF</ContextValue>
+	</Context>
+	<Context ContextName="BatteryContext" ContextType="Default">
+		<ContextValue>LOW</ContextValue>
+		<ContextValue>MEDIUM</ContextValue>
+		<ContextValue>HIGH</ContextValue>
+	</Context>
+	<CompositeContext ContextName="Datasync">
+		<ContextValue>ON</ContextValue>
+		<ContextValue>OFF</ContextValue>
+		<ChildContext>BluetoothContext</ChildContext>
+		<ChildContext>WifiContext</ChildContext>
+		<Rule>
+			<ChildValue>ON</ChildValue>
+			<ChildValue>ON</ChildValue>
+			<ParentValue>ON</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>ON</ChildValue>
+			<ChildValue>OFF</ChildValue>
+			<ParentValue>ON</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>OFF</ChildValue>
+			<ChildValue>ON</ChildValue>
+			<ParentValue>ON</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>OFF</ChildValue>
+			<ChildValue>OFF</ChildValue>
+			<ParentValue>OFF</ParentValue>
+		</Rule>
+	</CompositeContext>	
+	<CompositeContext ContextName="Connectivity">
+		<ContextValue>YES</ContextValue>
+		<ContextValue>NO</ContextValue>
+		<ChildContext>Datasync</ChildContext>
+		<ChildContext>BatteryContext</ChildContext>
+		<Rule>
+			<ChildValue>ON</ChildValue>
+			<ChildValue>HIGH</ChildValue>
+			<ParentValue>YES</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>ON</ChildValue>
+			<ChildValue>MEDIUM</ChildValue>
+			<ParentValue>YES</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>ON</ChildValue>
+			<ChildValue>LOW</ChildValue>
+			<ParentValue>NO</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>OFF</ChildValue>
+			<ChildValue>HIGH</ChildValue>
+			<ParentValue>NO</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>OFF</ChildValue>
+			<ChildValue>MEDIUM</ChildValue>
+			<ParentValue>NO</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>OFF</ChildValue>
+			<ChildValue>LOW</ChildValue>
+			<ParentValue>NO</ParentValue>
+		</Rule>
+	</CompositeContext>	
+	<CompositeContext ContextName="Availability">
+		<ContextValue>YES</ContextValue>
+		<ContextValue>NO</ContextValue>
+		<ChildContext>AtWork</ChildContext>
+		<ChildContext>Status</ChildContext>
+		<Rule>
+			<ChildValue>YES</ChildValue>
+			<ChildValue>AVAILABLE</ChildValue>
+			<ParentValue>YES</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>YES</ChildValue>
+			<ChildValue>BUSY</ChildValue>
+			<ParentValue>NO</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>NO</ChildValue>
+			<ChildValue>AVAILABLE</ChildValue>
+			<ParentValue>NO</ParentValue>
+		</Rule>
+		<Rule>
+			<ChildValue>NO</ChildValue>
+			<ChildValue>BUSY</ChildValue>
+			<ParentValue>NO</ParentValue>
+		</Rule>
+	</CompositeContext>	
+</ContextDefinition>

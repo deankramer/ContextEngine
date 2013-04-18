@@ -18,6 +18,7 @@ package uk.ac.tvu.mdse.contextengine;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import uk.ac.tvu.mdse.contextengine.highLevelContext.Rule;
 import uk.ac.tvu.mdse.contextengine.reasoning.ApplicationKey;
@@ -49,46 +50,64 @@ public class CompositeComponent extends Component implements Serializable {
 	//a set of valid context values
 	//public ArrayList<String> valuesSet = new ArrayList<String>();
 	
-	ArrayList<String> broadcastedKeys;
+	ArrayList<String> broadcastedKeys = new ArrayList<String>();		
 	
-	//to make easier if AND or OR can be applied
-	public enum Expression {ALL, ANY}; 
-	
-	public Expression simplerRule;
 
 	public CompositeComponent(String name, Context c) {
 		super(name, c);
-		if (D) Log.d(LOG_TAG, "constructor " + name);
-		this.contextInformation = "default";		
+		if (D) Log.d(LOG_TAG, "constructor " + name);			
 	}
 	
-	public void componentDefined(){
+	public void componentDefined(ApplicationKey appKey){
 		if (D) Log.d(LOG_TAG, "componentDefined " + contextName);
-		//in case that a new set of values has been defined
-		//remove the default values set:ON,OFF
-		if (valuesSets.size() == 2){			
-			valuesSets.remove(0);
+		for (ContextValues cv: valuesSets){
+			if (cv.keys.contains(appKey)){				
+				cv.contextInformation = cv.valuesSet.get(0);
+			}
 		}
-		if (D) Log.d(LOG_TAG, "componentDefined cv " + contextName);
 		setupMonitor();
 	}
 
-	private void setupMonitor() {
-		// TODO Auto-generated method stub
+private void setupMonitor() {
+		
 		contextMonitor = new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context c, Intent in) {
 				if (D) Log.d(LOG_TAG, "onReceive" + contextName);
-				// TODO Auto-generated method stub
-				String context = in.getExtras().getString(CONTEXT_NAME);
-//				boolean value = in.getExtras().getBoolean(CONTEXT_VALUE);
+
+				String context = in.getExtras().getString(CONTEXT_NAME);			
+
 				for (Component comp : components){
 					if (comp.contextName.equals(context)){
-						broadcastedKeys = in.getExtras().getStringArrayList(CONTEXT_APPLICATION_KEY);
-						if (D) Log.d(LOG_TAG, "onReceive keys ok" + broadcastedKeys.get(0));
-						checkContext();		
+						String keys = in.getExtras().getString(CONTEXT_APPLICATION_KEY);
+						if (D) Log.d(LOG_TAG, "onReceivekeys" + keys);
+
+						if (keys.contains(",")){
+							if (D) Log.d(LOG_TAG, "onReceivecontains");
+							StringTokenizer st = new StringTokenizer(keys, ",");
+							while(st.hasMoreTokens()) { 
+								String key = st.nextToken();	
+								if (!key.equals(""))
+									broadcastedKeys.add(key);
+								if (D) Log.d(LOG_TAG, "onReceivecontainskey" + key);
+							}			
+						}
+						else{
+							broadcastedKeys.add(keys);
+						}
+						if (D) Log.d(LOG_TAG, "onReceive keysNo:" + broadcastedKeys.size()+ " " +broadcastedKeys.get(0));						
+						for (ContextValues cv: valuesSets){
+							for (String key: cv.getKeysList())
+							if (key.equals(broadcastedKeys.get(0))){				
+								if (D) Log.d(LOG_TAG, "checkContext"+key);
+								checkContext(cv);
+							}
+						}
+						
 					}
+					
+					broadcastedKeys.clear();
 				}						
 			}
 		};
@@ -96,40 +115,12 @@ public class CompositeComponent extends Component implements Serializable {
 
 	}
 
-	public void checkContext(){
-		if (D) Log.d(LOG_TAG, "checkContext "+contextName);
-		String compositeContextValue  = fireRules(); //"ON";//
-		if (D) Log.d(LOG_TAG, "compositeContextValue "+compositeContextValue);
-		if (D) Log.d(LOG_TAG, "this.contextInformation "+this.contextInformation);
-		if (!compositeContextValue.equals(this.contextInformation))	{		//((compositeContextValue.equals(null)||compositeContextValue.equals(this.contextInformation)))){
-			if (D) Log.d(LOG_TAG, "compositeContextValue  this.contextInformation diff"+contextName);
-			this.contextInformation = compositeContextValue;
-			if (D) Log.d(LOG_TAG, "cv size"+valuesSets.size());
-			if (D) Log.d(LOG_TAG, "cv"+valuesSets.get(0).valuesSet.get(0));
-			for (ContextValues cv: this.valuesSets){
-				for (ApplicationKey ak: cv.keys){
-					if (ak.key.equals(broadcastedKeys.get(0))){
-						if (cv.setNewContextInformation(compositeContextValue))
-								sendNotification(cv);
-					}
-				}
-    		}
-			
-			if (D) Log.d(LOG_TAG, "sendNotification command "+contextName);
-		}			
-	}
-	
-	//ALL or ANY
-	public boolean addSimplerRule(String s){
-		if (D) Log.d(LOG_TAG, "addSimplerRule");
-		try{
-			this.simplerRule = Expression.valueOf(s);
-			return true;
-		}
-		catch(Exception e){
-			return false;
-		}
-	}
+	public void checkContext(ContextValues cv){
+		String compositeContextValue  = fireRules();
+		if (D) Log.d(LOG_TAG, "compositeRec: "+contextName+compositeContextValue);
+		if (cv.setNewContextInformation(compositeContextValue))
+			sendNotification(cv);			
+	}	
 	
 	public void addRule(String[] conditions, String statement){
 		if (D) Log.d(LOG_TAG, "addRule " +contextName);
@@ -219,16 +210,16 @@ public class CompositeComponent extends Component implements Serializable {
 		return this.components.size();
 	}
 	
-	public String[] getKeysList(){
-		if (D) Log.d(LOG_TAG, "getKeysList");
-		String[] keysList = new String[valuesSets.get(0).keys.size()];
-		int i=0;
-		for (ApplicationKey appKey: valuesSets.get(0).keys){
-			keysList[i] = appKey.key;
-			i++;
-		}
-		return keysList;
-	}
+//	public String[] getKeysList(){
+//		if (D) Log.d(LOG_TAG, "getKeysList");
+//		String[] keysList = new String[valuesSets.get(0).keys.size()];
+//		int i=0;
+//		for (ApplicationKey appKey: valuesSets.get(0).keys){
+//			keysList[i] = appKey.key;
+//			i++;
+//		}
+//		return keysList;
+//	}
 	
 //	public String[] getKeysList(){
 //		if (D) Log.d(LOG_TAG, "getKeysList");
