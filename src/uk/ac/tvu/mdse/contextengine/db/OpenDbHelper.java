@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Context Engine Project
+ * Copyright (C) 2013 The Context Engine Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class OpenDbHelper extends SQLiteOpenHelper {
 
 	private static final int DATABASE_VERSION = 1;
-	private static String DB_NAME = "contextDB";
-	private static final String CONTEXTTABLE_CREATE = "create table contexts (_id integer primary key autoincrement, "
-			+ "name text not null" + "lastDateTime text not null"
-			// + "count integer not null"
-			+ "value text not null" + ");";
+	private static final String DB_NAME = "contextDB";
+	public static final String CONTEXTTABLE = "usable_contexts";
+	private static final String CONTEXTTABLE_CREATE = "create table usable_contexts (_id integer primary key autoincrement, "
+			+ "packagename text,"
+			+ "name text,"
+			+ "owner text,"
+			+ "permission int not null," + "dex_file text);";
 
 	public OpenDbHelper(Context context) {
 		super(context, DB_NAME, null, DATABASE_VERSION);
@@ -36,11 +38,23 @@ public class OpenDbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CONTEXTTABLE_CREATE);
+		insertStandardContexts(db);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase arg0, int arg1, int arg2) {
-		// TODO Auto-generated method stub
+
+	}
+
+	private void insertStandardContexts(SQLiteDatabase db) {
+		db.execSQL("insert into usable_contexts values (1, 'uk.ac.tvu.mdse.contextengine.contexts', 'BatteryContext', 'contextengine', 0, 'classes.dex')");
+		db.execSQL("insert into usable_contexts values (2, 'uk.ac.tvu.mdse.contextengine.contexts', 'BluetoothContext', 'contextengine', 0, 'classes.dex')");
+		db.execSQL("insert into usable_contexts values (3, 'uk.ac.tvu.mdse.contextengine.contexts', 'ExternalStorageSpaceContext', 'contextengine', 0, 'classes.dex')");
+		db.execSQL("insert into usable_contexts values (4, 'uk.ac.tvu.mdse.contextengine.contexts', 'LightContext', 'contextengine', 0, 'classes.dex')");
+		db.execSQL("insert into usable_contexts values (5, 'uk.ac.tvu.mdse.contextengine.contexts', 'LocationContext', 'contextengine', 0, 'classes.dex')");
+		db.execSQL("insert into usable_contexts values (6, 'uk.ac.tvu.mdse.contextengine.contexts', 'TelephonyContext', 'contextengine', 0, 'classes.dex')");
+		db.execSQL("insert into usable_contexts values (7, 'uk.ac.tvu.mdse.contextengine.contexts', 'UserPreferenceContext', 'contextengine', 0, 'classes.dex')");
+		db.execSQL("insert into usable_contexts values (8, 'uk.ac.tvu.mdse.contextengine.contexts', 'WifiContext', 'contextengine', 0, 'classes.dex')");
 
 	}
 

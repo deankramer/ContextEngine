@@ -23,62 +23,68 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
-
-public class ListenerComponent extends Component implements SensorEventListener{
+public class ListenerComponent extends Component implements SensorEventListener {
 
 	private static final long serialVersionUID = 14671122599992688L;
 	public static final String LOG_TAG = "ListenerComponent";
-	public static final boolean D = true;
+	public static final boolean D = false;
 
 	protected SensorManager sensorManager;
 	private Sensor theSensor;
 	private int sensorType;
-	private int delayType; 
-	
-	
-	public ListenerComponent(String name, Context c, int sensorT, int delayT) {		
+	private int delayType;
+
+	public ListenerComponent(String name, Context c, int sensorT, int delayT) {
 		super(name, c);
-		if (D) Log.d(LOG_TAG, "constructor");
-		this.sensorManager = (SensorManager) c.getSystemService(Context.SENSOR_SERVICE);		
+		if (D)
+			Log.d(LOG_TAG, "constructor");
+		this.sensorManager = (SensorManager) c
+				.getSystemService(Context.SENSOR_SERVICE);
 		this.sensorType = sensorT;
 		theSensor = sensorManager.getDefaultSensor(sensorType);
 		this.delayType = delayT;
 		sensorManager.registerListener(this, theSensor, delayType);
-	}	
+	}
 
 	public void setDelaytype(int delaytype) {
-		if (D) Log.d(LOG_TAG, "setDelaytype");
+		if (D)
+			Log.d(LOG_TAG, "setDelaytype");
 		this.delayType = delaytype;
 		sensorManager.unregisterListener(this, theSensor);
 		sensorManager.registerListener(this, theSensor, delayType);
 	}
 
 	public int getDelaytype() {
-		if (D) Log.d(LOG_TAG, "getDelaytype");
+		if (D)
+			Log.d(LOG_TAG, "getDelaytype");
 		return delayType;
 	}
 
 	public void onAccuracyChanged(Sensor arg0, int arg1) {
-		if (D) Log.d(LOG_TAG, "onAccuracyChanged");
+		if (D)
+			Log.d(LOG_TAG, "onAccuracyChanged");
 	}
 
-	public void onSensorChanged(SensorEvent arg0) {		
-		if (D) Log.d(LOG_TAG, "onSensorChanged");
-		if (arg0.sensor.getType() == sensorType) 
-			checkContext(arg0);				
+	public void onSensorChanged(SensorEvent arg0) {
+		if (D)
+			Log.d(LOG_TAG, "onSensorChanged");
+		if (arg0.sensor.getType() == sensorType)
+			checkContext(arg0);
 	};
-	
-	//re-implement if context value depends on some values
+
+	// re-implement if context value depends on some values
 	public void checkContext(SensorEvent data) {
-		if (D) Log.d(LOG_TAG, "checkContext");
-		//check data		
-		//fire off the rules
-		//set contextValue	
-		//sendNotification();		
+		if (D)
+			Log.d(LOG_TAG, "checkContext");
+		// check data
+		// fire off the rules
+		// set contextValue
+		// sendNotification();
 	}
 
 	public void stop() {
-		if (D) Log.d(LOG_TAG, "stop");
+		if (D)
+			Log.d(LOG_TAG, "stop");
 		sensorManager.unregisterListener(this, theSensor);
 	}
 }

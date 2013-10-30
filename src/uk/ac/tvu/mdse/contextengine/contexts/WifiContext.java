@@ -34,30 +34,33 @@ public class WifiContext extends MonitorComponent {
 
 	public WifiContext(Context c) {
 		super("WifiContext", c, "android.net.wifi.WIFI_STATE_CHANGED");
-		if (D) Log.d(LOG_TAG, "constructor");
-		this.c=c;
-		this.wm = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);					
-//		this.contextInformation = obtainContextInformation();
-//		this.valuesSets.get(0).contextInformation = this.contextInformation;		
-//		Log.d("WifiContext", this.contextInformation);		
+		if (D)
+			Log.d(LOG_TAG, "constructor");
+		this.c = c;
+		this.wm = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
+		// this.contextInformation = obtainContextInformation();
+		// this.valuesSets.get(0).contextInformation = this.contextInformation;
+		// Log.d("WifiContext", this.contextInformation);
 	}
-	
-	protected String obtainContextInformation(){
-		if (D) Log.d(LOG_TAG, "obtainContextInformation");
-		Boolean wifiEnabled = wm.isWifiEnabled();		
+
+	protected String obtainContextInformation() {
+		if (D)
+			Log.d(LOG_TAG, "obtainContextInformation");
+		Boolean wifiEnabled = wm.isWifiEnabled();
 		return (wifiEnabled) ? "ON" : "OFF";
 	}
 
 	public void checkContext(Bundle data) {
-		if (D) Log.d(LOG_TAG, "checkContext");
-		wm = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);		
-		Boolean wifiEnabled = wm.isWifiEnabled();		
-		String wifiStatus = "";		
+		if (D)
+			Log.d(LOG_TAG, "checkContext");
+		wm = (WifiManager) c.getSystemService(Context.WIFI_SERVICE);
+		Boolean wifiEnabled = wm.isWifiEnabled();
+		String wifiStatus = "";
 		if (wifiEnabled)
-			wifiStatus = "ON" ;
+			wifiStatus = "ON";
 		else
-			wifiStatus = "OFF" ;				
-		for (ContextValues cv: this.valuesSets){
+			wifiStatus = "OFF";
+		for (ContextValues cv : this.valuesSets) {
 			if (cv.setNewContextInformation(wifiStatus))
 				sendNotification(cv);
 		}

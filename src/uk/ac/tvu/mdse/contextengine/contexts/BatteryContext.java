@@ -23,8 +23,8 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.util.Log;
 
-public class BatteryContext extends MonitorComponent{
-	
+public class BatteryContext extends MonitorComponent {
+
 	private static final double HIGH_BAT_VALUE = 80;
 	private static final double MEDIUM_BAT_VALUE = 30;
 	int v = -1;
@@ -32,56 +32,60 @@ public class BatteryContext extends MonitorComponent{
 	private static final long serialVersionUID = -7034400776638700530L;
 	public static final String LOG_TAG = "BatteryContext";
 	public static final boolean D = true;
-	
-	public BatteryContext(Context c) {
-		super("BatteryContext", c, "Intent.ACTION_BATTERY_CHANGED", "BatteryManager.EXTRA_STATUS");	
-		if (D) Log.d(LOG_TAG, "constructor");
-	}	
-	
-//	public void componentDefined(){
-//		if (D) Log.d(LOG_TAG, "componentDefined " + contextName);
-//		this.contextInformation = obtainContextInformation();
-////		if (valuesSets.size() == 2){			
-////			valuesSets.remove(0);
-////		}
-//		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.size());
-//		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.get(0).keys.size());
-//		if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.get(0).contextInformation);
-//	}
-	
-	protected String obtainContextInformation(){
-		if (D) Log.d(LOG_TAG, "obtainContextInformation");
-        /*
-		BatteryManager bm = new BatteryManager();
-		
-		int rawlevel = Integer.parseInt(BatteryManager.EXTRA_LEVEL);
-        int scale = Integer.parseInt(BatteryManager.EXTRA_SCALE);
-        
-        if (rawlevel >= 0 && scale > 0) 
-            v = (rawlevel * 100) / scale; 
-       */
-		
-		//set as default
-		int v=50;
-		
-        return this.valuesSets.get(1).contextInformation;
-	}
-	
-	protected void checkContext(Bundle data) {
-		if (D) Log.d(LOG_TAG, "checkContext");
-		int rawlevel = data.getInt(BatteryManager.EXTRA_LEVEL, -1);
-        int scale = data.getInt(BatteryManager.EXTRA_SCALE, -1);
-        
-        if (rawlevel >= 0 && scale > 0) {
-            v = (rawlevel * 100) / scale; 
-            
-            //go through all context sets and send notification 
-            //only for sets in which info changed
-        	for (ContextValues cv: this.valuesSets){
-    			if (cv.setNewContextValue(v))
-    				sendNotification(cv);
-    		}        	
-        }
-	}	
-}
 
+	public BatteryContext(Context c) {
+		super("BatteryContext", c, "Intent.ACTION_BATTERY_CHANGED",
+				"BatteryManager.EXTRA_STATUS");
+		if (D)
+			Log.d(LOG_TAG, "constructor");
+	}
+
+	// public void componentDefined(){
+	// if (D) Log.d(LOG_TAG, "componentDefined " + contextName);
+	// this.contextInformation = obtainContextInformation();
+	// // if (valuesSets.size() == 2){
+	// // valuesSets.remove(0);
+	// // }
+	// if (D) Log.d(LOG_TAG, "componentDefined " + valuesSets.size());
+	// if (D) Log.d(LOG_TAG, "componentDefined " +
+	// valuesSets.get(0).keys.size());
+	// if (D) Log.d(LOG_TAG, "componentDefined " +
+	// valuesSets.get(0).contextInformation);
+	// }
+
+	protected String obtainContextInformation() {
+		if (D)
+			Log.d(LOG_TAG, "obtainContextInformation");
+		/*
+		 * BatteryManager bm = new BatteryManager();
+		 * 
+		 * int rawlevel = Integer.parseInt(BatteryManager.EXTRA_LEVEL); int
+		 * scale = Integer.parseInt(BatteryManager.EXTRA_SCALE);
+		 * 
+		 * if (rawlevel >= 0 && scale > 0) v = (rawlevel * 100) / scale;
+		 */
+
+		// set as default
+		int v = 50;
+
+		return this.valuesSets.get(1).contextInformation;
+	}
+
+	protected void checkContext(Bundle data) {
+		if (D)
+			Log.d(LOG_TAG, "checkContext");
+		int rawlevel = data.getInt(BatteryManager.EXTRA_LEVEL, -1);
+		int scale = data.getInt(BatteryManager.EXTRA_SCALE, -1);
+
+		if (rawlevel >= 0 && scale > 0) {
+			v = (rawlevel * 100) / scale;
+
+			// go through all context sets and send notification
+			// only for sets in which info changed
+			for (ContextValues cv : this.valuesSets) {
+				if (cv.setNewContextValue(v))
+					sendNotification(cv);
+			}
+		}
+	}
+}

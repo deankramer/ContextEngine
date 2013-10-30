@@ -19,41 +19,43 @@ package uk.ac.tvu.mdse.contextengine.highLevelContext;
 import android.util.Log;
 
 public class Rule {
-	
+
 	public static final String LOG_TAG = "Rule";
 	public static final boolean D = true;
 
-	
 	public String[] ifCondition;
 	public String thenStatement;
-	
-	public Rule(String[] condition, String statement){
-		if (D) Log.d(LOG_TAG, "constructor");
+
+	public Rule(String[] condition, String statement) {
+		if (D)
+			Log.d(LOG_TAG, "constructor");
 		this.ifCondition = condition;
 		this.thenStatement = statement;
-		Log.d("Rule", String.valueOf(ifCondition.length)+" "+ifCondition[0]);
+		Log.d("Rule", String.valueOf(ifCondition.length) + " " + ifCondition[0]);
 	}
-	
-	public boolean fireRule(String[] condition){
-		if (D) Log.d(LOG_TAG, "fireRule");
-		int i=0;
-		int j =0;
+
+	public boolean fireRule(String[] condition) {
+		if (D)
+			Log.d(LOG_TAG, "fireRule");
+		int i = 0;
+		int j = 0;
 		boolean match = false;
-		while (i<ifCondition.length){
-			if (condition[i].equals(ifCondition[i])){
+		while (i < ifCondition.length) {
+			if (condition[i].equals(ifCondition[i])) {
 				j++;
 				if (j == ifCondition.length)
 					match = true;
-				Log.d("Rule", "fire rule" +String.valueOf(j));
+				Log.d("Rule", "fire rule" + String.valueOf(j));
 			}
 			i++;
 		}
-		Log.d("Rule", "fire rule" +String.valueOf(match));
+		Log.d("Rule", "fire rule" + String.valueOf(match));
 		return match;
 	}
-	
-	public String toString(){
-		if (D) Log.d(LOG_TAG, "toString");
+
+	public String toString() {
+		if (D)
+			Log.d(LOG_TAG, "toString");
 		StringBuffer strbuf = new StringBuffer();
 		for (String str : ifCondition)
 			strbuf.append(str);

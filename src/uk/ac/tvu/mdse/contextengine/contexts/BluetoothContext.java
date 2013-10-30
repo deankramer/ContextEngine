@@ -29,47 +29,52 @@ public class BluetoothContext extends MonitorComponent {
 	private static final long serialVersionUID = -8852296839608708684L;
 	public static final String LOG_TAG = "BluetoothContext";
 	public static final boolean D = true;
-	
+
 	BluetoothAdapter bluetoothAdapter;
 	static NetworkInfo netInfo;
 
-
 	public BluetoothContext(Context c) {
-		super("BluetoothContext", c, "android.bluetooth.adapter.action.STATE_CHANGED", "bluetoothAdapter.getState()" );
-		if (D) Log.d(LOG_TAG, "constructor");
+		super("BluetoothContext", c,
+				"android.bluetooth.adapter.action.STATE_CHANGED",
+				"bluetoothAdapter.getState()");
+		if (D)
+			Log.d(LOG_TAG, "constructor");
 		this.bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-//		this.contextInformation = obtainContextInformation();
-		//this.contextInformation = "ON";
-//		Log.d("BluetoothContext", this.contextInformation);
+		// this.contextInformation = obtainContextInformation();
+		// this.contextInformation = "ON";
+		// Log.d("BluetoothContext", this.contextInformation);
 	}
-	
-	protected String obtainContextInformation(){
-		if (D) Log.d(LOG_TAG, "obtainContextInformation");
+
+	protected String obtainContextInformation() {
+		if (D)
+			Log.d(LOG_TAG, "obtainContextInformation");
 		int bluetoothValue = bluetoothAdapter.getState();
-		
-		
-		//For some reason the statement below does not work, so using if statement for now
-		//return (bluetoothValue == BluetoothAdapter.STATE_ON) ? "ON" : "OFF";
+
+		// For some reason the statement below does not work, so using if
+		// statement for now
+		// return (bluetoothValue == BluetoothAdapter.STATE_ON) ? "ON" : "OFF";
 		if (bluetoothValue == BluetoothAdapter.STATE_ON)
 			return "ON";
 		else if (bluetoothValue == BluetoothAdapter.STATE_OFF)
 			return "OFF";
 		else
 			return "NOBODY KNOWS";
-		//return String.valueOf(bluetoothValue);
+		// return String.valueOf(bluetoothValue);
 	}
-	
-	protected void checkContext(Bundle data) {
-		if (D) Log.d(LOG_TAG, "checkContext");
-		//check data		
-		//evaluate by firing off the rules
-		//set contextValue	
-		String bluetoothValue = (bluetoothAdapter.getState() == BluetoothAdapter.STATE_ON) ? "ON" : "OFF";
 
-		for (ContextValues cv: this.valuesSets){
+	protected void checkContext(Bundle data) {
+		if (D)
+			Log.d(LOG_TAG, "checkContext");
+		// check data
+		// evaluate by firing off the rules
+		// set contextValue
+		String bluetoothValue = (bluetoothAdapter.getState() == BluetoothAdapter.STATE_ON) ? "ON"
+				: "OFF";
+
+		for (ContextValues cv : this.valuesSets) {
 			if (cv.setNewContextInformation(bluetoothValue))
 				sendNotification(cv);
 		}
-		
+
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Context Engine Project
+ * Copyright (C) 2013 The Context Engine Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,25 @@
 
 package uk.ac.tvu.mdse.contextengine.db;
 
-import java.util.ArrayList;
-
-import uk.ac.tvu.mdse.contextengine.Component;
+import java.util.List;
 
 public interface ContextDB {
 
-	boolean addContext(Component c);
+	List<String> getUsableContextList(String applicationId);
 
-	boolean removeContext(int id);
+	List<String> getAppContextList(String applicationId);
 
-	boolean updateContext(Component c);
+	String getDexFile(String componentName);
 
-	Component getContext(int id);
-	
-	boolean getContextValue(String name);
-	
-	ArrayList<Component> getAllContexts();
+	int getPermission(String componenName);
+
+	String getPackageName(String componentName);
+
+	boolean insertComponent(String packageName, String name, String owner,
+			int permission, String dex_file);
+
+	List<String> getLoadComponentInfo(String applicationId, String componentName);
+
+	void closeDB();
 
 }

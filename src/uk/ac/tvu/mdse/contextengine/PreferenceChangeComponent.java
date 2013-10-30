@@ -36,14 +36,20 @@ public class PreferenceChangeComponent extends Component implements
 
 	private SharedPreferences sharedPreferences;
 	private String preference;
-	public enum PreferenceType {STRING, INT, BOOLEAN};
+
+	public enum PreferenceType {
+		STRING, INT, BOOLEAN
+	};
+
 	private PreferenceType prefType;
-	
+
 	private String preferenceValue;
 
-	public PreferenceChangeComponent(SharedPreferences sp, String pref, PreferenceType prefT, Context c) {
+	public PreferenceChangeComponent(SharedPreferences sp, String pref,
+			PreferenceType prefT, Context c) {
 		super(pref, c);
-		if (D) Log.d(LOG_TAG, "constructor1");
+		if (D)
+			Log.d(LOG_TAG, "constructor1");
 		// might be option to work just with one preference a time, or register
 		// a number of preferences
 		preference = pref;
@@ -53,23 +59,28 @@ public class PreferenceChangeComponent extends Component implements
 		contextInformation = "unknown";
 	}
 
-	public PreferenceChangeComponent(SharedPreferences sp, String pref, String prefT, Context c) {
+	public PreferenceChangeComponent(SharedPreferences sp, String pref,
+			String prefT, Context c) {
 		super(pref, c);
-		if (D) Log.d(LOG_TAG, "constructor2");
+		if (D)
+			Log.d(LOG_TAG, "constructor2");
 		// might be option to work just with one preference a time, or register
 		// a number of preferences
 		preference = pref;
-		sharedPreferences = sp;	
+		sharedPreferences = sp;
 		prefType = PreferenceType.valueOf(prefT);
-		if (D) Log.d(LOG_TAG, "constructor2 prefType:"+prefType.toString());
+		if (D)
+			Log.d(LOG_TAG, "constructor2 prefType:" + prefType.toString());
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-		if (D) Log.d(LOG_TAG, "constructor2 ok");
+		if (D)
+			Log.d(LOG_TAG, "constructor2 ok");
 		contextInformation = "unknown";
 	}
 
 	public PreferenceChangeComponent(SharedPreferences pm, Context c) {
 		super("USER_PREFERENCE", c);
-		if (D) Log.d(LOG_TAG, "constructor2");
+		if (D)
+			Log.d(LOG_TAG, "constructor2");
 		sharedPreferences = pm;
 		sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 		contextInformation = "unknown";
@@ -77,37 +88,42 @@ public class PreferenceChangeComponent extends Component implements
 
 	public void stop() {
 		sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
-		if (D) Log.v(LOG_TAG, "Stopping");
+		if (D)
+			Log.v(LOG_TAG, "Stopping");
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences arg0, String arg1) {
-		if (D) Log.v(LOG_TAG, "onSharedPreferenceChanged");
-		if (preference.equals(arg1)){
-			switch (prefType){
-			case BOOLEAN:				
+		if (D)
+			Log.v(LOG_TAG, "onSharedPreferenceChanged");
+		if (preference.equals(arg1)) {
+			switch (prefType) {
+			case BOOLEAN:
 				preferenceValue = String.valueOf(arg0.getBoolean(arg1, true));
-				if (D) Log.v(LOG_TAG, "preferencetype BOOLEAN" + preferenceValue);
+				if (D)
+					Log.v(LOG_TAG, "preferencetype BOOLEAN" + preferenceValue);
 				checkContext(preferenceValue);
 				break;
-			case STRING:				
+			case STRING:
 				preferenceValue = arg0.getString(arg1, "none");
-				if (D) Log.v(LOG_TAG, "preferencetype STRING" + preferenceValue);
+				if (D)
+					Log.v(LOG_TAG, "preferencetype STRING" + preferenceValue);
 				checkContext(preferenceValue);
 				break;
-			case INT:				
+			case INT:
 				preferenceValue = String.valueOf(arg0.getInt(arg1, 0));
-				if (D) Log.v(LOG_TAG, "preferencetype INT" + preferenceValue);
+				if (D)
+					Log.v(LOG_TAG, "preferencetype INT" + preferenceValue);
 				checkContext(preferenceValue);
 				break;
 			default:
 				preferenceValue = "none";
 				checkContext(preferenceValue);
-			}			
-		}			
+			}
+		}
 	}
-	
-	public void checkContext(String preferenceValue){
-		for (ContextValues cv: this.valuesSets){
+
+	public void checkContext(String preferenceValue) {
+		for (ContextValues cv : this.valuesSets) {
 			if (cv.setNewContextInformation(preferenceValue))
 				sendNotification(cv);
 		}

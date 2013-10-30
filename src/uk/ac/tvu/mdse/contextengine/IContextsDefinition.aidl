@@ -24,41 +24,41 @@ interface IContextsDefinition {
   //***setup contexts using xml***
   void setupContexts(String path);
   
-  //***register the path to the application context components***
-  boolean registerContextPath(String path);
-  
   //***application registers its unique key***
   boolean registerApplicationKey(String key);
   
   //***add an atomic component***
-  boolean registerComponent(in String componentName);
+  boolean registerComponent(in String appKey, in String componentName);
   
   //***add context values to a component***
-  boolean addContextValues(in String componentName, in String[] contextValues);
+  boolean addContextValues(in String appKey, in String componentName, in String[] contextValues);
   
   //***add a context value***
-  boolean addContextValue(in String componentName, in String contextValue);
+  boolean addContextValue(in String appKey, in String componentName, in String contextValue);
   
   //***add a specific context value described by two numeric coordinates (e.g.location)***
-  //TO DO: void addSpecificContextValues(in String componentName, in String contextValue, sets of values);
+  //TO DO: void addSpecificContextValues(in String appKey, in String componentName, in String contextValue, sets of values);
   
   //***add a set of specific context values described by two numeric coordinates***
-  void addSpecificContextValue(in String componentName, in String contextValue, in String numericData1, in String numericData2);  
+  void addSpecificContextValue(in String appKey, in String componentName, in String contextValue, in String numericData1, in String numericData2);  
     
   //***define higher context value - in case of numeric values specify range of values***  
-  void addRange(in String componentName, in String minValue, in String maxValue, in String contextValue);  
+  void addRange(in String appKey, in String componentName, in String minValue, in String maxValue, in String contextValue);  
     
   //***create a composite component***
-  boolean newComposite(in String compositeName);
+  boolean newComposite(in String appKey, in String compositeName);
   
   //***add context to a composite context component
-  boolean addToComposite(in String componentName, in String compositeName);  
+  boolean addToComposite(in String appKey, in String componentName, in String compositeName);  
  
   //***specify context value of the composite context based on values of context it is composed of***
   void addRule(in String componentName, in String[] condition, in String result);
   
    //***notify that the composite context has been fully identified***
-  boolean startComposite(in String compositeName);   
+  boolean startComposite(in String compositeName);
+
+   //***Copy new context Components over***
+  void copyDexFile(in String appKey, in String newDex, in String[] contexts, in String packageName, int permission);  
   
   //***taken out and replaced - REMOVE once tested!***
   //void addLocationComponent(in String key);

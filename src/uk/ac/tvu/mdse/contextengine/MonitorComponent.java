@@ -23,85 +23,87 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 
-
-public class MonitorComponent extends Component{
+public class MonitorComponent extends Component {
 
 	private static final long serialVersionUID = -222900547936864703L;
 	public static final String LOG_TAG = "MonitorComponent";
 	public static final boolean D = true;
 
-    //BroadcastReceiver
-    public BroadcastReceiver contextMonitor = null;    
-    public String filterAction = "";
-    public String monitoringData = "";
-    public String monitoringKey;
-    String[] values = new String[]{"ON","OFF"};
-    
-    
-	public MonitorComponent(String name, Context c){		
-		super(name, c);	
-		if (D) Log.d(LOG_TAG, "constructor1");
-		//default set of context values is ON&OFF		
-		//ContextValues cv = new ContextValues(values);
-		//valuesSets.add(new ContextValues(values));
-		//cv.contextInformation = "OFF";
-		setupMonitor();
-	}
-	
-	public MonitorComponent(String name, Context c, String action){		
-		super(name, c);	
-		if (D) Log.d(LOG_TAG, "constructor2");
-		this.filterAction = action;	
-		//valuesSets.add(new ContextValues(values));
-		setupMonitor();
-	}
-	
-	
-	public MonitorComponent(String name, Context c, String action, String key){		
-		super(name, c);	
-		if (D) Log.d(LOG_TAG, "constructor3");
-		this.filterAction = action;		
-		this.monitoringKey = key;
-		//valuesSets.add(new ContextValues(values));
-		setupMonitor();
-	}
-	
+	// BroadcastReceiver
+	public BroadcastReceiver contextMonitor = null;
+	public String filterAction = "";
+	public String monitoringData = "";
+	public String monitoringKey;
+	String[] values = new String[] { "ON", "OFF" };
 
-	//implement receiver and specify the actions	
+	public MonitorComponent(String name, Context c) {
+		super(name, c);
+		if (D)
+			Log.d(LOG_TAG, "constructor1");
+		// default set of context values is ON&OFF
+		// ContextValues cv = new ContextValues(values);
+		// valuesSets.add(new ContextValues(values));
+		// cv.contextInformation = "OFF";
+		setupMonitor();
+	}
+
+	public MonitorComponent(String name, Context c, String action) {
+		super(name, c);
+		if (D)
+			Log.d(LOG_TAG, "constructor2");
+		this.filterAction = action;
+		// valuesSets.add(new ContextValues(values));
+		setupMonitor();
+	}
+
+	public MonitorComponent(String name, Context c, String action, String key) {
+		super(name, c);
+		if (D)
+			Log.d(LOG_TAG, "constructor3");
+		this.filterAction = action;
+		this.monitoringKey = key;
+		// valuesSets.add(new ContextValues(values));
+		setupMonitor();
+	}
+
+	// implement receiver and specify the actions
 	private void setupMonitor() {
 		contextMonitor = new BroadcastReceiver() {
 			@Override
-			public void onReceive(Context c, Intent in) {	
-				if (in.getAction().equals(filterAction)){
-				if (D) Log.d(LOG_TAG, "onReceive");
-                Bundle data =  in.getExtras();
-                checkContext(data);
+			public void onReceive(Context c, Intent in) {
+				if (in.getAction().equals(filterAction)) {
+					if (D)
+						Log.d(LOG_TAG, "onReceive");
+					Bundle data = in.getExtras();
+					checkContext(data);
+				}
 			}
-            }			
 		};
 		context.registerReceiver(contextMonitor, new IntentFilter(filterAction));
 	}
-	
+
 	protected void checkContext(Bundle data) {
-		if (D) Log.d(LOG_TAG, "checkContext");
-		//check data		
-		//checkContextValue(data.toString());
-		//evaluate by firing off the rules
-		//set contextValue
-		//sendNotification
-//		if (data != null)
-//			contextValue = data.getString(monitoringKey);
-		//sendNotification();		
+		if (D)
+			Log.d(LOG_TAG, "checkContext");
+		// check data
+		// checkContextValue(data.toString());
+		// evaluate by firing off the rules
+		// set contextValue
+		// sendNotification
+		// if (data != null)
+		// contextValue = data.getString(monitoringKey);
+		// sendNotification();
 	}
-	
-//	public String getContextValue(){
-//		if (contextValue.equals("default"))
-//			contextValue = monitoringKey;
-//		return contextValue;
-//	}
-	
+
+	// public String getContextValue(){
+	// if (contextValue.equals("default"))
+	// contextValue = monitoringKey;
+	// return contextValue;
+	// }
+
 	public void stop() {
-		if (D) Log.d(LOG_TAG, "stop");
+		if (D)
+			Log.d(LOG_TAG, "stop");
 		context.unregisterReceiver(contextMonitor);
 	}
 }

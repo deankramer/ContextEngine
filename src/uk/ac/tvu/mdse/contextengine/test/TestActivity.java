@@ -67,15 +67,15 @@ public class TestActivity extends Activity {
 			try {
 
 				contextService = IContextsDefinition.Stub.asInterface(service);
-//				try {
-//
-////					contextService.newComposite("datasync_ON");
-////					contextService.registerComponent("datasync_ON",
-////							"lightlevelHIGH");
-//				} catch (RemoteException e) {
-//
-//					e.printStackTrace();
-//				}
+				// try {
+				//
+				// // contextService.newComposite("datasync_ON");
+				// // contextService.registerComponent("datasync_ON",
+				// // "lightlevelHIGH");
+				// } catch (RemoteException e) {
+				//
+				// e.printStackTrace();
+				// }
 
 			} catch (NotFoundException e) {
 
@@ -109,7 +109,7 @@ public class TestActivity extends Activity {
 		unbindService(mConnection);
 		mIsBound = false;
 	}
-	
+
 	@Override
 	public void onStop() {
 		super.onStop();
@@ -124,9 +124,9 @@ public class TestActivity extends Activity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {		
+	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuItem i = menu.add(1, 1, 1, "Preferences");
-		i.setIcon(android.R.drawable.ic_menu_preferences);		
+		i.setIcon(android.R.drawable.ic_menu_preferences);
 		return true;
 	}
 

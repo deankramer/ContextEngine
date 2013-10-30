@@ -29,118 +29,143 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 
-public class LocationServices implements LocationListener{
-	
-		private LocationManager locationManager;	
-		private String provider;		
-		private Location location;
-		
-		public static final String LOG_TAG = "LocationServices";
-		public static final boolean D = true;
-		
-		Context context;
+public class LocationServices implements LocationListener {
 
-		//	in real life you *DO NOT* want to do this, it may consume too many resources
-	    // (time less than 60000ms for minTime is NOT recommended, used only for testing)
-		private int minTime = 3000; //in milliseconds
-		private int minDistance = 1000; //in meters	
-		
-		private ArrayList<LocationContextTest> locationContexts = new ArrayList<LocationContextTest>();
+	private LocationManager locationManager;
+	private String provider;
+	private Location location;
 
-		public LocationServices(Context c) {
-			if (D) Log.d(LOG_TAG, "constructor");
-			this.context = c;
-			
-		    locationManager = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
-		    
-		    Criteria criteria = new Criteria();
-		    criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-		    criteria.setAltitudeRequired(false);
-		    criteria.setBearingRequired(false);
-		    criteria.setCostAllowed(true);
-		    criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+	public static final String LOG_TAG = "LocationServices";
+	public static final boolean D = true;
 
-		    provider = locationManager.getBestProvider(criteria, false);
-		    Log.v("LocationServices", "LocationServices3 "+provider.toString());
-		    
-		    if (provider != null && locationManager.isProviderEnabled(provider)) {
-		    	//set minTime(milliseconds) and minDistance(meters)
-			    locationManager.requestLocationUpdates(provider, minTime, minDistance, this);   
-				
-				location = locationManager.getLastKnownLocation(provider);
-				Log.v("constr-LocationServices", "Latitude= " + location.getLatitude() + " Longitude= " + location.getLongitude());
-				Log.v("LocationServices", "Location accuracy: " + location.getAccuracy());
-		    }
-		    else{
-		    	Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-	            c.startActivity(myIntent);
-		    }
-		}
-		
-		public void setUpdatesCriteria(int time, int distance){
-			if (D) Log.d(LOG_TAG, "setUpdatesCriteria");
-			if ((time<minTime)||(distance<minDistance)){
-				this.minTime = time;
-				this.minDistance = distance;
-				locationManager.removeUpdates(this);
-				locationManager.requestLocationUpdates(provider, minTime, minDistance, this); 
-			}
-		}
-		
-		public void addLocationContext(LocationContextTest locationContext){
-			if (D) Log.d(LOG_TAG, "addLocationContext");
-			locationContexts.add(locationContext);
-		}
-		
-		public Location getLocation(){
-			if (D) Log.d(LOG_TAG, "getLocation");
-			return location;
-		}
-		
-		public void onLocationChanged(Location locale) {
-			if (D) Log.d(LOG_TAG, "onLocationChanged");
-			for (LocationContextTest locationContext:locationContexts){
-				locationContext.onLocationChanged(locale);
-			}			
-			this.location = locale;
-		}
+	Context context;
 
-		public void onProviderDisabled(String prv) {			
-			if (D) Log.v(LOG_TAG, "Provider " + prv + " disabled");
-			
-			//if best provider disabled, make GPS default
-			provider = locationManager.GPS_PROVIDER;
-			
-			//check if GPS enabled, if not - ask for it
-			if(!locationManager.isProviderEnabled(provider)){
-				Intent gpsOptionsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            	context.startActivity(gpsOptionsIntent);
-			}
-		}
+	// in real life you *DO NOT* want to do this, it may consume too many
+	// resources
+	// (time less than 60000ms for minTime is NOT recommended, used only for
+	// testing)
+	private int minTime = 3000; // in milliseconds
+	private int minDistance = 1000; // in meters
 
-		public void onProviderEnabled(String prv) {
-			if (D) Log.v(LOG_TAG, "Provider " + prv + " enabled");
-			locationManager.removeUpdates(this);
-			locationManager.requestLocationUpdates(provider, minTime, minDistance, this);   
-			
+	private ArrayList<LocationContextTest> locationContexts = new ArrayList<LocationContextTest>();
+
+	public LocationServices(Context c) {
+		if (D)
+			Log.d(LOG_TAG, "constructor");
+		this.context = c;
+
+		locationManager = (LocationManager) c
+				.getSystemService(Context.LOCATION_SERVICE);
+
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+		criteria.setAltitudeRequired(false);
+		criteria.setBearingRequired(false);
+		criteria.setCostAllowed(true);
+		criteria.setPowerRequirement(Criteria.NO_REQUIREMENT);
+
+		provider = locationManager.getBestProvider(criteria, false);
+		Log.v("LocationServices", "LocationServices3 " + provider.toString());
+
+		if (provider != null && locationManager.isProviderEnabled(provider)) {
+			// set minTime(milliseconds) and minDistance(meters)
+			locationManager.requestLocationUpdates(provider, minTime,
+					minDistance, this);
+
 			location = locationManager.getLastKnownLocation(provider);
-			if (D) Log.v(LOG_TAG, "Latitude= " + location.getLatitude() + " Longitude= " + location.getLongitude());
-			if (D) Log.v(LOG_TAG, "Location accuracy: " + location.getAccuracy());
+			Log.v("constr-LocationServices",
+					"Latitude= " + location.getLatitude() + " Longitude= "
+							+ location.getLongitude());
+			Log.v("LocationServices",
+					"Location accuracy: " + location.getAccuracy());
+		} else {
+			Intent myIntent = new Intent(
+					Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+			c.startActivity(myIntent);
 		}
+	}
 
-		public void onStatusChanged(String prv, int stat, Bundle extras) {	
-			if (stat == 2){
-				locationManager.removeUpdates(this);
-				locationManager.requestLocationUpdates(provider, minTime, minDistance, this);   
-				
-				location = locationManager.getLastKnownLocation(provider);
-				if (D) Log.v(LOG_TAG, "Latitude= " + location.getLatitude() + " Longitude= " + location.getLongitude());
-				if (D) Log.v(LOG_TAG, "Location accuracy: " + location.getAccuracy());
-			}
-		}	
-		
-		public void stop() {
+	public void setUpdatesCriteria(int time, int distance) {
+		if (D)
+			Log.d(LOG_TAG, "setUpdatesCriteria");
+		if ((time < minTime) || (distance < minDistance)) {
+			this.minTime = time;
+			this.minDistance = distance;
 			locationManager.removeUpdates(this);
-			if (D) Log.v(LOG_TAG, "Stopping");
+			locationManager.requestLocationUpdates(provider, minTime,
+					minDistance, this);
 		}
+	}
+
+	public void addLocationContext(LocationContextTest locationContext) {
+		if (D)
+			Log.d(LOG_TAG, "addLocationContext");
+		locationContexts.add(locationContext);
+	}
+
+	public Location getLocation() {
+		if (D)
+			Log.d(LOG_TAG, "getLocation");
+		return location;
+	}
+
+	public void onLocationChanged(Location locale) {
+		if (D)
+			Log.d(LOG_TAG, "onLocationChanged");
+		for (LocationContextTest locationContext : locationContexts) {
+			locationContext.onLocationChanged(locale);
+		}
+		this.location = locale;
+	}
+
+	public void onProviderDisabled(String prv) {
+		if (D)
+			Log.v(LOG_TAG, "Provider " + prv + " disabled");
+
+		// if best provider disabled, make GPS default
+		provider = locationManager.GPS_PROVIDER;
+
+		// check if GPS enabled, if not - ask for it
+		if (!locationManager.isProviderEnabled(provider)) {
+			Intent gpsOptionsIntent = new Intent(
+					android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+			context.startActivity(gpsOptionsIntent);
+		}
+	}
+
+	public void onProviderEnabled(String prv) {
+		if (D)
+			Log.v(LOG_TAG, "Provider " + prv + " enabled");
+		locationManager.removeUpdates(this);
+		locationManager.requestLocationUpdates(provider, minTime, minDistance,
+				this);
+
+		location = locationManager.getLastKnownLocation(provider);
+		if (D)
+			Log.v(LOG_TAG, "Latitude= " + location.getLatitude()
+					+ " Longitude= " + location.getLongitude());
+		if (D)
+			Log.v(LOG_TAG, "Location accuracy: " + location.getAccuracy());
+	}
+
+	public void onStatusChanged(String prv, int stat, Bundle extras) {
+		if (stat == 2) {
+			locationManager.removeUpdates(this);
+			locationManager.requestLocationUpdates(provider, minTime,
+					minDistance, this);
+
+			location = locationManager.getLastKnownLocation(provider);
+			if (D)
+				Log.v(LOG_TAG, "Latitude= " + location.getLatitude()
+						+ " Longitude= " + location.getLongitude());
+			if (D)
+				Log.v(LOG_TAG, "Location accuracy: " + location.getAccuracy());
+		}
+	}
+
+	public void stop() {
+		locationManager.removeUpdates(this);
+		if (D)
+			Log.v(LOG_TAG, "Stopping");
+	}
 }

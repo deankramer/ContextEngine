@@ -30,34 +30,35 @@ public class TelephonyContext extends MonitorComponent {
 
 	public TelephonyContext(String name, Context c) {
 		super("TELEPHONY_CONNECTED", c, "android.net.conn.CONNECTIVITY_CHANGE");
-		//checkContext();
-		this.tm = (TelephonyManager) c.getSystemService(Context.TELEPHONY_SERVICE);
+		// checkContext();
+		this.tm = (TelephonyManager) c
+				.getSystemService(Context.TELEPHONY_SERVICE);
 	}
-	
-	protected void checkContext(Bundle data) {		
+
+	protected void checkContext(Bundle data) {
 		checkRoaming();
 		checkConnectionState();
 	}
 
 	private void checkConnectionState() {
 		int v = tm.getDataState();
-		if (v != connection){
-//			if(v == 2)
-				//sendNotification("telephonyConnectedON", true);
-//			else
-				//sendNotification("telephonyConnectedON", false);
+		if (v != connection) {
+			// if(v == 2)
+			// sendNotification("telephonyConnectedON", true);
+			// else
+			// sendNotification("telephonyConnectedON", false);
 			connection = v;
-		}		
+		}
 	}
 
 	private void checkRoaming() {
 		boolean r = tm.isNetworkRoaming();
-//		if (r && (!roaming)) {
-//			sendNotification("roamingON", true);
-//			roaming = true;
-//		} else if ((!r) && (roaming)) {
-//			sendNotification("roamingON", false);
-//			roaming = false;
-//		}
+		// if (r && (!roaming)) {
+		// sendNotification("roamingON", true);
+		// roaming = true;
+		// } else if ((!r) && (roaming)) {
+		// sendNotification("roamingON", false);
+		// roaming = false;
+		// }
 	}
 }

@@ -22,55 +22,55 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import uk.ac.tvu.mdse.contextengine.ContextEngine;
+import uk.ac.tvu.mdse.contextengine.ContextEngineCore;
 
 import android.util.Log;
 
-public class ParserHandler extends DefaultHandler{
-	
-	//Unique application indentifier
+public class ParserHandler extends DefaultHandler {
+
+	// Unique application indentifier
 	private static final String APP_ID = "AppKey";
-	//Root for all context definitions
+	// Root for all context definitions
 	private static final String CONTEXT_DEFINITION = "ContextDefinition";
-	//Context container
+	// Context container
 	private static final String CONTEXT = "Context";
-	//Name of Context
+	// Name of Context
 	private static final String CONTEXT_NAME = "ContextName";
-	//Context Values
+	// Context Values
 	private static final String CONTEXT_VALUE = "ContextValue";
-	//Specific Context Values, for example for comparing locations
+	// Specific Context Values, for example for comparing locations
 	private static final String SPECIFIC_CVALUE = "SpecificContextValue";
-	//Name of Specific Context Value
+	// Name of Specific Context Value
 	private static final String SPECIFIC_CNAME = "SpecificName";
-	//Numeric value, part of specific context values
+	// Numeric value, part of specific context values
 	private static final String NUMERIC_VALUE1 = "NumericValue1";
-	//Second Numeric value, part of specific context values
+	// Second Numeric value, part of specific context values
 	private static final String NUMERIC_VALUE2 = "NumericValue2";
-	//Context Range container
+	// Context Range container
 	private static final String CONTEXT_RANGE = "Range";
-	//Context Range Name
+	// Context Range Name
 	private static final String CONTEXT_RANGE_NAME = "RangeName";
-	//Minimum value in Context Range
+	// Minimum value in Context Range
 	private static final String RANGE_MIN_VALUE = "Min";
-	//Maximum value in Context Range
+	// Maximum value in Context Range
 	private static final String RANGE_MAX_VALUE = "Max";
-	//Specific Context Value
+	// Specific Context Value
 	private static final String SPECIFIC_CONTEXT_VALUE = "SpeicificContextValue";
-	//Numeric value 1 to describe Specific Context Value
+	// Numeric value 1 to describe Specific Context Value
 	private static final String NUMERIC_VALUE_1 = "NumericValue1";
-	//Numeric value 2 to describe Specific Context Value
+	// Numeric value 2 to describe Specific Context Value
 	private static final String NUMERIC_VALUE_2 = "NumericValue2";
-	//Composite Context container
+	// Composite Context container
 	private static final String COMPOSITE_CONTEXT = "CompositeContext";
-	//Context needed for the composite composition
+	// Context needed for the composite composition
 	private static final String CONTEXT_CHILD = "ContextChild";
-	//Value of the Child context
+	// Value of the Child context
 	private static final String CONTEXT_CHILD_VALUE = "ChildValue";
-	//The value of the composite if rule is currect
+	// The value of the composite if rule is currect
 	private static final String CONTEXT_PARENT_VALUE = "ParentValue";
-	//Composite Context Rule container
+	// Composite Context Rule container
 	private static final String COMPOSITE_RULE = "Rule";
-	
+
 	private String appid;
 	private String currentElementValue;
 	private String currentElement;
@@ -79,91 +79,90 @@ public class ParserHandler extends DefaultHandler{
 	private XMLRange range;
 	ArrayList<String> ruleCondition;
 	String ruleParentValue;
-	private ContextEngine ce;
-	
-	public boolean setContextEngine(ContextEngine aContextEngine){
-		if(aContextEngine instanceof ContextEngine){
-			this.ce = aContextEngine;
-			return true;
-		}
-		return false;
-		
+	private ContextEngineCore ce;
+
+	public boolean setContextEngine(ContextEngineCore contextEngineCore) {
+		this.ce = contextEngineCore;
+		return true;
 	}
-	
+
 	@Override
-    public void startDocument() throws SAXException{
+	public void startDocument() throws SAXException {
 		Log.v("ContextEngineParser", "Beginning XML Document");
-       
-    }
 
-    @Override
-    public void endDocument() throws SAXException{
-    	Log.v("ContextEngineParser", "Finished XML Document");
-    }
+	}
 
-    @Override
-    public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
-    	
-    	
-    	if(localName.equals(CONTEXT_RANGE))
-    		range = new XMLRange();
-    	if(localName.equals(SPECIFIC_CVALUE))
-    		scv = new XMLSCV();
-    
-    	currentElement = localName;
-    }
-    
-    @Override
-    public void endElement(String namespaceURI, String localName, String qName) throws SAXException{
-    	if(localName.equals(APP_ID))
-    		appid = currentElementValue;
-    	if(localName.equals(CONTEXT_DEFINITION))
-    		Log.v("ContextEngine", "End of Contexts");
-    	if(localName.equals(CONTEXT_NAME))
-    		ce.newComponent(currentElementValue);
-    	if(localName.equals(CONTEXT_RANGE_NAME))
-    		range.name = currentElementValue;
-    	if(localName.equals(RANGE_MAX_VALUE))
-    		range.max = currentElementValue;
-    	if(localName.equals(RANGE_MIN_VALUE))
-    		range.min = currentElementValue;
-    	if(localName.equals(CONTEXT_RANGE))
-    		ce.newRange(contextName, range.min, range.max, range.name);
-    	if(localName.equals(CONTEXT_CHILD))
-    		ce.addToCompositeM(currentElementValue, contextName);
-    	if(localName.equals(CONTEXT_CHILD_VALUE))
-    		ruleCondition.add(currentElementValue);
-    	if(localName.equals(CONTEXT_PARENT_VALUE))
-    		ruleParentValue = currentElementValue;
-    	if(localName.equals(COMPOSITE_RULE))
-    		ce.newRule(contextName, (String[]) ruleCondition.toArray(), ruleParentValue);
-    	if(localName.equals(COMPOSITE_CONTEXT))
-    		ce.compositeReady(contextName);
-    	if(localName.equals(SPECIFIC_CVALUE))
-    		ce.newSpecificContextValue(contextName, scv.name, scv.value1, scv.value2);
-    	if(localName.equals(SPECIFIC_CNAME))
-    		scv.name = currentElementValue;
-    	if(localName.equals(NUMERIC_VALUE1))
-    		scv.value1 = currentElementValue;
-    	if(localName.equals(NUMERIC_VALUE2))
-    		scv.value2 = currentElementValue;
-    	
-    }
-    
-    @Override
-    public void characters(char ch[], int start, int length){
-    		currentElementValue = new String(ch, start, length);
-    }
+	@Override
+	public void endDocument() throws SAXException {
+		Log.v("ContextEngineParser", "Finished XML Document");
+	}
 
-    static class XMLRange{
-    	String name;
-    	String min;
-    	String max;
-    }
-    
-    static class XMLSCV{
-    	String name;
-    	String value1;
-    	String value2;
-    }
+	@Override
+	public void startElement(String namespaceURI, String localName,
+			String qName, Attributes atts) throws SAXException {
+
+		if (localName.equals(CONTEXT_RANGE))
+			range = new XMLRange();
+		if (localName.equals(SPECIFIC_CVALUE))
+			scv = new XMLSCV();
+
+		currentElement = localName;
+	}
+
+	@Override
+	public void endElement(String namespaceURI, String localName, String qName)
+			throws SAXException {
+		if (localName.equals(APP_ID))
+			appid = currentElementValue;
+		if (localName.equals(CONTEXT_DEFINITION))
+			Log.v("ContextEngine", "End of Contexts");
+		if (localName.equals(CONTEXT_NAME))
+			ce.newComponent(appid, currentElementValue);
+		if (localName.equals(CONTEXT_RANGE_NAME))
+			range.name = currentElementValue;
+		if (localName.equals(RANGE_MAX_VALUE))
+			range.max = currentElementValue;
+		if (localName.equals(RANGE_MIN_VALUE))
+			range.min = currentElementValue;
+		if (localName.equals(CONTEXT_RANGE))
+			ce.newRange(appid, contextName, range.min, range.max, range.name);
+		if (localName.equals(CONTEXT_CHILD))
+			ce.addToCompositeM(appid, currentElementValue, contextName);
+		if (localName.equals(CONTEXT_CHILD_VALUE))
+			ruleCondition.add(currentElementValue);
+		if (localName.equals(CONTEXT_PARENT_VALUE))
+			ruleParentValue = currentElementValue;
+		if (localName.equals(COMPOSITE_RULE))
+			ce.newRule(contextName, (String[]) ruleCondition.toArray(),
+					ruleParentValue);
+		if (localName.equals(COMPOSITE_CONTEXT))
+			ce.compositeReady(contextName);
+		if (localName.equals(SPECIFIC_CVALUE))
+			ce.newSpecificContextValue(appid, contextName, scv.name,
+					scv.value1, scv.value2);
+		if (localName.equals(SPECIFIC_CNAME))
+			scv.name = currentElementValue;
+		if (localName.equals(NUMERIC_VALUE1))
+			scv.value1 = currentElementValue;
+		if (localName.equals(NUMERIC_VALUE2))
+			scv.value2 = currentElementValue;
+
+	}
+
+	@Override
+	public void characters(char ch[], int start, int length) {
+		currentElementValue = new String(ch, start, length);
+	}
+
+	static class XMLRange {
+		String name;
+		String min;
+		String max;
+	}
+
+	static class XMLSCV {
+		String name;
+		String value1;
+		String value2;
+	}
 }
