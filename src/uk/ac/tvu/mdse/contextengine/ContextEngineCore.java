@@ -62,9 +62,9 @@ import dalvik.system.DexClassLoader;
 
 public class ContextEngineCore {
 
-	private Context context;
-	private static final String LOG_TAG = "ContextEngine";
-	private static final boolean D = true;
+	protected Context context;
+	protected static final String LOG_TAG = "ContextEngine";
+	protected static final boolean D = true;
 	// public String USER_CLASSPATH = null;
 
 	private final HashMap<String, Component> activeContexts = new HashMap<String, Component>();
@@ -96,10 +96,10 @@ public class ContextEngineCore {
 	// public static final String DEFAULT_CLASSPATH =
 	// "uk.ac.uwl.mdse.adspl.contextengine.contexts.";
 
-	private BroadcastReceiver contextMonitor;
+	protected BroadcastReceiver contextMonitor;
 	private ContextEngineService ces = null;
 	private ContextDB contextDB;
-	private IntentFilter filter;
+	protected IntentFilter filter;
 	int mValue = 0;
 
 	// for notifications
@@ -374,7 +374,7 @@ public class ContextEngineCore {
 
 	}
 
-	private void setupContextMonitor() {
+	public void setupContextMonitor() {
 		Log.v("value", "add contextMonitor");
 		contextMonitor = new BroadcastReceiver() {
 			@Override
