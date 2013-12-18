@@ -1,5 +1,7 @@
 package uk.ac.tvu.mdse.contextengine;
 
+import java.util.List;
+
 import uk.ac.tvu.mdse.contextengine.IContextsDefinition;
 import android.app.Service;
 import android.content.Intent;
@@ -22,9 +24,32 @@ public class ContextEngineService extends Service {
 		if (IContextsDefinition.class.getName().equals(intent.getAction())) {
 			Log.d(LOG_TAG, "bind-contextsBinder");
 			return contextsBinder;
+		} else if (ISynchronousCommunication.class.equals(intent.getAction())) {
+			return syncontextsBinder;
 		}
 		return null;
 	}
+	
+	public final ISynchronousCommunication.Stub syncontextsBinder = new ISynchronousCommunication.Stub() {
+		
+		@Override
+		public String getContextValue(String componentName) throws RemoteException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public List<String> getContextList() throws RemoteException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public boolean isComponentDeployed(String appkey, String component)
+				throws RemoteException {
+			return cec.isComponentDeployed(appkey, component);
+		}
+	};
 
 	public final IContextsDefinition.Stub contextsBinder = new IContextsDefinition.Stub() {
 

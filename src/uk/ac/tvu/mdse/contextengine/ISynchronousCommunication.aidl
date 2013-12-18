@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 The Context Engine Project
+ * Copyright (C) 2014 The Context Engine Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,4 +22,5 @@ package uk.ac.tvu.mdse.contextengine;
 interface ISynchronousCommunication {
   List<String> getContextList();
   String getContextValue(in String componentName);
+  boolean isComponentDeployed(in String appkey, in String component); 
 }

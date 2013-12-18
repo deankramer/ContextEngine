@@ -32,6 +32,8 @@ public interface ContextDB {
 
 	boolean insertComponent(String packageName, String name, String owner,
 			int permission, String dex_file);
+	
+	boolean removeComponent(String name, String owner);
 
 	List<String> getLoadComponentInfo(String applicationId, String componentName);
 

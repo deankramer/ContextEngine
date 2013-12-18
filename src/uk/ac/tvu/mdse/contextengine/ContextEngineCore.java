@@ -125,6 +125,14 @@ public class ContextEngineCore {
 		// Log.e(LOG_TAG, e.getLocalizedMessage());
 		// }
 	}
+	
+	public boolean isComponentDeployed(String appkey, String componentname) {
+		List<String> component = contextDB.getLoadComponentInfo(appkey, componentname);
+		if (component != null)
+			return true;
+		else
+			return false;
+	}
 
 	public boolean newPreferenceComponent(String appKey, String preferenceName,
 			String preferenceType) {

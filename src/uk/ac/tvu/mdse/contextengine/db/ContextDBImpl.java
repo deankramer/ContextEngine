@@ -122,6 +122,26 @@ public class ContextDBImpl implements ContextDB {
 			return false;
 		}
 	}
+	
+	@Override
+	public boolean removeComponent(String name, String owner) {
+		try {
+			List<String> component = getLoadComponentInfo(owner, name);
+			if (component.size() == 0 || component == null) {
+				return false;
+			} else {
+				SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
+				
+				sqlite.delete(CONTEXTTABLE, "name = ?", new String[] {name});
+				return true;
+			}
+				
+		} catch(Exception sqlerror) {
+			Log.e("Error" , sqlerror.getMessage());
+			return false;
+		}
+		
+	}
 
 	@Override
 	public String getPackageName(String componentName) {
@@ -203,5 +223,7 @@ public class ContextDBImpl implements ContextDB {
 
 		return contexts;
 	}
+
+	
 
 }
