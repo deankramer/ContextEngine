@@ -130,10 +130,12 @@ public class ContextDBImpl implements ContextDB {
 			if (component.size() == 0 || component == null) {
 				return false;
 			} else {
-				SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
-				
-				sqlite.delete(CONTEXTTABLE, "name = ?", new String[] {name});
-				return true;
+				if (component.get(2).equalsIgnoreCase(owner)) {
+					SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
+					sqlite.delete(CONTEXTTABLE, "name = ?", new String[] {name});
+					return true;
+				}
+				return false;
 			}
 				
 		} catch(Exception sqlerror) {
@@ -179,13 +181,19 @@ public class ContextDBImpl implements ContextDB {
 
 			int numRows = crsr.getCount();
 			if (numRows > 0) {
-				if (crsr.getString(2).equalsIgnoreCase(applicationId)) {
+				String owner = crsr.getString(2);
+				int permission = crsr.getInt(3);
+				if (owner.equalsIgnoreCase(applicationId)) {
 					returnValues.add(crsr.getString(0));
 					returnValues.add(crsr.getString(1));
+					returnValues.add(owner);
+					returnValues.add(String.valueOf(permission));
 				} else {
-					if (crsr.getInt(3) == 0) {
+					if (permission == 0) {
 						returnValues.add(crsr.getString(0));
 						returnValues.add(crsr.getString(1));
+						returnValues.add(owner);
+						returnValues.add(String.valueOf(permission));
 					}
 				}
 
