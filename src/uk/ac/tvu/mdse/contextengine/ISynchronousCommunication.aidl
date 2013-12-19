@@ -20,7 +20,7 @@ package uk.ac.tvu.mdse.contextengine;
 // Deals with synchronous communication
 
 interface ISynchronousCommunication {
-  List<String> getContextList();
-  String getContextValue(in String componentName);
+  List<String> getContextList(in String appkey);
+  String getContextValue(in String appkey, in String componentName);
   boolean isComponentDeployed(in String appkey, in String component); 
 }

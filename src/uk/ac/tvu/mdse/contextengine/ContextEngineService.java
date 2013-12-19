@@ -33,15 +33,13 @@ public class ContextEngineService extends Service {
 	public final ISynchronousCommunication.Stub syncontextsBinder = new ISynchronousCommunication.Stub() {
 		
 		@Override
-		public String getContextValue(String componentName) throws RemoteException {
-			// TODO Auto-generated method stub
-			return null;
+		public String getContextValue(String appkey, String componentName) throws RemoteException {
+			return cec.getContextValue(appkey, componentName);
 		}
 		
 		@Override
-		public List<String> getContextList() throws RemoteException {
-			// TODO Auto-generated method stub
-			return null;
+		public List<String> getContextList(String appkey) throws RemoteException {
+			return cec.getContextList(appkey);
 		}
 		
 		@Override

@@ -126,6 +126,21 @@ public class ContextEngineCore {
 		// }
 	}
 	
+	public List<String> getContextList(String appkey) {
+		return contextDB.getUsableContextList(appkey);
+	}
+	
+	public String getContextValue(String appkey, String componentname) {
+		
+		Component context = this.activeContexts.get(componentname);
+		
+		if (context != null) {
+			return context.getContextInformation(appkey);
+		}
+		
+		return "";
+	}
+	
 	public boolean isComponentDeployed(String appkey, String componentname) {
 		List<String> component = contextDB.getLoadComponentInfo(appkey, componentname);
 		if (component != null)
