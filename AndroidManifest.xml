@@ -23,7 +23,7 @@
         </receiver>
          
         </activity>
-        <service android:name="ContextEngine">
+        <service android:name="uk.ac.tvu.mdse.contextengine.ContextEngineService">
             <intent-filter>
                 <action android:name="uk.ac.tvu.mdse.contextengine.IContextsDefinition"></action>
                 <action android:name="uk.ac.tvu.mdse.contextengine.ISynchronousCommunication"></action>
